@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowBnb - Detalhes do Imóvel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar / Menu Lateral -->
+        <div class="bg-blue-900 text-white w-64 flex-shrink-0">
+            <div class="p-4 text-center">
+                <img src="https://i.imgur.com/YOUR_LOGO_URL.png" alt="FlowBnb Logo" class="mx-auto h-12 mb-2">
+                <h2 class="text-xl font-semibold">FlowBnb</h2>
+                <p class="text-sm opacity-75">Gestão Financeira</p>
+            </div>
+            
+            <nav class="mt-8">
+                <a href="dashboard.html" class="flex items-center px-4 py-3 hover:bg-blue-800 text-white">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 bg-blue-800 text-white">
+                    <i class="fas fa-home mr-3"></i>
+                    <span>Imóveis</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 hover:bg-blue-800 text-white">
+                    <i class="fas fa-money-bill-wave mr-3"></i>
+                    <span>Transações</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 hover:bg-blue-800 text-white">
+                    <i class="fas fa-chart-line mr-3"></i>
+                    <span>Relatórios</span>
+                </a>
+            </nav>
+            
+            <div class="absolute bottom-0 w-64 p-4">
+                <a href="#" id="logoutBtn" class="flex items-center text-white opacity-75 hover:opacity-100">
+                    <i class="fas fa-sign-out-alt mr-3"></i>
+                    <span>Sair</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Conteúdo Principal -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header / Cabeçalho -->
+            <header class="bg-white shadow-sm">
+                <div class="px-4 py-3 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <a href="dashboard.html" class="text-gray-500 mr-3">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 class="text-xl font-semibold text-gray-800" id="propertyName">Detalhes do Imóvel</h1>
+                    </div>
+                    <div class="flex items-center">
+                        <button id="editPropertyBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm mr-3">
+                            <i class="fas fa-edit mr-2"></i>Editar
+                        </button>
+                        <div class="relative">
+                            <button id="userMenuBtn" class="flex items-center focus:outline-none">
+                                <span class="mr-2 text-sm font-medium text-gray-700" id="userName">Usuário</span>
+                                <img class="h-8 w-8 rounded-full bg-gray-300" src="https://via.placeholder.com/32" alt="Avatar">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Conteúdo Principal -->
+            <main class="flex-1 overflow-auto bg-gray-100 p-4">
+                <!-- Detalhes do Imóvel -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+                    <div class="h-64 bg-gray-200 relative">
+                        <img id="propertyImage" src="https://via.placeholder.com/1200x400" alt="Imóvel" class="w-full h-full object-cover">
+                        <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-2 py-1 m-2 rounded" id="propertyStatus">
+                            Ativo
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex flex-wrap justify-between items-start mb-6">
+                            <div class="w-full md:w-1/2 mb-4 md:mb-0">
+                                <h2 id="propertyDetailName" class="text-2xl font-bold text-gray-800 mb-2">Nome do Imóvel</h2>
+                                <p id="propertyAddress" class="text-gray-600 mb-4">
+                                    <i class="fas fa-map-marker-alt mr-2"></i> Endereço Completo, Cidade, Estado
+                                </p>
+                                <div class="flex items-center">
+                                    <span id="propertyCreatedAt" class="text-sm text-gray-500">Cadastrado em: 01/01/2025</span>
+                                </div>
+                            </div>
+                            <div class="w-full md:w-1/2 md:text-right">
+                                <div class="flex flex-col md:items-end">
+                                    <div class="mb-4">
+                                        <select id="periodFilter" class="border rounded px-3 py-2 text-sm">
+                                            <option value="all">Todos os períodos</option>
+                                            <option value="current_month">Mês atual</option>
+                                            <option value="last_month">Mês anterior</option>
+                                            <option value="current_year">Ano atual</option>
+                                            <option value="custom">Período personalizado</option>
+                                        </select>
+                                    </div>
+                                    <div id="customPeriod" class="flex items-center gap-2 hidden">
+                                        <input type="date" id="startDate" class="border rounded px-3 py-1 text-sm">
+                                        <span>até</span>
+                                        <input type="date" id="endDate" class="border rounded px-3 py-1 text-sm">
+                                        <button id="applyFilter" class="bg-blue-600 text-white px-2 py-1 rounded text-sm">
+                                            <i class="fas fa-filter"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Resumo Financeiro -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-green-100 rounded-full p-3 mr-4">
+                                        <i class="fas fa-money-bill-wave text-green-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-500 text-sm">Receita Total</p>
+                                        <h3 class="text-2xl font-bold text-gray-800" id="propertyTotalRevenue">R$ 0,00</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-red-100 rounded-full p-3 mr-4">
+                                        <i class="fas fa-hand-holding-usd text-red-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-500 text-sm">Despesa Total</p>
+                                        <h3 class="text-2xl font-bold text-gray-800" id="propertyTotalExpenses">R$ 0,00</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-blue-100 rounded-full p-3 mr-4">
+                                        <i class="fas fa-chart-line text-blue-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-500 text-sm">Lucro Líquido</p>
+                                        <h3 class="text-2xl font-bold text-gray-800" id="propertyTotalProfit">R$ 0,00</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Ações Rápidas -->
+                        <div class="flex flex-wrap gap-3 mb-6">
+                            <button id="addTransactionPropertyBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm flex items-center">
+                                <i class="fas fa-plus mr-2"></i>Nova Transação
+                            </button>
+                            <button id="sharePropertyBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm flex items-center">
+                                <i class="fas fa-share-alt mr-2"></i>Compartilhar
+                            </button>
+                            <button id="exportPropertyBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm flex items-center">
+                                <i class="fas fa-file-export mr-2"></i>Exportar Dados
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Transações do Imóvel -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h2 class="text-lg font-semibold text-gray-800">Histórico de Transações</h2>
+                        <div class="flex items-center">
+                            <input type="text" id="transactionSearch" placeholder="Buscar transação..." class="border rounded-md px-3 py-1 text-sm mr-2">
+                            <select id="transactionTypeFilter" class="border rounded-md px-3 py-1 text-sm">
+                                <option value="all">Todos os tipos</option>
+                                <option value="income">Receitas</option>
+                                <option value="expense">Despesas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="propertyTransactions" class="bg-white divide-y divide-gray-200">
+                                <!-- As transações serão inseridas aqui via JavaScript -->
+                                
+                                <!-- Exemplo de transação -->
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">15/04/2025</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Pagamento de aluguel - Abril</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            Receita
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">+ R$ 2.500,00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="text-blue-600 hover:text-blue-800 mr-3">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="text-red-600 hover:text-red-800">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">10/04/2025</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Manutenção do ar-condicionado</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            Despesa
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600">- R$ 350,00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="text-blue-600 hover:text-blue-800 mr-3">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="text-red-600 hover:text-red-800">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-4 py-3 bg-gray-50 text-right">
+                        <button id="loadMoreTransactions" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            Carregar mais transações
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modal Editar Imóvel -->
+    <div id="editPropertyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Editar Imóvel</h2>
+                <button id="closeEditPropertyModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editPropertyForm">
+                <input type="hidden" id="editPropertyId">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="editPropertyName">
+                        Nome do Imóvel
+                    </label>
+                    <input type="text" id="editPropertyName" class="w-full px-3 py-2 border rounded-md" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="editPropertyAddress">
+                        Endereço
+                    </label>
+                    <input type="text" id="editPropertyAddress" class="w-full px-3 py-2 border rounded-md" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="editPropertyCity">
+                        Cidade
+                    </label>
+                    <input type="text" id="editPropertyCity" class="w-full px-3 py-2 border rounded-md" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="editPropertyState">
+                        Estado
+                    </label>
+                    <input type="text" id="editPropertyState" class="w-full px-3 py-2 border rounded-md" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="editPropertyImage">
+                        URL da Imagem
+                    </label>
+                    <input type="text" id="editPropertyImage" class="w-full px-3 py-2 border rounded-md">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="editPropertyStatus">
+                        Status
+                    </label>
+                    <select id="editPropertyStatus" class="w-full px-3 py-2 border rounded-md" required>
+                        <option value="active">Ativo</option>
+                        <option value="inactive">Inativo</option>
+                    </select>
+                </div>
+                <div class="flex justify-between">
+                    <button type="button" id="deleteProperty" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
+                        Excluir
+                    </button>
+                    <div>
+                        <button type="button" id="cancelEditProperty" class="px-4 py-2 text-gray-600 mr-2">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            Salvar Alterações
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal Adicionar Transação -->
+    <div id="addTransactionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Adicionar Nova Transação</h2>
+                <button id="closeAddTransactionModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addTransactionForm">
+                <input type="hidden" id="transactionPropertyId">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="transactionDate">
+                        Data
+                    </label>
+                    <input type="date" id="transactionDate" class="w-full px-3 py-2 border rounded-md" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="transactionType">
+                        Tipo
+                    </label>
+                    <select id="transactionType" class="w-full px-3 py-2 border rounded-md" required>
+                        <option value="income">Receita</option>
+                        <option value="expense">Despesa</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="transactionCategory">
+                        Categoria
+                    </label>
+                    <select id="transactionCategory" class="w-full px-3 py-2 border rounded-md" required>
+                        <option value="">Selecione uma categoria</option>
+                        <!-- Categorias para Receitas -->
+                        <optgroup label="Receitas" id="incomeCategories">
+                            <option value="rent">Aluguel</option>
+                            <option value="service">Serviços adicionais</option>
+                            <option value="deposit">Depósito/Caução</option>
+                            <option value="other_income">Outras receitas</option>
+                        </optgroup>
+                        <!-- Categorias para Despesas -->
+                        <optgroup label="Despesas" id="expenseCategories">
+                            <option value="maintenance">Manutenção</option>
+                            <option value="cleaning">Limpeza</option>
+                            <option value="utilities">Contas (água, luz, etc)</option>
+                            <option value="internet">Internet/TV</option>
+                            <option value="tax">Impostos</option>
+                            <option value="insurance">Seguro</option>
+                            <option value="supplies">Suprimentos</option>
+                            <option value="other_expense">Outras despesas</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="transactionAmount">
+                        Valor (R$)
+                    </label>
+                    <input type="number" step="0.01" min="0.01" id="transactionAmount" class="w-full px-3 py-2 border rounded-md" placeholder="Ex: 1500.00" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="transactionDescription">
+                        Descrição
+                    </label>
+                    <textarea id="transactionDescription" class="w-full px-3 py-2 border rounded-md" rows="2" placeholder="Ex: Pagamento de aluguel referente ao mês de abril" required></textarea>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="cancelAddTransaction" class="px-4 py-2 text-gray-600 mr-2">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                        Adicionar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts do Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Scripts da aplicação -->
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/properties.js"></script>
+    <script src="../js/transactions.js"></script>
+    <script src="../js/property-details.js"></script>
+</body>
+</html>
