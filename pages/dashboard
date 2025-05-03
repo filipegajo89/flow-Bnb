@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowBnb - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar / Menu Lateral -->
+        <div class="bg-blue-900 text-white w-64 flex-shrink-0">
+            <div class="p-4 text-center">
+                <img src="https://i.imgur.com/YOUR_LOGO_URL.png" alt="FlowBnb Logo" class="mx-auto h-12 mb-2">
+                <h2 class="text-xl font-semibold">FlowBnb</h2>
+                <p class="text-sm opacity-75">Gestão Financeira</p>
+            </div>
+            
+            <nav class="mt-8">
+                <a href="#" class="flex items-center px-4 py-3 bg-blue-800 text-white">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 hover:bg-blue-800 text-white">
+                    <i class="fas fa-home mr-3"></i>
+                    <span>Imóveis</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 hover:bg-blue-800 text-white">
+                    <i class="fas fa-money-bill-wave mr-3"></i>
+                    <span>Transações</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 hover:bg-blue-800 text-white">
+                    <i class="fas fa-chart-line mr-3"></i>
+                    <span>Relatórios</span>
+                </a>
+            </nav>
+            
+            <div class="absolute bottom-0 w-64 p-4">
+                <a href="#" id="logoutBtn" class="flex items-center text-white opacity-75 hover:opacity-100">
+                    <i class="fas fa-sign-out-alt mr-3"></i>
+                    <span>Sair</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Conteúdo Principal -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header / Cabeçalho -->
+            <header class="bg-white shadow-sm">
+                <div class="px-4 py-3 flex justify-between items-center">
+                    <h1 class="text-xl font-semibold text-gray-800">Dashboard</h1>
+                    <div class="flex items-center">
+                        <button id="addPropertyBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm mr-3">
+                            <i class="fas fa-plus mr-2"></i>Novo Imóvel
+                        </button>
+                        <div class="relative">
+                            <button id="userMenuBtn" class="flex items-center focus:outline-none">
+                                <span class="mr-2 text-sm font-medium text-gray-700" id="userName">Usuário</span>
+                                <img class="h-8 w-8 rounded-full bg-gray-300" src="https://via.placeholder.com/32" alt="Avatar">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Conteúdo Principal -->
+            <main class="flex-1 overflow-auto bg-gray-100 p-4">
+                <!-- Resumo Geral -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-green-100 rounded-full p-3 mr-4">
+                                <i class="fas fa-money-bill-wave text-green-500 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Receita Total</p>
+                                <h3 class="text-2xl font-bold text-gray-800" id="totalRevenue">R$ 0,00</h3>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-red-100 rounded-full p-3 mr-4">
+                                <i class="fas fa-hand-holding-usd text-red-500 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Despesa Total</p>
+                                <h3 class="text-2xl font-bold text-gray-800" id="totalExpenses">R$ 0,00</h3>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-blue-100 rounded-full p-3 mr-4">
+                                <i class="fas fa-chart-line text-blue-500 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Lucro Líquido</p>
+                                <h3 class="text-2xl font-bold text-gray-800" id="totalProfit">R$ 0,00</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lista de Imóveis -->
+                <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h2 class="text-lg font-semibold text-gray-800">Seus Imóveis</h2>
+                        <select id="monthFilter" class="border rounded px-3 py-1 text-sm">
+                            <option value="all">Todos os meses</option>
+                            <option value="1">Janeiro</option>
+                            <option value="2">Fevereiro</option>
+                            <option value="3">Março</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Maio</option>
+                            <option value="6">Junho</option>
+                            <option value="7">Julho</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Setembro</option>
+                            <option value="10">Outubro</option>
+                            <option value="11">Novembro</option>
+                            <option value="12">Dezembro</option>
+                        </select>
+                    </div>
+                    
+                    <div id="propertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                        <!-- Os cards de imóveis serão inseridos aqui via JavaScript -->
+                        
+                        <!-- Exemplo de card de propriedade -->
+                        <div class="property-card bg-white border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                            <div class="h-40 bg-gray-200 relative">
+                                <img src="https://via.placeholder.com/300x160" alt="Propriedade" class="w-full h-full object-cover">
+                                <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-2 py-1 m-2 rounded">
+                                    Ativo
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-lg mb-1">Apartamento Centro</h3>
+                                <p class="text-gray-600 text-sm mb-3">
+                                    <i class="fas fa-map-marker-alt mr-1"></i> Rio de Janeiro, RJ
+                                </p>
+                                <div class="flex justify-between items-center mb-3">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Rendimento</p>
+                                        <p class="font-bold text-green-600">+ R$ 2.500,00</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm text-gray-500">Despesas</p>
+                                        <p class="font-bold text-red-600">- R$ 800,00</p>
+                                    </div>
+                                </div>
+                                <div class="pt-3 border-t">
+                                    <p class="text-sm text-gray-500">Lucro Líquido</p>
+                                    <p class="font-bold text-blue-600">R$ 1.700,00</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-4 py-3 flex justify-between">
+                                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    Ver Detalhes
+                                </button>
+                                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    <i class="fas fa-plus mr-1"></i> Transação
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Histórico de Transações Recentes -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b">
+                        <h2 class="text-lg font-semibold text-gray-800">Transações Recentes</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imóvel</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentTransactions" class="bg-white divide-y divide-gray-200">
+                                <!-- As transações serão inseridas aqui via JavaScript -->
+                                
+                                <!-- Exemplo de transação -->
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">15/04/2025</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Apartamento Centro</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Pagamento de aluguel - Abril</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            Receita
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">+ R$ 2.500,00</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">10/04/2025</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Casa Praia</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Manutenção do ar-condicionado</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            Despesa
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600">- R$ 350,00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modal Adicionar Imóvel -->
+    <div id="addPropertyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Adicionar Novo Imóvel</h2>
+                <button id="closeAddPropertyModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addPropertyForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyName">
+                        Nome do Imóvel
+                    </label>
+                    <input type="text" id="propertyName" class="w-full px-3 py-2 border rounded-md" placeholder="Ex: Apartamento Centro" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyAddress">
+                        Endereço
+                    </label>
+                    <input type="text" id="propertyAddress" class="w-full px-3 py-2 border rounded-md" placeholder="Ex: Av. Atlântica, 1500" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyCity">
+                        Cidade
+                    </label>
+                    <input type="text" id="propertyCity" class="w-full px-3 py-2 border rounded-md" placeholder="Ex: Rio de Janeiro" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyState">
+                        Estado
+                    </label>
+                    <input type="text" id="propertyState" class="w-full px-3 py-2 border rounded-md" placeholder="Ex: RJ" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyImage">
+                        URL da Imagem (opcional)
+                    </label>
+                    <input type="text" id="propertyImage" class="w-full px-3 py-2 border rounded-md" placeholder="Ex: https://exemplo.com/imagem.jpg">
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="cancelAddProperty" class="px-4 py-2 text-gray-600 mr-2">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                        Adicionar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Transação -->
+    <div id="addTransactionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Adicionar Nova Transação</h2>
+                <button id="closeAddTransactionModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addTransactionForm">
+                <input type="hidden" id="transactionPropertyId">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="transactionDate">
+                        Data
+                    </label>
+                    <input type="date" id="transactionDate" class="w-full px-3 py-2 border rounded-md" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="transactionType">
+                        Tipo
+                    </label>
+                    <select id="transactionType" class="w-full px-3 py-2 border rounded-md" required>
+                        <option value="income">Receita</option>
+                        <option value="expense">Despesa</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="transactionCategory">
+                        Categoria
+                    </label>
+                    <select id="transactionCategory" class="w-full px-3 py-2 border rounded-md" required>
+                        <option value="">Selecione uma categoria</option>
+                        <!-- Categorias para Receitas -->
+                        <optgroup label="Receitas" id="incomeCategories">
+                            <option value="rent">Aluguel</option>
+                            <option value="service">Serviços adicionais</option>
+                            <option value="deposit">Depósito/Caução</option>
+                            <option value="other_income">Outras receitas</option>
+                        </optgroup>
+                        <!-- Categorias para Despesas -->
+                        <optgroup label="Despesas" id="expenseCategories">
+                            <option value="maintenance">Manutenção</option>
+                            <option value="cleaning">Limpeza</option>
+                            <option value="utilities">Contas (água, luz, etc)</option>
+                            <option value="internet">Internet/TV</option>
+                            <option value="tax">Impostos</option>
+                            <option value="insurance">Seguro</option>
+                            <option value="supplies">Suprimentos</option>
+                            <option value="other_expense">Outras despesas</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="transactionAmount">
+                        Valor (R$)
+                    </label>
+                    <input type="number" step="0.01" min="0.01" id="transactionAmount" class="w-full px-3 py-2 border rounded-md" placeholder="Ex: 1500.00" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="transactionDescription">
+                        Descrição
+                    </label>
+                    <textarea id="transactionDescription" class="w-full px-3 py-2 border rounded-md" rows="2" placeholder="Ex: Pagamento de aluguel referente ao mês de abril" required></textarea>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="cancelAddTransaction" class="px-4 py-2 text-gray-600 mr-2">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                        Adicionar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts do Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Scripts da aplicação -->
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/properties.js"></script>
+    <script src="../js/transactions.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>
