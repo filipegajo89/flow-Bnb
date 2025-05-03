@@ -1,6 +1,6 @@
 // Configuração do Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDqv5HcYLf8PWLx57qB8TuB3RJUxD3-gDg",
+  apiKey: "-",
   authDomain: "flowbnb-86591.firebaseapp.com",
   projectId: "flowbnb-86591",
   storageBucket: "flowbnb-86591.firebasestorage.app",
