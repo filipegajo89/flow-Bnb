@@ -1,11 +1,11 @@
 // Configuração do Firebase
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "flowbnb-app.firebaseapp.com",
-  projectId: "flowbnb-app",
-  storageBucket: "flowbnb-app.appspot.com",
-  messagingSenderId: "SUA_MESSAGING_SENDER_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyDqv5HcYLf8PWLx57qB8TuB3RJUxD3-gDg",
+  authDomain: "flowbnb-86591.firebaseapp.com",
+  projectId: "flowbnb-86591",
+  storageBucket: "flowbnb-86591.firebasestorage.app",
+  messagingSenderId: "417382171684",
+  appId: "1:417382171684:web:f1b19bc1ec07cc4302c4b1"
 };
 
 // Inicializar Firebase
