@@ -1,0 +1,106 @@
+/* Estilos Personalizados para FlowBnb */
+
+/* Cores personalizadas */
+:root {
+  --primary-blue: #0a3d62;
+  --accent-green: #10ac84;
+  --accent-red: #ee5253;
+  --accent-blue: #1e90ff;
+  --light-gray: #f5f6fa;
+  --dark-gray: #57606f;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+/* Efeitos de hover e transições */
+.hover-shadow:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Cards de imóveis */
+.property-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.property-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Animações para modais */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-container {
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  animation: slideUp 0.3s ease;
+}
+
+/* Classes de status */
+.status-active {
+  background-color: var(--accent-green);
+  color: white;
+}
+
+.status-inactive {
+  background-color: var(--dark-gray);
+  color: white;
+}
+
+/* Estilos dos valores financeiros */
+.value-positive {
+  color: var(--accent-green);
+  font-weight: bold;
+}
+
+.value-negative {
+  color: var(--accent-red);
+  font-weight: bold;
+}
+
+/* Barra de carregamento */
+.loading-bar {
+  height: 3px;
+  background: linear-gradient(to right, var(--accent-blue), var(--accent-green));
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  animation: loadingAnimation 1.5s infinite ease-in-out;
+}
+
+@keyframes loadingAnimation {
+  0% { width: 0%; left: 0; }
+  50% { width: 70%; left: 15%; }
+  100% { width: 0%; left: 100%; }
+}
+
+/* Estilos para dispositivos móveis */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    height: auto;
+    z-index: 100;
+  }
+  
+  .content-area {
+    margin-left: 0;
+    margin-bottom: 60px;
+  }
+}
