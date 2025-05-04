@@ -1,71 +1,77 @@
 // Funções de autenticação de usuários
 console.log('Arquivo auth.js carregado');
 
+// Flag para controlar redirecionamentos e evitar loops
+let isRedirecting = false;
+let manualLoginAttempt = false;
+
 // Helper para determinar caminhos
-const pathHelper = {
-  isLoginPage: function() {
-    const path = window.location.pathname;
-    return path.endsWith('/index.html') || path === '/' || path.endsWith('/');
-  },
-  
-  getDashboardPath: function() {
-    // Ajusta o caminho baseado na estrutura do projeto
-    if (window.location.hostname.includes('github.io')) {
-      // Se estiver no GitHub Pages
-      return './pages/dashboard.html';
-    } else {
-      // Se estiver em ambiente local ou outro
-      return './pages/dashboard.html';
-    }
-  },
-  
-  getLoginPath: function() {
-    // Ajusta o caminho baseado na estrutura do projeto
-    if (window.location.pathname.includes('/pages/')) {
-      return '../index.html';
-    } else {
-      return './index.html';
-    }
+const getRelativePath = (path) => {
+  // Se estiver no GitHub Pages, ajusta o caminho
+  if (window.location.hostname.includes('github.io')) {
+    return './' + path;
+  } else {
+    return path;
   }
 };
 
-// Flag para controlar redirecionamentos
-let isRedirecting = false;
-
 // Verificar estado de autenticação
 auth.onAuthStateChanged(user => {
+  console.log('Estado de autenticação alterado:', user ? 'Usuário logado' : 'Usuário não logado');
+  
   // Evitar múltiplos redirecionamentos
-  if (isRedirecting) return;
+  if (isRedirecting) {
+    console.log('Redirecionamento já em andamento, ignorando verificação');
+    return;
+  }
+  
+  // Verificar se está na página de login
+  const isLoginPage = window.location.pathname.includes('index.html') || 
+                      window.location.pathname === '/' || 
+                      window.location.pathname.endsWith('/');
   
   if (user) {
     // Usuário logado
-    console.log('Usuário logado:', user.email);
+    console.log('Usuário autenticado:', user.email);
     
-    // Apenas redirecionar se estiver na página de login e o usuário fez login manualmente
-    if (pathHelper.isLoginPage() && sessionStorage.getItem('login_attempt') === 'true') {
-      console.log('Redirecionando para dashboard após login...');
+    // Apenas redirecionar se estiver na página de login e for um login manual
+    if (isLoginPage && manualLoginAttempt) {
+      console.log('Login manual detectado, redirecionando para dashboard');
       isRedirecting = true;
-      sessionStorage.removeItem('login_attempt');
-      window.location.href = pathHelper.getDashboardPath();
+      manualLoginAttempt = false;
+      
+      // Redirecionar para o dashboard
+      const dashboardPath = getRelativePath('pages/dashboard.html');
+      console.log('Redirecionando para:', dashboardPath);
+      window.location.href = dashboardPath;
       return;
     }
     
     // Atualizar UI com informações do usuário logado
-    if (document.getElementById('userName')) {
-      document.getElementById('userName').textContent = user.email;
+    const userNameElement = document.getElementById('userName');
+    if (userNameElement) {
+      userNameElement.textContent = user.email;
     }
     
     // Carregar dados do usuário
     loadUserData(user.uid);
   } else {
     // Usuário não logado
-    console.log('Usuário não logado');
+    console.log('Nenhum usuário autenticado');
     
-    // Se estiver em página que requer autenticação, redirecionar para login
-    if (!pathHelper.isLoginPage()) {
-      console.log('Redirecionando para login...');
+    // Se estiver em página protegida, redirecionar para login
+    if (!isLoginPage) {
+      console.log('Acesso a página protegida sem autenticação, redirecionando para login');
       isRedirecting = true;
-      window.location.href = pathHelper.getLoginPath();
+      
+      // Determinar o caminho correto para a página de login
+      let loginPath = '../index.html';
+      if (window.location.pathname.includes('property-details')) {
+        loginPath = '../index.html';
+      }
+      
+      console.log('Redirecionando para:', loginPath);
+      window.location.href = loginPath;
       return;
     }
   }
@@ -74,9 +80,7 @@ auth.onAuthStateChanged(user => {
 // Função de login
 const login = (email, password) => {
   console.log('Tentando login com:', email);
-  
-  // Marcar que houve uma tentativa de login manual
-  sessionStorage.setItem('login_attempt', 'true');
+  manualLoginAttempt = true;
   
   return auth.signInWithEmailAndPassword(email, password)
     .then(userCredential => {
@@ -85,8 +89,8 @@ const login = (email, password) => {
     })
     .catch(error => {
       console.error('Erro no login:', error);
+      manualLoginAttempt = false;
       alert('Erro no login: ' + error.message);
-      sessionStorage.removeItem('login_attempt');
       throw error;
     });
 };
@@ -94,13 +98,12 @@ const login = (email, password) => {
 // Função de registro de novo usuário
 const register = (email, password) => {
   console.log('Tentando registrar:', email);
-  
-  // Marcar que houve uma tentativa de registro
-  sessionStorage.setItem('login_attempt', 'true');
+  manualLoginAttempt = true;
   
   return auth.createUserWithEmailAndPassword(email, password)
     .then(cred => {
       console.log('Registro bem-sucedido:', cred.user.email);
+      
       // Criar documento do usuário no Firestore
       return db.collection('users').doc(cred.user.uid).set({
         email: email,
@@ -109,8 +112,8 @@ const register = (email, password) => {
     })
     .catch(error => {
       console.error('Erro no registro:', error);
+      manualLoginAttempt = false;
       alert('Erro no registro: ' + error.message);
-      sessionStorage.removeItem('login_attempt');
       throw error;
     });
 };
@@ -119,8 +122,10 @@ const register = (email, password) => {
 const logout = () => {
   return auth.signOut()
     .then(() => {
-      console.log('Usuário deslogado');
-      window.location.href = pathHelper.getLoginPath();
+      console.log('Usuário deslogado com sucesso');
+      
+      // Redirecionar para a página de login após logout
+      window.location.href = '../index.html';
     })
     .catch(error => {
       console.error('Erro no logout:', error);
@@ -134,7 +139,7 @@ const loadUserData = (userId) => {
     .then(doc => {
       if (doc.exists) {
         const userData = doc.data();
-        console.log('Dados do usuário:', userData);
+        console.log('Dados do usuário carregados:', userData);
         return userData;
       } else {
         console.log('Nenhum documento de usuário encontrado');
@@ -148,12 +153,13 @@ const loadUserData = (userId) => {
 
 // Adicionar ouvintes para botões de autenticação
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM carregado, configurando ouvintes de autenticação');
+  console.log('DOM carregado, configurando listeners de autenticação');
   
   // Form de login
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {
-    console.log('Form de login encontrado');
+    console.log('Form de login encontrado na página');
+    
     // Inicializar modo do formulário
     if (!loginForm.dataset.mode) {
       loginForm.dataset.mode = 'login';
@@ -161,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     loginForm.addEventListener('submit', e => {
       e.preventDefault();
-      console.log('Form de login enviado no modo:', loginForm.dataset.mode);
+      console.log('Form submetido no modo:', loginForm.dataset.mode);
       
       const email = loginForm.email.value;
       const password = loginForm.password.value;
@@ -174,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // Link para registro
+  // Link para alternar entre login e registro
   const registerLink = document.getElementById('registerLink');
   if (registerLink) {
     console.log('Link de registro encontrado');
