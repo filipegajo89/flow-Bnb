@@ -299,3 +299,212 @@
     display: block;
   }
 }
+
+// Adicione este código CSS ao arquivo style.css
+
+/* Estilos para os Cards de Imóveis */
+.property-card {
+  background-color: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  transition: var(--transition-standard);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.property-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-medium);
+}
+
+.property-image-container {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+}
+
+.property-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.property-card:hover .property-image {
+  transform: scale(1.05);
+}
+
+.property-status {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.property-status.active {
+  background-color: rgba(9, 177, 136, 0.9);
+  color: white;
+}
+
+.property-status.inactive {
+  background-color: rgba(100, 116, 139, 0.9);
+  color: white;
+}
+
+.property-content {
+  padding: 1.25rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.property-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--dark-text);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.property-location {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+}
+
+.property-location-icon {
+  color: var(--secondary-color);
+  margin-right: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.property-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.property-stat {
+  flex: 1;
+}
+
+.property-stat + .property-stat {
+  border-left: 1px solid #e2e8f0;
+  padding-left: 1rem;
+}
+
+.property-stat-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.property-stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.property-stat-value.income {
+  color: var(--secondary-color);
+}
+
+.property-stat-value.expense {
+  color: #e53e3e;
+}
+
+.property-profit {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1rem;
+  margin-top: auto;
+}
+
+.property-profit-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.property-profit-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+.property-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background-color: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.property-action-button {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--accent-color);
+  transition: var(--transition-standard);
+  display: flex;
+  align-items: center;
+}
+
+.property-action-button:hover {
+  color: var(--primary-color);
+}
+
+.property-action-icon {
+  margin-right: 0.5rem;
+}
+
+/* Placeholder para quando não houver imóveis */
+.no-properties {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.no-properties-icon {
+  font-size: 3rem;
+  color: #cbd5e1;
+  margin-bottom: 1.5rem;
+}
+
+.no-properties-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.75rem;
+}
+
+.no-properties-text {
+  color: #64748b;
+  margin-bottom: 1.5rem;
+}
+
+.add-property-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--secondary-color);
+  color: white;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: var(--transition-standard);
+}
+
+.add-property-button:hover {
+  background-color: #08a078;
+  transform: translateY(-2px);
+}
+
+.add-property-icon {
+  margin-right: 0.5rem;
+}
