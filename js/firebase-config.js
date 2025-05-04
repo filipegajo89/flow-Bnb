@@ -15,10 +15,19 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// Definir persistência para manter o login mesmo após fechar o navegador
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .catch(error => {
+    console.error('Erro ao configurar persistência:', error);
+  });
+
 // Configurações do Firestore
 db.settings({
   timestampsInSnapshots: true
 });
+
+// Verificar inicialização
+console.log('Firebase inicializado com sucesso');
 
 // Formato para valor em reais (BRL)
 const formatCurrency = (value) => {
@@ -30,6 +39,7 @@ const formatCurrency = (value) => {
 
 // Converte timestamp do Firestore para data legível
 const formatDate = (timestamp) => {
+  if (!timestamp) return '';
   const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
   return date.toLocaleDateString('pt-BR');
 };
