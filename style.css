@@ -1,154 +1,301 @@
-/* Estilos Personalizados para FlowBnb */
+<!-- Modificações no CSS (style.css) -->
 
-/* Cores personalizadas */
+/* Esquema de cores profissional */
 :root {
-  --primary-blue: #0a3d62;
-  --accent-green: #10ac84;
-  --accent-red: #ee5253;
-  --accent-blue: #1e90ff;
-  --light-gray: #f5f6fa;
-  --dark-gray: #57606f;
+  --primary-color: #0c2e69;       /* Azul escuro profundo */
+  --secondary-color: #09b188;     /* Verde esmeralda */
+  --accent-color: #1c5def;        /* Azul vibrante */
+  --light-bg: #f8f9fc;            /* Fundo claro */
+  --dark-text: #2c3e50;           /* Texto escuro */
+  --light-text: #f8f9fc;          /* Texto claro */
+  --sidebar-width: 280px;         /* Largura da sidebar */
+  --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --transition-standard: all 0.3s ease;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
-}
-
-/* Efeitos de hover e transições */
-.hover-shadow:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease;
-}
-
-/* Cards de imóveis */
-.property-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.property-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-/* Animações para modais */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.modal-container {
-  animation: fadeIn 0.3s ease;
-}
-
-.modal-content {
-  animation: slideUp 0.3s ease;
-}
-
-/* Classes de status */
-.status-active {
-  background-color: var(--accent-green);
-  color: white;
-}
-
-.status-inactive {
-  background-color: var(--dark-gray);
-  color: white;
-}
-
-/* Estilos dos valores financeiros */
-.value-positive {
-  color: var(--accent-green);
-  font-weight: bold;
-}
-
-.value-negative {
-  color: var(--accent-red);
-  font-weight: bold;
-}
-
-/* Barra de carregamento */
-.loading-bar {
-  height: 3px;
-  background: linear-gradient(to right, var(--accent-blue), var(--accent-green));
+/* Estilos da Sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  background: linear-gradient(to bottom, var(--primary-color), #041c44);
+  color: var(--light-text);
   position: fixed;
-  top: 0;
+  height: 100vh;
   left: 0;
-  z-index: 1000;
-  animation: loadingAnimation 1.5s infinite ease-in-out;
+  top: 0;
+  overflow-y: auto;
+  transition: var(--transition-standard);
+  box-shadow: var(--shadow-medium);
+  z-index: 10;
 }
 
-@keyframes loadingAnimation {
-  0% { width: 0%; left: 0; }
-  50% { width: 70%; left: 15%; }
-  100% { width: 0%; left: 100%; }
-}
-
-/* Estilos para dispositivos móveis */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    height: auto;
-    z-index: 100;
-  }
-  
-  .content-area {
-    margin-left: 0;
-    margin-bottom: 60px;
-  }
-}
-
-/* Para o sidebar logo */
+/* Logo Container */
 .logo-container {
+  padding: 2rem 1.5rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1.5rem;
 }
 
-.logo-container img {
+.logo-image {
   height: 2.5rem;
-  transition: transform 0.3s ease;
-}
-
-.logo-container:hover img {
-  transform: scale(1.05);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  transition: var(--transition-standard);
 }
 
 .logo-text {
-  font-weight: 700;
+  margin-left: 0.75rem;
   font-size: 1.5rem;
-  color: white;
-  margin-left: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--light-text);
+  text-shadow: 0px 2px 4px rgba(0,0,0,0.3);
 }
 
-/* Para a página de login */
-.login-logo {
+.logo-container:hover .logo-image {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+}
+
+.brand-tagline {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 300;
+  opacity: 0.8;
+  margin-top: 0.25rem;
+  letter-spacing: 0.5px;
+}
+
+/* Menu de Navegação */
+.sidebar-nav-item {
   display: flex;
   align-items: center;
-  justify-content: center;
+  padding: 1rem 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  transition: var(--transition-standard);
+  border-left: 3px solid transparent;
+  margin: 0.25rem 0;
+}
+
+.sidebar-nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-left: 3px solid var(--secondary-color);
+}
+
+.sidebar-nav-item.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-left: 3px solid var(--secondary-color);
+}
+
+.sidebar-nav-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 1rem;
+  opacity: 0.9;
+}
+
+.sidebar-nav-text {
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* Rodapé da Sidebar */
+.sidebar-footer {
+  padding: 1rem 1.5rem;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.875rem;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.7);
+  transition: var(--transition-standard);
+}
+
+.logout-button:hover {
+  color: white;
+}
+
+.logout-icon {
+  margin-right: 0.75rem;
+}
+
+/* Conteúdo Principal */
+.main-content {
+  margin-left: var(--sidebar-width);
+  padding: 2rem;
+  background-color: var(--light-bg);
+  min-height: 100vh;
+  transition: var(--transition-standard);
+}
+
+/* Header do conteúdo principal */
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--dark-text);
+}
+
+/* Cards para o dashboard */
+.dashboard-card {
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-soft);
+  padding: 1.5rem;
+  transition: var(--transition-standard);
+}
+
+.dashboard-card:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
   margin-bottom: 1rem;
 }
 
-.login-logo img {
-  height: 4rem;
-  transition: transform 0.3s ease;
+.card-icon {
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  margin-right: 1rem;
 }
 
-.login-logo:hover img {
-  transform: scale(1.05);
+.card-icon.revenue {
+  background-color: rgba(9, 177, 136, 0.1);
+  color: var(--secondary-color);
 }
 
-.login-title {
+.card-icon.expense {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+.card-icon.profit {
+  background-color: rgba(28, 93, 239, 0.1);
+  color: var(--accent-color);
+}
+
+.card-title {
+  font-size: 0.875rem;
+  color: #7f8c8d;
+  margin-bottom: 0.25rem;
+}
+
+.card-value {
+  font-size: 1.5rem;
   font-weight: 700;
-  font-size: 2rem;
-  color: #1e3a8a;
-  margin-left: 0.75rem;
+  color: var(--dark-text);
+}
+
+/* Botões */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: var(--transition-standard);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  background-color: var(--secondary-color);
+  color: white;
+  box-shadow: 0 2px 4px rgba(9, 177, 136, 0.3);
+}
+
+.btn-primary:hover {
+  background-color: #08a078;
+  box-shadow: 0 4px 8px rgba(9, 177, 136, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-icon {
+  margin-right: 0.5rem;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 5rem;
+    overflow: visible;
+  }
+  
+  .logo-text, .brand-tagline, .sidebar-nav-text {
+    display: none;
+  }
+  
+  .logo-container {
+    justify-content: center;
+    padding: 1.5rem 0;
+  }
+  
+  .sidebar-nav-item {
+    justify-content: center;
+    padding: 1rem;
+  }
+  
+  .sidebar-nav-icon {
+    margin-right: 0;
+  }
+  
+  .main-content {
+    margin-left: 5rem;
+  }
+  
+  .sidebar-footer {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+  }
+  
+  .logout-button {
+    justify-content: center;
+  }
+  
+  .logout-icon {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 0;
+    transform: translateX(-100%);
+  }
+  
+  .sidebar.open {
+    width: var(--sidebar-width);
+    transform: translateX(0);
+  }
+  
+  .main-content {
+    margin-left: 0;
+  }
+  
+  .menu-toggle {
+    display: block;
+  }
 }
