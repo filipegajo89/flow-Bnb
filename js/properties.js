@@ -163,49 +163,48 @@ const getPropertyFinancialSummary = async (propertyId, month = null, year = null
   }
 };
 
-// Renderizar card de imóvel
+// Renderizar card de imóvel com o novo design
 const renderPropertyCard = (property, financialSummary) => {
   const card = document.createElement('div');
-  card.className = 'property-card bg-white border rounded-lg overflow-hidden hover:shadow-md transition-shadow';
+  card.className = 'property-card';
   card.dataset.id = property.id;
   
-  const statusClass = property.status === 'active' ? 'bg-green-500' : 'bg-gray-500';
+  const statusClass = property.status === 'active' ? 'active' : 'inactive';
   const statusText = property.status === 'active' ? 'Ativo' : 'Inativo';
-  const imageUrl = property.image || 'https://via.placeholder.com/300x160?text=Imóvel';
+  const imageUrl = property.image || 'assets/images/property-placeholder.jpg';
   
   card.innerHTML = `
-    <div class="h-40 bg-gray-200 relative">
-      <img src="${imageUrl}" alt="${property.name}" class="w-full h-full object-cover">
-      <div class="absolute top-0 right-0 ${statusClass} text-white text-xs font-bold px-2 py-1 m-2 rounded">
-        ${statusText}
-      </div>
+    <div class="property-image-container">
+      <img src="${imageUrl}" alt="${property.name}" class="property-image">
+      <div class="property-status ${statusClass}">${statusText}</div>
     </div>
-    <div class="p-4">
-      <h3 class="font-bold text-lg mb-1">${property.name}</h3>
-      <p class="text-gray-600 text-sm mb-3">
-        <i class="fas fa-map-marker-alt mr-1"></i> ${property.city}, ${property.state}
+    <div class="property-content">
+      <h3 class="property-title">${property.name}</h3>
+      <p class="property-location">
+        <i class="fas fa-map-marker-alt property-location-icon"></i>
+        ${property.city}, ${property.state}
       </p>
-      <div class="flex justify-between items-center mb-3">
-        <div>
-          <p class="text-sm text-gray-500">Rendimento</p>
-          <p class="font-bold text-green-600">+ ${financialSummary.formattedIncome}</p>
+      <div class="property-stats">
+        <div class="property-stat">
+          <p class="property-stat-label">Receita</p>
+          <p class="property-stat-value income">+ ${financialSummary.formattedIncome}</p>
         </div>
-        <div class="text-right">
-          <p class="text-sm text-gray-500">Despesas</p>
-          <p class="font-bold text-red-600">- ${financialSummary.formattedExpense}</p>
+        <div class="property-stat">
+          <p class="property-stat-label">Despesa</p>
+          <p class="property-stat-value expense">- ${financialSummary.formattedExpense}</p>
         </div>
       </div>
-      <div class="pt-3 border-t">
-        <p class="text-sm text-gray-500">Lucro Líquido</p>
-        <p class="font-bold text-blue-600">${financialSummary.formattedProfit}</p>
+      <div class="property-profit">
+        <p class="property-profit-label">Lucro Líquido</p>
+        <p class="property-profit-value">${financialSummary.formattedProfit}</p>
       </div>
     </div>
-    <div class="bg-gray-50 px-4 py-3 flex justify-between">
-      <button class="viewPropertyBtn text-blue-600 hover:text-blue-800 text-sm font-medium">
-        Ver Detalhes
+    <div class="property-actions">
+      <button class="property-action-button viewPropertyBtn">
+        <i class="fas fa-eye property-action-icon"></i>Ver Detalhes
       </button>
-      <button class="addTransactionBtn text-blue-600 hover:text-blue-800 text-sm font-medium">
-        <i class="fas fa-plus mr-1"></i> Transação
+      <button class="property-action-button addTransactionBtn">
+        <i class="fas fa-plus property-action-icon"></i>Transação
       </button>
     </div>
   `;
@@ -213,7 +212,7 @@ const renderPropertyCard = (property, financialSummary) => {
   return card;
 };
 
-// Carregar e exibir imóveis na página
+// Atualização para a função loadAndDisplayProperties
 const loadAndDisplayProperties = async (monthFilter = null) => {
   try {
     // Obter o elemento onde os imóveis serão exibidos
@@ -229,11 +228,15 @@ const loadAndDisplayProperties = async (monthFilter = null) => {
     // Verificar se há imóveis
     if (properties.length === 0) {
       propertiesList.innerHTML = `
-        <div class="col-span-full text-center py-10">
-          <p class="text-gray-500 mb-4">Você ainda não tem imóveis cadastrados.</p>
-          <button id="addFirstPropertyBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-            <i class="fas fa-plus mr-2"></i>Adicionar Primeiro Imóvel
-          </button>
+        <div class="col-span-full">
+          <div class="no-properties">
+            <i class="fas fa-home no-properties-icon"></i>
+            <h3 class="no-properties-title">Nenhum imóvel cadastrado</h3>
+            <p class="no-properties-text">Você ainda não tem imóveis cadastrados. Comece adicionando seu primeiro imóvel.</p>
+            <button id="addFirstPropertyBtn" class="add-property-button">
+              <i class="fas fa-plus add-property-icon"></i>Adicionar Primeiro Imóvel
+            </button>
+          </div>
         </div>
       `;
       
@@ -284,7 +287,7 @@ const loadAndDisplayProperties = async (monthFilter = null) => {
       
       if (viewBtn) {
         viewBtn.addEventListener('click', () => {
-          window.location.href = `/pages/property-details.html?id=${property.id}`;
+          window.location.href = `pages/property-details.html?id=${property.id}`;
         });
       }
       
@@ -310,7 +313,14 @@ const loadAndDisplayProperties = async (monthFilter = null) => {
     if (propertiesList) {
       propertiesList.innerHTML = `
         <div class="col-span-full text-center py-10">
-          <p class="text-red-500">Erro ao carregar imóveis. Tente novamente.</p>
+          <div class="bg-white rounded-lg p-6 shadow-md">
+            <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-4"></i>
+            <p class="text-red-500 font-medium mb-2">Erro ao carregar imóveis</p>
+            <p class="text-gray-600 mb-4">Não foi possível carregar seus imóveis. Por favor, tente novamente.</p>
+            <button onclick="location.reload()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+              <i class="fas fa-redo mr-2"></i>Tentar novamente
+            </button>
+          </div>
         </div>
       `;
     }
