@@ -10,6 +10,10 @@ const initApp = () => {
   
   // Não duplicamos a verificação de autenticação aqui
   // Isso já está sendo feito em auth.js
+  
+  // Adicionar logs para depuração
+  console.log('Caminho atual:', window.location.pathname);
+  console.log('URL completa:', window.location.href);
 };
 
 // Verificar se é a primeira execução do aplicativo
