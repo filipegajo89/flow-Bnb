@@ -104,3 +104,51 @@ body {
     margin-bottom: 60px;
   }
 }
+
+/* Para o sidebar logo */
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.logo-container img {
+  height: 2.5rem;
+  transition: transform 0.3s ease;
+}
+
+.logo-container:hover img {
+  transform: scale(1.05);
+}
+
+.logo-text {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: white;
+  margin-left: 0.5rem;
+}
+
+/* Para a página de login */
+.login-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.login-logo img {
+  height: 4rem;
+  transition: transform 0.3s ease;
+}
+
+.login-logo:hover img {
+  transform: scale(1.05);
+}
+
+.login-title {
+  font-weight: 700;
+  font-size: 2rem;
+  color: #1e3a8a;
+  margin-left: 0.75rem;
+}
