@@ -352,29 +352,132 @@
     </script>
 
     <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Toggle de visibilidade da senha
-    const togglePassword = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('password');
-    
-    if (togglePassword && passwordInput) {
-      console.log('Configurando toggle de senha');
-      togglePassword.addEventListener('click', function() {
-        // Verificar o tipo atual da senha
-        const currentType = passwordInput.getAttribute('type');
-        const newType = currentType === 'password' ? 'text' : 'password';
-        console.log('Mudando tipo de input para:', newType);
-        passwordInput.setAttribute('type', newType);
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('loginForm');
+        const submitButton = document.querySelector('.submit-btn');
+        const submitButtonText = document.getElementById('submitButtonText');
+        const notification = document.getElementById('notification');
+        const registerLink = document.getElementById('registerLink');
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
         
-        // Alternar o ícone
-        this.classList.toggle('fa-eye');
-        this.classList.toggle('fa-eye-slash');
-      });
-    } else {
-      console.log('Elementos de toggle de senha não encontrados');
-    }
-  });
-</script>
+        // Inicializar modo do formulário
+        loginForm.dataset.mode = 'login';
+        
+        // Toggle de visibilidade da senha
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
+                // Alternar entre mostrar e esconder a senha
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                console.log('Mudando tipo de input para:', type);
+                
+                // Alternar o ícone
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
+        
+        // Função para mostrar notificações
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = 'notification ' + type;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Alternar entre login e registro
+        registerLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (loginForm.dataset.mode === 'register') {
+                // Voltar para login
+                loginForm.dataset.mode = 'login';
+                submitButtonText.textContent = 'Entrar';
+                registerLink.textContent = 'Registre-se';
+                showNotification('Volte para o login', 'info');
+            } else {
+                // Mudar para registro
+                loginForm.dataset.mode = 'register';
+                submitButtonText.textContent = 'Registrar';
+                registerLink.textContent = 'Voltar para login';
+                showNotification('Crie uma nova conta', 'info');
+            }
+        });
+        
+        // Lidar com envio do formulário
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = loginForm.email.value;
+            const password = loginForm.password.value;
+            
+            // Validação básica
+            if (!email || !password) {
+                showNotification('Por favor, preencha todos os campos', 'error');
+                return;
+            }
+            
+            // Mostrar loading
+            submitButton.classList.add('btn-loading');
+            submitButton.disabled = true;
+            
+            try {
+                if (loginForm.dataset.mode === 'register') {
+                    // Modo de registro - acessando a função diretamente do auth global
+                    await auth.createUserWithEmailAndPassword(email, password)
+                        .then(cred => {
+                            console.log('Registro bem-sucedido:', cred.user.email);
+                            
+                            // Criar documento do usuário no Firestore
+                            return db.collection('users').doc(cred.user.uid).set({
+                                email: email,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        });
+                    showNotification('Conta criada com sucesso!', 'success');
+                } else {
+                    // Modo de login - acessando a função diretamente do auth global
+                    await auth.signInWithEmailAndPassword(email, password)
+                        .then(userCredential => {
+                            console.log('Login bem-sucedido:', userCredential.user.email);
+                        });
+                    showNotification('Login realizado com sucesso!', 'success');
+                    
+                    // Adicionar pequeno delay antes de redirecionar
+                    setTimeout(() => {
+                        window.location.href = 'pages/dashboard.html';
+                    }, 1000);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                
+                // Traduzir mensagens de erro comuns do Firebase
+                let errorMessage = error.message;
+                if (error.code === 'auth/quota-exceeded') {
+                    errorMessage = 'Limite de tentativas excedido. Tente novamente mais tarde.';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'Senha incorreta. Tente novamente.';
+                } else if (error.code === 'auth/user-not-found') {
+                    errorMessage = 'Usuário não encontrado. Verifique seu email.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Email inválido. Verifique o formato.';
+                } else if (error.code === 'auth/invalid-credential') {
+                    errorMessage = 'Credenciais inválidas. Verifique seu email e senha.';
+                }
+                
+                showNotification(errorMessage, 'error');
+            } finally {
+                // Remover loading independente do resultado
+                submitButton.classList.remove('btn-loading');
+                submitButton.disabled = false;
+            }
+        });
+    });
+    </script>
     
 </body>
 </html>
