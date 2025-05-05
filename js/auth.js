@@ -65,44 +65,49 @@ auth.onAuthStateChanged(user => {
     return;
   }
   
-  // Verificar se está na página de login
-  const currentPath = window.location.pathname;
-  const isLoginPage = currentPath.endsWith('/index.html') || 
-                     currentPath === '/' || 
-                     currentPath.endsWith('/') ||
-                     currentPath.includes('/flow-Bnb/');
+  // Verificar se está na página de login - simplificado
+  const isLoginPage = window.location.pathname.includes('index.html') || 
+                     window.location.pathname === '/' || 
+                     window.location.pathname.endsWith('/');
   
-  console.log('Caminho atual:', currentPath);
+  console.log('Caminho atual:', window.location.pathname);
   console.log('É página de login?', isLoginPage);
-  console.log('Valor de manualLoginAttempt:', manualLoginAttempt);
   
   if (user) {
     // Usuário logado
     console.log('Usuário autenticado:', user.email);
     
-    // Apenas redirecionar se estiver na página de login e for um login manual
-    if (isLoginPage && manualLoginAttempt) {
-      console.log('Login manual detectado, redirecionando para dashboard');
+    // Redirecionar para dashboard se estiver na página de login
+    if (isLoginPage) {
+      console.log('Redirecionando para dashboard');
       isRedirecting = true;
-      manualLoginAttempt = false;
       
-      // Determinar o caminho correto para o dashboard
-      let dashboardPath;
-      if (currentPath.includes('/flow-Bnb/')) {
-        dashboardPath = './pages/dashboard.html';
-      } else {
-        dashboardPath = 'pages/dashboard.html';
-      }
-      
-      console.log('Redirecionando para:', dashboardPath);
-      
-      // Usar um pequeno atraso para garantir que o redirecionamento aconteça
-      setTimeout(() => {
-        window.location.href = dashboardPath;
-      }, 500);
-      
+      // Simplificar caminho para dashboard
+      window.location.href = 'pages/dashboard.html';
       return;
     }
+    
+    // Atualizar UI com informações do usuário
+    const userNameElement = document.getElementById('userName');
+    if (userNameElement) {
+      userNameElement.textContent = user.email;
+    }
+    
+  } else {
+    // Usuário não logado
+    console.log('Nenhum usuário autenticado');
+    
+    // Se estiver em página protegida, redirecionar para login
+    if (!isLoginPage) {
+      console.log('Acesso a página protegida sem autenticação, redirecionando para login');
+      isRedirecting = true;
+      
+      // Caminho simples para o login
+      window.location.href = '../index.html';
+      return;
+    }
+  }
+});
     
     // Atualizar UI com informações do usuário logado
     const userNameElement = document.getElementById('userName');
@@ -137,17 +142,14 @@ auth.onAuthStateChanged(user => {
 // Função de login
 function login(email, password) {
   console.log('Tentando login com:', email);
-  manualLoginAttempt = true; // Definindo que é um login manual
   
   return auth.signInWithEmailAndPassword(email, password)
     .then(userCredential => {
       console.log('Login bem-sucedido:', userCredential.user.email);
-      // Não resetamos a flag manualLoginAttempt aqui para permitir o redirecionamento
       return userCredential;
     })
     .catch(error => {
       console.error('Erro no login:', error);
-      manualLoginAttempt = false; // Resetar em caso de erro
       const errorMessage = handleFirebaseError(error);
       alert(errorMessage);
       throw error;
