@@ -15,7 +15,8 @@ const getRelativePath = (path) => {
   }
 };
 
-// Verificar estado de autenticação
+// Verifique e corrija a parte do auth.onAuthStateChanged no arquivo auth.js:
+
 auth.onAuthStateChanged(user => {
   console.log('Estado de autenticação alterado:', user ? 'Usuário logado' : 'Usuário não logado');
   
@@ -24,76 +25,93 @@ auth.onAuthStateChanged(user => {
     console.log('Redirecionamento já em andamento, ignorando verificação');
     return;
   }
-
-  // Adicione esta função ao arquivo auth.js para traduzir e tratar erros do Firebase
-
-// Função para traduzir e tratar erros do Firebase
-const handleFirebaseError = (error) => {
-  console.error('Erro Firebase:', error);
-  let message = 'Ocorreu um erro. Tente novamente.';
   
-  switch (error.code) {
-    case 'auth/quota-exceeded':
-      message = 'Limite de tentativas de login excedido. Por favor, tente novamente mais tarde ou use outro método de login.';
-      break;
-    case 'auth/user-not-found':
-      message = 'Usuário não encontrado. Verifique seu email ou crie uma nova conta.';
-      break;
-    case 'auth/wrong-password':
-      message = 'Senha incorreta. Verifique sua senha e tente novamente.';
-      break;
-    case 'auth/invalid-email':
-      message = 'Email inválido. Por favor, verifique o formato do email.';
-      break;
-    case 'auth/email-already-in-use':
-      message = 'Este email já está em uso. Tente fazer login ou use outro email.';
-      break;
-    case 'auth/weak-password':
-      message = 'A senha é muito fraca. Use pelo menos 6 caracteres.';
-      break;
-    case 'auth/network-request-failed':
-      message = 'Erro de conexão. Verifique sua internet e tente novamente.';
-      break;
-    case 'auth/too-many-requests':
-      message = 'Muitas tentativas incorretas. Tente novamente mais tarde ou redefina sua senha.';
-      break;
-    case 'auth/requires-recent-login':
-      message = 'Esta operação requer um login recente. Por favor, faça login novamente.';
-      break;
-    case 'auth/invalid-credential':
-      message = 'Credenciais inválidas. Verifique seu email e senha.';
-      break;
-    case 'auth/operation-not-allowed':
-      message = 'Este método de login não está habilitado. Contate o suporte.';
-      break;
-    case 'auth/account-exists-with-different-credential':
-      message = 'Este email já está associado a outra conta. Tente outro método de login.';
-      break;
-    default:
-      message = `Erro: ${error.message}`;
+  // Verificar se está na página de login
+  const currentPath = window.location.pathname;
+  const isLoginPage = currentPath.endsWith('/index.html') || 
+                     currentPath === '/' || 
+                     currentPath.endsWith('/') ||
+                     currentPath.includes('/flow-Bnb/');
+  
+  console.log('Caminho atual:', currentPath);
+  console.log('É página de login?', isLoginPage);
+  
+  if (user) {
+    // Usuário logado
+    console.log('Usuário autenticado:', user.email);
+    
+    // Apenas redirecionar se estiver na página de login e for um login manual
+    if (isLoginPage && manualLoginAttempt) {
+      console.log('Login manual detectado, redirecionando para dashboard');
+      isRedirecting = true;
+      manualLoginAttempt = false;
+      
+      // Determinar o caminho correto para o dashboard
+      let dashboardPath;
+      if (currentPath.includes('/flow-Bnb/')) {
+        dashboardPath = './pages/dashboard.html';
+      } else {
+        dashboardPath = 'pages/dashboard.html';
+      }
+      
+      console.log('Redirecionando para:', dashboardPath);
+      
+      // Usar um pequeno atraso para garantir que o redirecionamento aconteça
+      setTimeout(() => {
+        window.location.href = dashboardPath;
+      }, 500);
+      
+      return;
+    }
+    
+    // Atualizar UI com informações do usuário logado
+    const userNameElement = document.getElementById('userName');
+    if (userNameElement) {
+      userNameElement.textContent = user.email;
+    }
+    
+    // Carregar dados do usuário
+    loadUserData(user.uid);
+  } else {
+    // Usuário não logado
+    console.log('Nenhum usuário autenticado');
+    
+    // Se estiver em página protegida, redirecionar para login
+    if (!isLoginPage) {
+      console.log('Acesso a página protegida sem autenticação, redirecionando para login');
+      isRedirecting = true;
+      
+      // Determinar o caminho correto para o index.html
+      let loginPath = '../index.html';
+      if (currentPath.includes('property-details')) {
+        loginPath = '../index.html';
+      }
+      
+      console.log('Redirecionando para:', loginPath);
+      window.location.href = loginPath;
+      return;
+    }
   }
-  
-  return message;
-};
+});
 
-// Modificar a função de login para incluir o novo tratamento de erros
+// Também precisamos garantir que a flag manualLoginAttempt seja configurada corretamente
+// Vamos modificar as funções de login e registro:
+
 const login = (email, password) => {
   console.log('Tentando login com:', email);
-  manualLoginAttempt = true;
+  manualLoginAttempt = true; // Definindo que é um login manual
   
   return auth.signInWithEmailAndPassword(email, password)
     .then(userCredential => {
       console.log('Login bem-sucedido:', userCredential.user.email);
+      // Não resetamos a flag manualLoginAttempt aqui para permitir o redirecionamento
       return userCredential;
     })
     .catch(error => {
       console.error('Erro no login:', error);
-      manualLoginAttempt = false;
-      
-      // Usar a nova função de tratamento de erros
+      manualLoginAttempt = false; // Resetar em caso de erro
       const errorMessage = handleFirebaseError(error);
       alert(errorMessage);
-      
       throw error;
     });
 };
