@@ -24,6 +24,106 @@ auth.onAuthStateChanged(user => {
     console.log('Redirecionamento já em andamento, ignorando verificação');
     return;
   }
+
+  // Adicione esta função ao arquivo auth.js para traduzir e tratar erros do Firebase
+
+// Função para traduzir e tratar erros do Firebase
+const handleFirebaseError = (error) => {
+  console.error('Erro Firebase:', error);
+  let message = 'Ocorreu um erro. Tente novamente.';
+  
+  switch (error.code) {
+    case 'auth/quota-exceeded':
+      message = 'Limite de tentativas de login excedido. Por favor, tente novamente mais tarde ou use outro método de login.';
+      break;
+    case 'auth/user-not-found':
+      message = 'Usuário não encontrado. Verifique seu email ou crie uma nova conta.';
+      break;
+    case 'auth/wrong-password':
+      message = 'Senha incorreta. Verifique sua senha e tente novamente.';
+      break;
+    case 'auth/invalid-email':
+      message = 'Email inválido. Por favor, verifique o formato do email.';
+      break;
+    case 'auth/email-already-in-use':
+      message = 'Este email já está em uso. Tente fazer login ou use outro email.';
+      break;
+    case 'auth/weak-password':
+      message = 'A senha é muito fraca. Use pelo menos 6 caracteres.';
+      break;
+    case 'auth/network-request-failed':
+      message = 'Erro de conexão. Verifique sua internet e tente novamente.';
+      break;
+    case 'auth/too-many-requests':
+      message = 'Muitas tentativas incorretas. Tente novamente mais tarde ou redefina sua senha.';
+      break;
+    case 'auth/requires-recent-login':
+      message = 'Esta operação requer um login recente. Por favor, faça login novamente.';
+      break;
+    case 'auth/invalid-credential':
+      message = 'Credenciais inválidas. Verifique seu email e senha.';
+      break;
+    case 'auth/operation-not-allowed':
+      message = 'Este método de login não está habilitado. Contate o suporte.';
+      break;
+    case 'auth/account-exists-with-different-credential':
+      message = 'Este email já está associado a outra conta. Tente outro método de login.';
+      break;
+    default:
+      message = `Erro: ${error.message}`;
+  }
+  
+  return message;
+};
+
+// Modificar a função de login para incluir o novo tratamento de erros
+const login = (email, password) => {
+  console.log('Tentando login com:', email);
+  manualLoginAttempt = true;
+  
+  return auth.signInWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      console.log('Login bem-sucedido:', userCredential.user.email);
+      return userCredential;
+    })
+    .catch(error => {
+      console.error('Erro no login:', error);
+      manualLoginAttempt = false;
+      
+      // Usar a nova função de tratamento de erros
+      const errorMessage = handleFirebaseError(error);
+      alert(errorMessage);
+      
+      throw error;
+    });
+};
+
+// Também atualizar a função de registro
+const register = (email, password) => {
+  console.log('Tentando registrar:', email);
+  manualLoginAttempt = true;
+  
+  return auth.createUserWithEmailAndPassword(email, password)
+    .then(cred => {
+      console.log('Registro bem-sucedido:', cred.user.email);
+      
+      // Criar documento do usuário no Firestore
+      return db.collection('users').doc(cred.user.uid).set({
+        email: email,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    })
+    .catch(error => {
+      console.error('Erro no registro:', error);
+      manualLoginAttempt = false;
+      
+      // Usar a nova função de tratamento de erros
+      const errorMessage = handleFirebaseError(error);
+      alert(errorMessage);
+      
+      throw error;
+    });
+};
   
   // Verificar se está na página de login
   const isLoginPage = window.location.pathname.includes('index.html') || 
