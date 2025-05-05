@@ -350,5 +350,31 @@
             });
         });
     </script>
+
+    <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Toggle de visibilidade da senha
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    
+    if (togglePassword && passwordInput) {
+      console.log('Configurando toggle de senha');
+      togglePassword.addEventListener('click', function() {
+        // Verificar o tipo atual da senha
+        const currentType = passwordInput.getAttribute('type');
+        const newType = currentType === 'password' ? 'text' : 'password';
+        console.log('Mudando tipo de input para:', newType);
+        passwordInput.setAttribute('type', newType);
+        
+        // Alternar o ícone
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+      });
+    } else {
+      console.log('Elementos de toggle de senha não encontrados');
+    }
+  });
+</script>
+    
 </body>
 </html>
