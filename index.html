@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .login-container {
-            background: linear-gradient(135deg, rgba(12, 46, 105, 0.95), rgba(9, 177, 136, 0.85)), url('assets/images/property-bg.jpg');
+            background: linear-gradient(135deg, rgba(12, 46, 105, 0.95), rgba(9, 177, 136, 0.85));
             background-size: cover;
             background-position: center;
         }
@@ -25,13 +25,12 @@
         
         .login-logo-container {
             display: flex;
-            align-items: center;
             justify-content: center;
             margin-bottom: 1.5rem;
         }
         
         .login-logo {
-            height: 4rem;
+            height: 5rem;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
             transition: all 0.3s ease;
         }
@@ -39,16 +38,6 @@
         .login-logo:hover {
             transform: scale(1.05);
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
-        }
-        
-        .login-title {
-            margin-left: 1rem;
-            font-size: 2.25rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, #0c2e69, #09b188);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0px 2px 4px rgba(0,0,0,0.1);
         }
         
         .login-tagline {
@@ -125,6 +114,14 @@
             color: #a0aec0;
         }
         
+        .form-icon-right {
+            position: absolute;
+            top: 0.75rem;
+            right: 1rem;
+            color: #a0aec0;
+            cursor: pointer;
+        }
+        
         .form-input-icon {
             padding-left: 2.5rem;
         }
@@ -182,31 +179,6 @@
         .notification.info {
             background-color: #3182ce;
         }
-        
-        /* Modo escuro para os navegadores que suportam */
-        @media (prefers-color-scheme: dark) {
-            .login-card {
-                background: rgba(30, 41, 59, 0.95);
-            }
-            
-            .login-tagline {
-                color: #e2e8f0;
-            }
-            
-            .form-label {
-                color: #e2e8f0;
-            }
-            
-            .form-input {
-                background-color: rgba(30, 41, 59, 0.8);
-                border-color: #4b5563;
-                color: #e2e8f0;
-            }
-            
-            .form-input:focus {
-                background-color: rgba(30, 41, 59, 0.9);
-            }
-        }
     </style>
 </head>
 <body>
@@ -218,7 +190,6 @@
             <div class="login-card w-full max-w-md p-8">
                 <div class="login-logo-container">
                     <img src="assets/images/logo.png" alt="FlowBnb Logo" class="login-logo">
-                    <h1 class="login-title">FlowBnb</h1>
                 </div>
                 
                 <p class="login-tagline">Gestão Financeira Inteligente para seus Imóveis</p>
@@ -237,6 +208,7 @@
                         <div class="relative">
                             <i class="fas fa-lock form-icon"></i>
                             <input type="password" id="password" required class="form-input form-input-icon" placeholder="Sua senha">
+                            <i class="fas fa-eye form-icon-right toggle-password" id="togglePassword"></i>
                         </div>
                     </div>
                     
@@ -249,12 +221,12 @@
                 </form>
                 
                 <div class="mt-6 text-center">
-                    <p class="text-sm text-gray-600 dark:text-gray-300">
+                    <p class="text-sm text-gray-600">
                         Não tem uma conta? <a href="#" id="registerLink" class="register-link">Registre-se</a>
                     </p>
                 </div>
                 
-                <div class="mt-8 text-center text-xs text-gray-500 dark:text-gray-400">
+                <div class="mt-8 text-center text-xs text-gray-500">
                     <p>&copy; 2025 FlowBnb - Todos os direitos reservados.</p>
                 </div>
             </div>
@@ -279,9 +251,22 @@
             const submitButtonText = document.getElementById('submitButtonText');
             const notification = document.getElementById('notification');
             const registerLink = document.getElementById('registerLink');
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
             
             // Inicializar modo do formulário
             loginForm.dataset.mode = 'login';
+            
+            // Toggle de visibilidade da senha
+            togglePassword.addEventListener('click', function() {
+                // Alternar entre mostrar e esconder a senha
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Alternar o ícone
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
             
             // Função para mostrar notificações
             function showNotification(message, type = 'info') {
@@ -342,7 +327,22 @@
                     }
                 } catch (error) {
                     console.error('Erro:', error);
-                    showNotification(error.message, 'error');
+                    
+                    // Traduzir mensagens de erro comuns do Firebase
+                    let errorMessage = error.message;
+                    if (error.code === 'auth/quota-exceeded') {
+                        errorMessage = 'Limite de tentativas excedido. Tente novamente mais tarde.';
+                    } else if (error.code === 'auth/wrong-password') {
+                        errorMessage = 'Senha incorreta. Tente novamente.';
+                    } else if (error.code === 'auth/user-not-found') {
+                        errorMessage = 'Usuário não encontrado. Verifique seu email.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Email inválido. Verifique o formato.';
+                    } else if (error.code === 'auth/invalid-credential') {
+                        errorMessage = 'Credenciais inválidas. Verifique seu email e senha.';
+                    }
+                    
+                    showNotification(errorMessage, 'error');
                     
                     // Remover loading
                     submitButton.classList.remove('btn-loading');
