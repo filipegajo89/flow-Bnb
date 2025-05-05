@@ -1,7 +1,7 @@
 // Funções de autenticação de usuários
 console.log('Arquivo auth.js carregado');
 
-// Flag para controlar redirecionamentos e evitar loops
+// Variáveis globais para controle de redirecionamento
 let isRedirecting = false;
 let manualLoginAttempt = false;
 
@@ -15,8 +15,47 @@ const getRelativePath = (path) => {
   }
 };
 
-// Verifique e corrija a parte do auth.onAuthStateChanged no arquivo auth.js:
+// Função para traduzir e tratar erros do Firebase
+function handleFirebaseError(error) {
+  console.error('Erro Firebase:', error);
+  let message = 'Ocorreu um erro. Tente novamente.';
+  
+  switch (error.code) {
+    case 'auth/quota-exceeded':
+      message = 'Limite de tentativas de login excedido. Por favor, tente novamente mais tarde.';
+      break;
+    case 'auth/user-not-found':
+      message = 'Usuário não encontrado. Verifique seu email ou crie uma nova conta.';
+      break;
+    case 'auth/wrong-password':
+      message = 'Senha incorreta. Verifique sua senha e tente novamente.';
+      break;
+    case 'auth/invalid-email':
+      message = 'Email inválido. Por favor, verifique o formato do email.';
+      break;
+    case 'auth/email-already-in-use':
+      message = 'Este email já está em uso. Tente fazer login ou use outro email.';
+      break;
+    case 'auth/weak-password':
+      message = 'A senha é muito fraca. Use pelo menos 6 caracteres.';
+      break;
+    case 'auth/network-request-failed':
+      message = 'Erro de conexão. Verifique sua internet e tente novamente.';
+      break;
+    case 'auth/too-many-requests':
+      message = 'Muitas tentativas incorretas. Tente novamente mais tarde.';
+      break;
+    case 'auth/requires-recent-login':
+      message = 'Esta operação requer um login recente. Por favor, faça login novamente.';
+      break;
+    default:
+      message = `Erro: ${error.message}`;
+  }
+  
+  return message;
+}
 
+// Verificar estado de autenticação
 auth.onAuthStateChanged(user => {
   console.log('Estado de autenticação alterado:', user ? 'Usuário logado' : 'Usuário não logado');
   
@@ -35,6 +74,7 @@ auth.onAuthStateChanged(user => {
   
   console.log('Caminho atual:', currentPath);
   console.log('É página de login?', isLoginPage);
+  console.log('Valor de manualLoginAttempt:', manualLoginAttempt);
   
   if (user) {
     // Usuário logado
@@ -94,10 +134,8 @@ auth.onAuthStateChanged(user => {
   }
 });
 
-// Também precisamos garantir que a flag manualLoginAttempt seja configurada corretamente
-// Vamos modificar as funções de login e registro:
-
-const login = (email, password) => {
+// Função de login
+function login(email, password) {
   console.log('Tentando login com:', email);
   manualLoginAttempt = true; // Definindo que é um login manual
   
@@ -114,107 +152,10 @@ const login = (email, password) => {
       alert(errorMessage);
       throw error;
     });
-};
-
-// Também atualizar a função de registro
-const register = (email, password) => {
-  console.log('Tentando registrar:', email);
-  manualLoginAttempt = true;
-  
-  return auth.createUserWithEmailAndPassword(email, password)
-    .then(cred => {
-      console.log('Registro bem-sucedido:', cred.user.email);
-      
-      // Criar documento do usuário no Firestore
-      return db.collection('users').doc(cred.user.uid).set({
-        email: email,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    })
-    .catch(error => {
-      console.error('Erro no registro:', error);
-      manualLoginAttempt = false;
-      
-      // Usar a nova função de tratamento de erros
-      const errorMessage = handleFirebaseError(error);
-      alert(errorMessage);
-      
-      throw error;
-    });
-};
-  
-  // Verificar se está na página de login
-  const isLoginPage = window.location.pathname.includes('index.html') || 
-                      window.location.pathname === '/' || 
-                      window.location.pathname.endsWith('/');
-  
-  if (user) {
-    // Usuário logado
-    console.log('Usuário autenticado:', user.email);
-    
-    // Apenas redirecionar se estiver na página de login e for um login manual
-    if (isLoginPage && manualLoginAttempt) {
-      console.log('Login manual detectado, redirecionando para dashboard');
-      isRedirecting = true;
-      manualLoginAttempt = false;
-      
-      // Redirecionar para o dashboard
-      const dashboardPath = getRelativePath('pages/dashboard.html');
-      console.log('Redirecionando para:', dashboardPath);
-      window.location.href = dashboardPath;
-      return;
-    }
-    
-    // Atualizar UI com informações do usuário logado
-    const userNameElement = document.getElementById('userName');
-    if (userNameElement) {
-      userNameElement.textContent = user.email;
-    }
-    
-    // Carregar dados do usuário
-    loadUserData(user.uid);
-  } else {
-    // Usuário não logado
-    console.log('Nenhum usuário autenticado');
-    
-    // Se estiver em página protegida, redirecionar para login
-    if (!isLoginPage) {
-      console.log('Acesso a página protegida sem autenticação, redirecionando para login');
-      isRedirecting = true;
-      
-      // Determinar o caminho correto para a página de login
-      let loginPath = '../index.html';
-      if (window.location.pathname.includes('property-details')) {
-        loginPath = '../index.html';
-      }
-      
-      console.log('Redirecionando para:', loginPath);
-      window.location.href = loginPath;
-      return;
-    }
-  }
-});
-
-// Função de login
-const login = (email, password) => {
-  console.log('Tentando login com:', email);
-  manualLoginAttempt = true;
-  
-  return auth.signInWithEmailAndPassword(email, password)
-    .then(userCredential => {
-      console.log('Login bem-sucedido:', userCredential.user.email);
-      return userCredential;
-    })
-    .catch(error => {
-      console.error('Erro no login:', error);
-      manualLoginAttempt = false;
-      alert('Erro no login: ' + error.message);
-      throw error;
-    });
-};
+}
 
 // Função de registro de novo usuário
-const register = (email, password) => {
+function register(email, password) {
   console.log('Tentando registrar:', email);
   manualLoginAttempt = true;
   
@@ -231,13 +172,14 @@ const register = (email, password) => {
     .catch(error => {
       console.error('Erro no registro:', error);
       manualLoginAttempt = false;
-      alert('Erro no registro: ' + error.message);
+      const errorMessage = handleFirebaseError(error);
+      alert(errorMessage);
       throw error;
     });
-};
+}
 
 // Função de logout
-const logout = () => {
+function logout() {
   return auth.signOut()
     .then(() => {
       console.log('Usuário deslogado com sucesso');
@@ -249,10 +191,10 @@ const logout = () => {
       console.error('Erro no logout:', error);
       alert('Erro no logout: ' + error.message);
     });
-};
+}
 
 // Carregar dados do usuário
-const loadUserData = (userId) => {
+function loadUserData(userId) {
   return db.collection('users').doc(userId).get()
     .then(doc => {
       if (doc.exists) {
@@ -267,7 +209,7 @@ const loadUserData = (userId) => {
     .catch(error => {
       console.error('Erro ao carregar dados do usuário:', error);
     });
-};
+}
 
 // Adicionar ouvintes para botões de autenticação
 document.addEventListener('DOMContentLoaded', () => {
@@ -332,6 +274,22 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutBtn.addEventListener('click', e => {
       e.preventDefault();
       logout();
+    });
+  }
+  
+  // Verificar se existe o botão de toggle de senha
+  const togglePassword = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('password');
+  
+  if (togglePassword && passwordInput) {
+    togglePassword.addEventListener('click', function() {
+      // Alternar entre mostrar e esconder a senha
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      
+      // Alternar o ícone
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
     });
   }
 });
