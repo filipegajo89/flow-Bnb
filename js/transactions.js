@@ -167,8 +167,11 @@ const loadRecentTransactions = async () => {
     // Mostrar indicador de carregamento
     recentTransactionsEl.innerHTML = `
       <tr>
-        <td colspan="5" class="px-6 py-4 text-center">
-          <i class="fas fa-spinner fa-spin text-blue-500"></i> Carregando transações...
+        <td colspan="6" class="px-6 py-10 text-center">
+          <div class="inline-block">
+            <div class="loading-spinner"></div>
+          </div>
+          <p class="text-gray-500 mt-2">Carregando transações...</p>
         </td>
       </tr>
     `;
@@ -180,11 +183,43 @@ const loadRecentTransactions = async () => {
     if (transactions.length === 0) {
       recentTransactionsEl.innerHTML = `
         <tr>
-          <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-            Nenhuma transação registrada ainda.
+          <td colspan="6" class="px-6 py-10 text-center">
+            <i class="fas fa-receipt text-gray-300 text-4xl mb-3"></i>
+            <p class="text-gray-500">Nenhuma transação registrada ainda.</p>
+            <button id="addFirstTransactionBtn" class="mt-3 text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center mx-auto">
+              <i class="fas fa-plus mr-2"></i>Nova Transação
+            </button>
           </td>
         </tr>
       `;
+      
+      // Adicionar listener ao botão de adicionar primeira transação
+      const addFirstTransactionBtn = document.getElementById('addFirstTransactionBtn');
+      if (addFirstTransactionBtn) {
+        addFirstTransactionBtn.addEventListener('click', () => {
+          // Verificar se há imóveis cadastrados
+          getProperties().then(properties => {
+            if (properties.length > 0) {
+              // Abrir modal de adicionar transação
+              const modal = document.getElementById('addTransactionModal');
+              if (modal) {
+                document.getElementById('transactionPropertyId').value = properties[0].id;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+              }
+            } else {
+              alert('Você precisa cadastrar um imóvel primeiro!');
+              // Abrir modal de adicionar imóvel
+              const propertyModal = document.getElementById('addPropertyModal');
+              if (propertyModal) {
+                propertyModal.classList.remove('hidden');
+                propertyModal.classList.add('flex');
+              }
+            }
+          });
+        });
+      }
+      
       return;
     }
     
@@ -193,34 +228,39 @@ const loadRecentTransactions = async () => {
     
     // Renderizar cada transação
     for (const transaction of transactions) {
-      const row = await renderTransactionRow(transaction);
-      recentTransactionsEl.appendChild(row);
-      
-      // Adicionar listeners aos botões
-      const editBtn = row.querySelector('.editTransactionBtn');
-      const deleteBtn = row.querySelector('.deleteTransactionBtn');
-      
-      if (editBtn) {
-        editBtn.addEventListener('click', () => {
-          // Implementar edição de transação
-          alert('Funcionalidade de edição será implementada em breve.');
-        });
-      }
-      
-      if (deleteBtn) {
-        deleteBtn.addEventListener('click', async () => {
-          if (confirm('Tem certeza que deseja excluir esta transação?')) {
-            try {
-              await deleteTransaction(transaction.id);
-              row.remove();
-              
-              // Recarregar resumo financeiro
-              loadAndDisplayProperties();
-            } catch (error) {
-              alert('Erro ao excluir transação: ' + error.message);
+      try {
+        const row = await renderTransactionRow(transaction);
+        recentTransactionsEl.appendChild(row);
+        
+        // Adicionar listeners aos botões
+        const editBtn = row.querySelector('.editTransactionBtn');
+        const deleteBtn = row.querySelector('.deleteTransactionBtn');
+        
+        if (editBtn) {
+          editBtn.addEventListener('click', () => {
+            // Implementar edição de transação
+            alert('Funcionalidade de edição será implementada em breve.');
+          });
+        }
+        
+        if (deleteBtn) {
+          deleteBtn.addEventListener('click', async () => {
+            if (confirm('Tem certeza que deseja excluir esta transação?')) {
+              try {
+                await deleteTransaction(transaction.id);
+                row.remove();
+                
+                // Recarregar resumo financeiro
+                loadAndDisplayProperties();
+              } catch (error) {
+                alert('Erro ao excluir transação: ' + error.message);
+              }
             }
-          }
-        });
+          });
+        }
+      } catch (transactionError) {
+        console.error('Erro ao processar transação:', transactionError);
+        continue; // Continuar com a próxima transação mesmo se esta falhar
       }
     }
   } catch (error) {
@@ -229,8 +269,13 @@ const loadRecentTransactions = async () => {
     if (recentTransactionsEl) {
       recentTransactionsEl.innerHTML = `
         <tr>
-          <td colspan="5" class="px-6 py-4 text-center text-red-500">
-            Erro ao carregar transações. Tente novamente.
+          <td colspan="6" class="px-6 py-10 text-center">
+            <i class="fas fa-exclamation-circle text-red-500 text-2xl mb-2"></i>
+            <p class="text-red-500 font-medium mb-2">Erro ao carregar transações</p>
+            <p class="text-gray-600 mb-3">Não foi possível carregar suas transações. Por favor, tente novamente.</p>
+            <button onclick="loadRecentTransactions()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+              <i class="fas fa-redo mr-2"></i>Tentar novamente
+            </button>
           </td>
         </tr>
       `;
