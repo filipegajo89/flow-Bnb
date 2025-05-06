@@ -17,7 +17,7 @@
         
         /* Corrigindo o layout da barra lateral - ajustando a cor para combinar com o logo */
         .sidebar {
-            background: #002856; /* Azul marinho escuro do logo */
+            background: #f0f4f8; /* Fundo mais claro */
             width: 240px;
             height: 100vh;
             position: fixed;
@@ -30,49 +30,53 @@
         
         /* Melhorando o espaçamento do logo */
         .logo-container {
-            padding: 1.75rem;
+            padding: 1.5rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #001d40; /* Um pouco mais escuro para contrastar */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background-color: #002856; /* Azul marinho para destacar o logo */
             margin-bottom: 1rem;
         }
         
         .logo-image {
-            height: 3.5rem; /* Aumentando o tamanho para melhor visualização */
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-            transition: all 0.3s ease;
+            height: 2.75rem; /* Ajustando para evitar deformação */
+            width: auto; /* Mantém a proporção original */
+            object-fit: contain; /* Evita cortes na imagem */
         }
         
         /* Menu de navegação na sidebar */
         .nav-menu {
-            padding: 1rem 0;
+            padding: 0.5rem 0;
         }
         
         .nav-item {
             display: flex;
             align-items: center;
             padding: 0.875rem 1.5rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: #002856; /* Texto azul escuro */
             transition: all 0.3s ease;
             margin-bottom: 0.25rem;
+            border-left: 3px solid transparent;
         }
         
         .nav-item:hover {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
+            color: #00B17C; /* Verde do logo ao passar o mouse */
+            background-color: rgba(0, 177, 124, 0.1);
         }
         
         .nav-item.active {
-            color: white;
-            background-color: rgba(0, 177, 124, 0.15); /* Verde similar ao logo */
-            border-left: 3px solid #00B17C; /* Verde do logo */
+            color: #00B17C; /* Verde do logo */
+            background-color: rgba(0, 177, 124, 0.15);
+            border-left: 3px solid #00B17C;
+            font-weight: 600;
         }
         
         .nav-icon {
-           color: white;
-           background-color: rgba(0, 177, 124, 0.1);
+           margin-right: 1.25rem; /* Aumentando o espaçamento entre ícone e texto */
+           width: 1.25rem;
+           text-align: center;
+           color: inherit; /* Herda a cor do elemento pai */
+           font-size: 1.125rem; /* Tamanho do ícone um pouco maior */
         }
         
         /* Conteúdo principal ajustado para a sidebar */
@@ -408,7 +412,7 @@
     <!-- Barra lateral - Ajustada conforme solicitado -->
     <div class="sidebar">
         <div class="logo-container">
-        <!-- Logo em destaque -->
+        <!-- Logo com proporções mantidas -->
         <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="logo-image">
     </div>
     
