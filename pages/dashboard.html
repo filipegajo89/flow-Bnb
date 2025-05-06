@@ -15,7 +15,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        /* Corrigindo o layout da barra lateral - ajustando a cor para combinar com o logo */
+        /* Corrigindo o layout da barra lateral */
         .sidebar {
             background: #f0f4f8; /* Fundo mais claro */
             width: 240px;
@@ -34,21 +34,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #f0f4f8; /* Mudando para fundo branco para contraste com o texto azul da logo */
+            background-color: white; /* Fundo branco para contraste com o texto azul da logo */
             margin-bottom: 1rem;
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
         
         .logo-image {
-            height: 2.75rem; /* Ajustando para evitar deformação */
-            width: auto; /* Mantém a proporção original */
-            object-fit: contain; /* Evita cortes na imagem */
-            filter: drop-shadow(0 0 0 transparent);
+            height: 2.75rem;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 0 transparent); /* Remover qualquer sombra existente */
         }
         
         /* Menu de navegação na sidebar */
         .nav-menu {
-            padding: 0.5rem 0;
+            padding: 1rem 0;
         }
         
         .nav-item {
@@ -74,11 +74,11 @@
         }
         
         .nav-icon {
-           margin-right: 1.25rem; /* Aumentando o espaçamento entre ícone e texto */
-           width: 1.25rem;
-           text-align: center;
-           color: inherit; /* Herda a cor do elemento pai */
-           font-size: 1.125rem; /* Tamanho do ícone um pouco maior */
+            margin-right: 1.25rem; /* Aumentando o espaçamento entre ícone e texto */
+            width: 1.25rem;
+            text-align: center;
+            color: inherit; /* Herda a cor do elemento pai */
+            font-size: 1.125rem; /* Tamanho do ícone um pouco maior */
         }
         
         /* Conteúdo principal ajustado para a sidebar */
@@ -288,7 +288,7 @@
         
         /* Botão de ação principal */
         .btn-primary {
-            background-color: #00B17C; /* Verde do logo */
+            background-color: #00B17C;
             color: white;
             padding: 0.625rem 1.25rem;
             border-radius: 0.5rem;
@@ -402,10 +402,13 @@
                 height: 2rem;
                 margin-right: 0.5rem;
             }
-        }
-
-        /* Ajuste do botão "Novo Imóvel" para dispositivos móveis */
-        @media (max-width: 768px) {
+            
+            /* Esconder o título duplicado em telas menores */
+            .mobile-title {
+                display: none; /* Oculta o título duplicado em dispositivos móveis */
+            }
+            
+            /* Botão "Novo Imóvel" mais compacto em mobile */
             .btn-primary {
                 padding: 0.5rem 1rem; /* Padding menor */
                 font-size: 0.875rem; /* Fonte menor */
@@ -416,23 +419,6 @@
                 font-size: 0.875rem; /* Ícone menor */
             }
         }
-
-        /* Esconder o título duplicado em telas menores */
-        @media (max-width: 768px) {
-            .mobile-title {
-                display: none; /* Oculta o título duplicado em dispositivos móveis */
-            }
-            
-            .btn-primary {
-                padding: 0.5rem 1rem; /* Botão menor */
-                font-size: 0.875rem;
-            }
-            
-            .btn-icon {
-                margin-right: 0.375rem;
-                font-size: 0.875rem;
-            }
-        }   
     </style>
 </head>
 <body>
@@ -444,29 +430,29 @@
     <!-- Barra lateral - Ajustada conforme solicitado -->
     <div class="sidebar">
         <div class="logo-container">
-        <!-- Logo com proporções mantidas -->
-        <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="logo-image">
+            <!-- Logo sem texto ao lado -->
+            <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="logo-image">
+        </div>
+        
+        <div class="nav-menu">
+            <a href="dashboard.html" class="nav-item active">
+                <i class="fas fa-tachometer-alt nav-icon"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span>Imóveis</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-money-bill-wave nav-icon"></i>
+                <span>Transações</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-chart-line nav-icon"></i>
+                <span>Relatórios</span>
+            </a>
+        </div>
     </div>
-    
-    <div class="nav-menu">
-        <a href="dashboard.html" class="nav-item active">
-            <i class="fas fa-tachometer-alt nav-icon"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fas fa-home nav-icon"></i>
-            <span>Imóveis</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fas fa-money-bill-wave nav-icon"></i>
-            <span>Transações</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fas fa-chart-line nav-icon"></i>
-            <span>Relatórios</span>
-        </a>
-    </div>
-</div>
     
     <!-- Conteúdo Principal -->
     <div class="main-content">
@@ -766,6 +752,7 @@
                         });
                     }
                 }
+                }
             };
             
             window.showErrorState = function(message) {
@@ -780,8 +767,9 @@
                                 <i class="fas fa-redo btn-icon"></i>Tentar novamente
                             </button>
                         </div>
-                        ;
-                        // Adicionar listener ao botão de tentar novamente
+                    `;
+                    
+                    // Adicionar listener ao botão de tentar novamente
                     const retryBtn = document.getElementById('retryLoadPropertiesBtn');
                     if (retryBtn) {
                         retryBtn.addEventListener('click', function() {
