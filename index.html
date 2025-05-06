@@ -244,41 +244,56 @@
     
     <!-- Script para melhorar a experiência de login -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const loginForm = document.getElementById('loginForm');
-            const submitButton = document.querySelector('.submit-btn');
-            const submitButtonText = document.getElementById('submitButtonText');
-            const notification = document.getElementById('notification');
-            const registerLink = document.getElementById('registerLink');
-            const togglePassword = document.getElementById('togglePassword');
-            const passwordInput = document.getElementById('password');
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM carregado, iniciando configuração da página de login');
+        
+        // Elementos do DOM
+        const loginForm = document.getElementById('loginForm');
+        const submitButton = document.querySelector('.submit-btn');
+        const submitButtonText = document.getElementById('submitButtonText');
+        const notification = document.getElementById('notification');
+        const registerLink = document.getElementById('registerLink');
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        
+        // Inicializar modo do formulário
+        loginForm.dataset.mode = 'login';
+        
+        // Função para mostrar notificações
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = 'notification ' + type;
+            notification.classList.add('show');
             
-            // Inicializar modo do formulário
-            loginForm.dataset.mode = 'login';
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Configurar toggle de senha - CORRIGIDO
+        if (togglePassword && passwordInput) {
+            console.log('Configurando toggle de senha');
             
-            // Toggle de visibilidade da senha
-            togglePassword.addEventListener('click', function() {
+            togglePassword.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevenir comportamento padrão
+                e.stopPropagation(); // Parar propagação
+                
                 // Alternar entre mostrar e esconder a senha
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
+                const currentType = passwordInput.getAttribute('type');
+                passwordInput.setAttribute('type', currentType === 'password' ? 'text' : 'password');
                 
                 // Alternar o ícone
                 this.classList.toggle('fa-eye');
                 this.classList.toggle('fa-eye-slash');
-            });
-            
-            // Função para mostrar notificações
-            function showNotification(message, type = 'info') {
-                notification.textContent = message;
-                notification.className = 'notification ' + type;
-                notification.classList.add('show');
                 
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
-            
-            // Alternar entre login e registro
+                console.log('Toggle de senha clicado, tipo atual:', passwordInput.getAttribute('type'));
+            });
+        } else {
+            console.warn('Elementos de toggle de senha não encontrados!');
+        }
+        
+        // Alternar entre login e registro
+        if (registerLink) {
             registerLink.addEventListener('click', function(e) {
                 e.preventDefault();
                 
@@ -296,10 +311,13 @@
                     showNotification('Crie uma nova conta', 'info');
                 }
             });
-            
-            // Lidar com envio do formulário
-            loginForm.addEventListener('submit', async function(e) {
+        }
+        
+        // Lidar com envio do formulário - CORRIGIDO
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                console.log('Formulário submetido no modo:', loginForm.dataset.mode);
                 
                 const email = loginForm.email.value;
                 const password = loginForm.password.value;
@@ -314,168 +332,119 @@
                 submitButton.classList.add('btn-loading');
                 submitButton.disabled = true;
                 
-                try {
-                    if (loginForm.dataset.mode === 'register') {
-                        // Modo de registro
-                        await register(email, password);
-                        showNotification('Conta criada com sucesso!', 'success');
-                    } else {
-                        // Modo de login
-                        await login(email, password);
-                        showNotification('Login realizado com sucesso!', 'success');
-                    }
-                } catch (error) {
-                    console.error('Erro:', error);
-                    
-                    // Traduzir mensagens de erro comuns do Firebase
-                    let errorMessage = error.message;
-                    if (error.code === 'auth/quota-exceeded') {
-                        errorMessage = 'Limite de tentativas excedido. Tente novamente mais tarde.';
-                    } else if (error.code === 'auth/wrong-password') {
-                        errorMessage = 'Senha incorreta. Tente novamente.';
-                    } else if (error.code === 'auth/user-not-found') {
-                        errorMessage = 'Usuário não encontrado. Verifique seu email.';
-                    } else if (error.code === 'auth/invalid-email') {
-                        errorMessage = 'Email inválido. Verifique o formato.';
-                    } else if (error.code === 'auth/invalid-credential') {
-                        errorMessage = 'Credenciais inválidas. Verifique seu email e senha.';
-                    }
-                    
-                    showNotification(errorMessage, 'error');
-                    
-                    // Remover loading
-                    submitButton.classList.remove('btn-loading');
-                    submitButton.disabled = false;
-                }
-            });
-        });
-    </script>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const loginForm = document.getElementById('loginForm');
-        const submitButton = document.querySelector('.submit-btn');
-        const submitButtonText = document.getElementById('submitButtonText');
-        const notification = document.getElementById('notification');
-        const registerLink = document.getElementById('registerLink');
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
-        
-        // Inicializar modo do formulário
-        loginForm.dataset.mode = 'login';
-        
-        // Toggle de visibilidade da senha
-        if (togglePassword && passwordInput) {
-            togglePassword.addEventListener('click', function() {
-                // Alternar entre mostrar e esconder a senha
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                console.log('Mudando tipo de input para:', type);
-                
-                // Alternar o ícone
-                this.classList.toggle('fa-eye');
-                this.classList.toggle('fa-eye-slash');
-            });
-        }
-        
-        // Função para mostrar notificações
-        function showNotification(message, type = 'info') {
-            notification.textContent = message;
-            notification.className = 'notification ' + type;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-        
-        // Alternar entre login e registro
-        registerLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            if (loginForm.dataset.mode === 'register') {
-                // Voltar para login
-                loginForm.dataset.mode = 'login';
-                submitButtonText.textContent = 'Entrar';
-                registerLink.textContent = 'Registre-se';
-                showNotification('Volte para o login', 'info');
-            } else {
-                // Mudar para registro
-                loginForm.dataset.mode = 'register';
-                submitButtonText.textContent = 'Registrar';
-                registerLink.textContent = 'Voltar para login';
-                showNotification('Crie uma nova conta', 'info');
-            }
-        });
-        
-        // Lidar com envio do formulário
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = loginForm.email.value;
-            const password = loginForm.password.value;
-            
-            // Validação básica
-            if (!email || !password) {
-                showNotification('Por favor, preencha todos os campos', 'error');
-                return;
-            }
-            
-            // Mostrar loading
-            submitButton.classList.add('btn-loading');
-            submitButton.disabled = true;
-            
-            try {
-                if (loginForm.dataset.mode === 'register') {
-                    // Modo de registro - acessando a função diretamente do auth global
-                    await auth.createUserWithEmailAndPassword(email, password)
-                        .then(cred => {
-                            console.log('Registro bem-sucedido:', cred.user.email);
+                // Definir função para tratar a autenticação
+                const handleAuth = async () => {
+                    try {
+                        if (loginForm.dataset.mode === 'register') {
+                            // Modo de registro - usando Firebase Auth diretamente
+                            console.log('Tentando registrar usuário:', email);
+                            
+                            const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                            console.log('Registro bem-sucedido:', userCredential.user.email);
                             
                             // Criar documento do usuário no Firestore
-                            return db.collection('users').doc(cred.user.uid).set({
+                            await firebase.firestore().collection('users').doc(userCredential.user.uid).set({
                                 email: email,
                                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
                             });
-                        });
-                    showNotification('Conta criada com sucesso!', 'success');
-                } else {
-                    // Modo de login - acessando a função diretamente do auth global
-                    await auth.signInWithEmailAndPassword(email, password)
-                        .then(userCredential => {
+                            
+                            showNotification('Conta criada com sucesso!', 'success');
+                            
+                            // Redirecionar após um pequeno delay
+                            setTimeout(() => {
+                                window.location.href = 'pages/dashboard.html';
+                            }, 1500);
+                        } else {
+                            // Modo de login - usando Firebase Auth diretamente
+                            console.log('Tentando login com:', email);
+                            
+                            const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
                             console.log('Login bem-sucedido:', userCredential.user.email);
-                        });
-                    showNotification('Login realizado com sucesso!', 'success');
+                            
+                            showNotification('Login realizado com sucesso!', 'success');
+                            
+                            // Redirecionar após um pequeno delay
+                            setTimeout(() => {
+                                window.location.href = 'pages/dashboard.html';
+                            }, 1500);
+                        }
+                    } catch (error) {
+                        console.error('Erro:', error);
+                        
+                        // Traduzir mensagens de erro comuns do Firebase
+                        let errorMessage = 'Ocorreu um erro. Tente novamente.';
+                        
+                        switch (error.code) {
+                            case 'auth/quota-exceeded':
+                                errorMessage = 'Limite de tentativas excedido. Por favor, tente novamente mais tarde.';
+                                break;
+                            case 'auth/user-not-found':
+                                errorMessage = 'Usuário não encontrado. Verifique seu email ou crie uma nova conta.';
+                                break;
+                            case 'auth/wrong-password':
+                                errorMessage = 'Senha incorreta. Verifique sua senha e tente novamente.';
+                                break;
+                            case 'auth/invalid-email':
+                                errorMessage = 'Email inválido. Por favor, verifique o formato do email.';
+                                break;
+                            case 'auth/email-already-in-use':
+                                errorMessage = 'Este email já está em uso. Tente fazer login ou use outro email.';
+                                break;
+                            case 'auth/weak-password':
+                                errorMessage = 'A senha é muito fraca. Use pelo menos 6 caracteres.';
+                                break;
+                            case 'auth/network-request-failed':
+                                errorMessage = 'Erro de conexão. Verifique sua internet e tente novamente.';
+                                break;
+                            case 'auth/too-many-requests':
+                                errorMessage = 'Muitas tentativas incorretas. Tente novamente mais tarde.';
+                                break;
+                            default:
+                                errorMessage = `Erro: ${error.message}`;
+                        }
+                        
+                        showNotification(errorMessage, 'error');
+                    } finally {
+                        // Remover loading independente do resultado
+                        submitButton.classList.remove('btn-loading');
+                        submitButton.disabled = false;
+                    }
+                };
+                
+                // Executar a função de autenticação
+                handleAuth();
+            });
+        } else {
+            console.error('Formulário de login não encontrado!');
+        }
+        
+        // Verificar estado de autenticação
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                console.log('Usuário já autenticado:', user.email);
+                
+                // Atualizar UI se necessário
+                const userNameElement = document.getElementById('userName');
+                if (userNameElement) {
+                    userNameElement.textContent = user.email;
+                }
+                
+                // Se estiver na página de login e já autenticado, redirecionar para dashboard
+                if (window.location.pathname === '/' || 
+                    window.location.pathname.endsWith('index.html') || 
+                    window.location.pathname.endsWith('/')) {
                     
-                    // Adicionar pequeno delay antes de redirecionar
+                    console.log('Redirecionando para dashboard (usuário já autenticado)');
                     setTimeout(() => {
                         window.location.href = 'pages/dashboard.html';
-                    }, 1000);
+                    }, 500);
                 }
-            } catch (error) {
-                console.error('Erro:', error);
-                
-                // Traduzir mensagens de erro comuns do Firebase
-                let errorMessage = error.message;
-                if (error.code === 'auth/quota-exceeded') {
-                    errorMessage = 'Limite de tentativas excedido. Tente novamente mais tarde.';
-                } else if (error.code === 'auth/wrong-password') {
-                    errorMessage = 'Senha incorreta. Tente novamente.';
-                } else if (error.code === 'auth/user-not-found') {
-                    errorMessage = 'Usuário não encontrado. Verifique seu email.';
-                } else if (error.code === 'auth/invalid-email') {
-                    errorMessage = 'Email inválido. Verifique o formato.';
-                } else if (error.code === 'auth/invalid-credential') {
-                    errorMessage = 'Credenciais inválidas. Verifique seu email e senha.';
-                }
-                
-                showNotification(errorMessage, 'error');
-            } finally {
-                // Remover loading independente do resultado
-                submitButton.classList.remove('btn-loading');
-                submitButton.disabled = false;
+            } else {
+                console.log('Nenhum usuário autenticado');
             }
         });
+        
+        console.log('Configuração da página de login concluída');
     });
     </script>
     
