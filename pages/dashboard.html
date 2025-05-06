@@ -415,6 +415,23 @@
                 font-size: 0.875rem; /* Ícone menor */
             }
         }
+
+        /* Esconder o título duplicado em telas menores */
+        @media (max-width: 768px) {
+            .mobile-title {
+                display: none; /* Oculta o título duplicado em dispositivos móveis */
+            }
+            
+            .btn-primary {
+                padding: 0.5rem 1rem; /* Botão menor */
+                font-size: 0.875rem;
+            }
+            
+            .btn-icon {
+                margin-right: 0.375rem;
+                font-size: 0.875rem;
+            }
+        }   
     </style>
 </head>
 <body>
