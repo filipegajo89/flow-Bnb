@@ -34,8 +34,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #002856; /* Azul marinho para destacar o logo */
+            background-color: white; /* Mudando para fundo branco para contraste com o texto azul da logo */
             margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
         
         .logo-image {
@@ -399,6 +400,19 @@
             .mobile-logo {
                 height: 2rem;
                 margin-right: 0.5rem;
+            }
+        }
+
+        /* Ajuste do botão "Novo Imóvel" para dispositivos móveis */
+        @media (max-width: 768px) {
+            .btn-primary {
+                padding: 0.5rem 1rem; /* Padding menor */
+                font-size: 0.875rem; /* Fonte menor */
+            }
+            
+            .btn-icon {
+                margin-right: 0.375rem; /* Espaço menor entre ícone e texto */
+                font-size: 0.875rem; /* Ícone menor */
             }
         }
     </style>
