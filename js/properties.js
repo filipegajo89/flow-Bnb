@@ -212,7 +212,7 @@ const renderPropertyCard = (property, financialSummary) => {
   return card;
 };
 
-// Atualização para a função loadAndDisplayProperties
+// Atualização da função loadAndDisplayProperties
 const loadAndDisplayProperties = async (monthFilter = null) => {
   try {
     // Obter o elemento onde os imóveis serão exibidos
@@ -220,38 +220,14 @@ const loadAndDisplayProperties = async (monthFilter = null) => {
     if (!propertiesList) return;
     
     // Mostrar indicador de carregamento
-    propertiesList.innerHTML = '<div class="col-span-full text-center py-10"><i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i></div>';
+    showLoadingState();
     
     // Obter imóveis do usuário
     const properties = await getProperties();
     
     // Verificar se há imóveis
     if (properties.length === 0) {
-      propertiesList.innerHTML = `
-        <div class="col-span-full">
-          <div class="no-properties">
-            <i class="fas fa-home no-properties-icon"></i>
-            <h3 class="no-properties-title">Nenhum imóvel cadastrado</h3>
-            <p class="no-properties-text">Você ainda não tem imóveis cadastrados. Comece adicionando seu primeiro imóvel.</p>
-            <button id="addFirstPropertyBtn" class="add-property-button">
-              <i class="fas fa-plus add-property-icon"></i>Adicionar Primeiro Imóvel
-            </button>
-          </div>
-        </div>
-      `;
-      
-      // Adicionar listener ao botão
-      const addFirstPropertyBtn = document.getElementById('addFirstPropertyBtn');
-      if (addFirstPropertyBtn) {
-        addFirstPropertyBtn.addEventListener('click', () => {
-          const addPropertyModal = document.getElementById('addPropertyModal');
-          if (addPropertyModal) {
-            addPropertyModal.classList.remove('hidden');
-            addPropertyModal.classList.add('flex');
-          }
-        });
-      }
-      
+      showEmptyState();
       return;
     }
     
@@ -270,37 +246,42 @@ const loadAndDisplayProperties = async (monthFilter = null) => {
     
     // Para cada imóvel, calcular resumo financeiro e exibir
     for (const property of properties) {
-      const financialSummary = await getPropertyFinancialSummary(property.id, currentMonth, currentYear);
+      try {
+        const financialSummary = await getPropertyFinancialSummary(property.id, currentMonth, currentYear);
       
-      // Adicionar aos totais gerais
-      totalIncome += financialSummary.income;
-      totalExpense += financialSummary.expense;
-      totalProfit += financialSummary.profit;
+        // Adicionar aos totais gerais
+        totalIncome += financialSummary.income;
+        totalExpense += financialSummary.expense;
+        totalProfit += financialSummary.profit;
       
-      // Renderizar card do imóvel
-      const propertyCard = renderPropertyCard(property, financialSummary);
-      propertiesList.appendChild(propertyCard);
+        // Renderizar card do imóvel
+        const propertyCard = renderPropertyCard(property, financialSummary);
+        propertiesList.appendChild(propertyCard);
       
-      // Adicionar listeners aos botões
-      const viewBtn = propertyCard.querySelector('.viewPropertyBtn');
-      const addTransactionBtn = propertyCard.querySelector('.addTransactionBtn');
+        // Adicionar listeners aos botões
+        const viewBtn = propertyCard.querySelector('.viewPropertyBtn');
+        const addTransactionBtn = propertyCard.querySelector('.addTransactionBtn');
       
-      if (viewBtn) {
-        viewBtn.addEventListener('click', () => {
-          window.location.href = `pages/property-details.html?id=${property.id}`;
-        });
-      }
+        if (viewBtn) {
+          viewBtn.addEventListener('click', () => {
+            window.location.href = `property-details.html?id=${property.id}`;
+          });
+        }
       
-      if (addTransactionBtn) {
-        addTransactionBtn.addEventListener('click', () => {
-          // Abrir modal de adicionar transação
-          const modal = document.getElementById('addTransactionModal');
-          if (modal) {
-            document.getElementById('transactionPropertyId').value = property.id;
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-          }
-        });
+        if (addTransactionBtn) {
+          addTransactionBtn.addEventListener('click', () => {
+            // Abrir modal de adicionar transação
+            const modal = document.getElementById('addTransactionModal');
+            if (modal) {
+              document.getElementById('transactionPropertyId').value = property.id;
+              modal.classList.remove('hidden');
+              modal.classList.add('flex');
+            }
+          });
+        }
+      } catch (propertyError) {
+        console.error('Erro ao processar imóvel:', propertyError);
+        continue; // Continuar com o próximo imóvel mesmo se este falhar
       }
     }
     
@@ -309,22 +290,65 @@ const loadAndDisplayProperties = async (monthFilter = null) => {
     
   } catch (error) {
     console.error('Erro ao carregar imóveis:', error);
-    const propertiesList = document.getElementById('propertiesList');
-    if (propertiesList) {
-      propertiesList.innerHTML = `
-        <div class="col-span-full text-center py-10">
-          <div class="bg-white rounded-lg p-6 shadow-md">
-            <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-4"></i>
-            <p class="text-red-500 font-medium mb-2">Erro ao carregar imóveis</p>
-            <p class="text-gray-600 mb-4">Não foi possível carregar seus imóveis. Por favor, tente novamente.</p>
-            <button onclick="location.reload()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-              <i class="fas fa-redo mr-2"></i>Tentar novamente
+    showErrorState('Não foi possível carregar seus imóveis. Por favor, tente novamente.');
+  }
+};
+
+// Atualização continuada para a função renderPropertyCard  
+const renderPropertyCard = (property, financialSummary) => {
+  const card = document.createElement('div');
+  card.className = 'bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1';
+  card.dataset.id = property.id;
+  
+  const statusClass = property.status === 'active' ? 'bg-green-500' : 'bg-gray-500';
+  const statusText = property.status === 'active' ? 'Ativo' : 'Inativo';
+  const imageUrl = property.image || 'https://via.placeholder.com/800x400?text=Imóvel';
+  
+  card.innerHTML = `
+    <div class="relative h-44 overflow-hidden bg-gray-200">
+      <img src="${imageUrl}" alt="${property.name}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+      <div class="absolute top-3 right-3 ${statusClass} text-white text-xs font-bold px-2 py-1 rounded-full">
+        ${statusText}
+      </div>
+    </div>
+    <div class="p-5">
+      <h3 class="text-lg font-bold text-gray-800 mb-2 line-clamp-1">${property.name}</h3>
+      <p class="text-gray-600 text-sm mb-4 flex items-center">
+        <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>
+        ${property.city}, ${property.state}
+      </p>
+      
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="text-center p-2 bg-green-50 rounded-lg">
+          <p class="text-xs text-gray-500 mb-1">Receitas</p>
+          <p class="text-green-600 font-semibold">${financialSummary.formattedIncome}</p>
+        </div>
+        <div class="text-center p-2 bg-red-50 rounded-lg">
+          <p class="text-xs text-gray-500 mb-1">Despesas</p>
+          <p class="text-red-600 font-semibold">${financialSummary.formattedExpense}</p>
+        </div>
+      </div>
+      
+      <div class="border-t pt-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="text-xs text-gray-500">Lucro</p>
+            <p class="text-blue-600 font-bold">${financialSummary.formattedProfit}</p>
+          </div>
+          <div class="flex space-x-2">
+            <button class="viewPropertyBtn p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="addTransactionBtn p-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors">
+              <i class="fas fa-plus"></i>
             </button>
           </div>
         </div>
-      `;
-    }
-  }
+      </div>
+    </div>
+  `;
+  
+  return card;
 };
 
 // Atualizar resumo do dashboard
