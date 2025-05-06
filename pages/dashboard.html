@@ -1,17 +1,191 @@
-<!-- Estrutura HTML atualizada para dashboard.html -->
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Substitua a meta tag CSP atual por esta versão mais permissiva -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com/firebasejs/ https://cdnjs.cloudflare.com/ https://cdn.jsdelivr.net/; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com/ https://use.typekit.net/; font-src 'self' https://cdnjs.cloudflare.com/ https://use.typekit.net/ data:; img-src 'self' https://via.placeholder.com/ https://i.imgur.com/ data:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app https://firestore.googleapis.com https://*.googleapis.com https://use.typekit.net/">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com/firebasejs/ https://cdnjs.cloudflare.com/ https://cdn.jsdelivr.net/; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com/ https://use.typekit.net/; font-src 'self' https://cdnjs.cloudflare.com/ https://use.typekit.net/ data:; img-src 'self' https://via.placeholder.com/ https://i.imgur.com/ data:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app https://firestore.googleapis.com https://*.googleapis.com https://use.typekit.net/">
     <link rel="icon" href="../assets/icons/favicon.png" type="image/png">
     <title>FlowBnb - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Novos estilos para o dashboard */
+        .main-stats-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            height: 100%;
+        }
+        
+        .main-stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .income-card {
+            border-left-color: #09b188;
+        }
+        
+        .expense-card {
+            border-left-color: #e74c3c;
+        }
+        
+        .profit-card {
+            border-left-color: #1c5def;
+        }
+        
+        .stats-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            margin-right: 1rem;
+        }
+        
+        .income-icon {
+            background-color: rgba(9, 177, 136, 0.1);
+            color: #09b188;
+        }
+        
+        .expense-icon {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+        
+        .profit-icon {
+            background-color: rgba(28, 93, 239, 0.1);
+            color: #1c5def;
+        }
+        
+        .stats-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #2c3e50;
+        }
+        
+        .stats-label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Novos estilos para o cabeçalho */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        /* Estado vazio */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .empty-state-icon {
+            font-size: 3.5rem;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+        
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.75rem;
+        }
+        
+        .empty-state-text {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Botão de ação principal */
+        .main-action-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            background: linear-gradient(to right, #09b188, #0c2e69);
+            color: white;
+            font-weight: 600;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(9, 177, 136, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .main-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(9, 177, 136, 0.25);
+            background: linear-gradient(to right, #08a078, #0a2554);
+        }
+        
+        .btn-icon {
+            margin-right: 0.625rem;
+        }
+        
+        /* Estados de erro e carregamento */
+        .error-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(9, 177, 136, 0.1);
+            border-radius: 50%;
+            border-top-color: #09b188;
+            width: 3rem;
+            height: 3rem;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body class="bg-gray-100 font-sans">
     <!-- Botão de Menu Mobile -->
@@ -19,13 +193,13 @@
         <i class="fas fa-bars"></i>
     </button>
 
-    <!-- Sidebar -->
+    <!-- Sidebar otimizada -->
     <div class="sidebar">
         <div class="logo-container">
             <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="logo-image">
             <div>
                 <span class="logo-text">FlowBnb</span>
-                <span class="brand-tagline">Gestão Financeira de Imóveis</span>
+                <span class="brand-tagline">Gestão de Imóveis</span>
             </div>
         </div>
         
@@ -62,17 +236,17 @@
     
     <!-- Conteúdo Principal -->
     <div class="main-content">
-        <!-- Header -->
-        <header class="main-header">
-            <h1 class="page-title">Dashboard</h1>
+        <!-- Header aprimorado -->
+        <header class="dashboard-header">
+            <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
             <div class="flex items-center">
-                <button class="btn btn-primary mr-4">
+                <button id="addPropertyBtn" class="main-action-btn mr-4">
                     <i class="fas fa-plus btn-icon"></i>
                     <span>Novo Imóvel</span>
                 </button>
-                <div class="user-profile flex items-center">
+                <div class="flex items-center bg-white p-2 rounded-full shadow-sm">
                     <span class="mr-3 font-medium text-gray-700" id="userName">Usuário</span>
-                    <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
                         <i class="fas fa-user"></i>
                     </div>
                 </div>
@@ -80,64 +254,101 @@
         </header>
         
         <!-- Resumo Financeiro -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <div class="card-icon revenue">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="main-stats-card income-card">
+                <div class="flex items-center">
+                    <div class="stats-icon income-icon">
                         <i class="fas fa-money-bill-wave text-xl"></i>
                     </div>
                     <div>
-                        <h3 class="card-title">Receita Total</h3>
-                        <p class="card-value" id="totalRevenue">R$ 0,00</p>
+                        <p class="stats-label">Receita Total</p>
+                        <p class="stats-value" id="totalRevenue">R$ 0,00</p>
                     </div>
                 </div>
             </div>
             
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <div class="card-icon expense">
+            <div class="main-stats-card expense-card">
+                <div class="flex items-center">
+                    <div class="stats-icon expense-icon">
                         <i class="fas fa-hand-holding-usd text-xl"></i>
                     </div>
                     <div>
-                        <h3 class="card-title">Despesa Total</h3>
-                        <p class="card-value" id="totalExpenses">R$ 0,00</p>
+                        <p class="stats-label">Despesa Total</p>
+                        <p class="stats-value" id="totalExpenses">R$ 0,00</p>
                     </div>
                 </div>
             </div>
             
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <div class="card-icon profit">
+            <div class="main-stats-card profit-card">
+                <div class="flex items-center">
+                    <div class="stats-icon profit-icon">
                         <i class="fas fa-chart-line text-xl"></i>
                     </div>
                     <div>
-                        <h3 class="card-title">Lucro Líquido</h3>
-                        <p class="card-value" id="totalProfit">R$ 0,00</p>
+                        <p class="stats-label">Lucro Líquido</p>
+                        <p class="stats-value" id="totalProfit">R$ 0,00</p>
                     </div>
                 </div>
             </div>
         </div>
         
         <!-- Lista de Imóveis -->
-        <div class="dashboard-card mb-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold text-gray-800">Seus Imóveis</h2>
-                <select id="monthFilter" class="border rounded px-3 py-1 text-sm bg-white">
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+            <div class="section-header">
+                <h2 class="section-title">Seus Imóveis</h2>
+                <select id="monthFilter" class="border rounded-lg px-3 py-2 text-sm bg-white">
                     <option value="all">Todos os meses</option>
-                    <!-- Opções de meses -->
+                    <option value="1">Janeiro</option>
+                    <option value="2">Fevereiro</option>
+                    <option value="3">Março</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Maio</option>
+                    <option value="6">Junho</option>
+                    <option value="7">Julho</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
                 </select>
             </div>
             
-            <div id="propertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Os cards de imóveis serão inseridos aqui via JavaScript -->
+            <div id="propertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Estado de carregamento -->
+                <div class="loading-state col-span-full">
+                    <div class="loading-spinner"></div>
+                    <p class="text-gray-500">Carregando seus imóveis...</p>
+                </div>
+                
+                <!-- Estado de erro (será exibido pelo JavaScript quando necessário) -->
+                <div class="error-state col-span-full hidden">
+                    <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Erro ao carregar imóveis</h3>
+                    <p class="text-gray-600 mb-6">Não foi possível carregar seus imóveis. Por favor, tente novamente.</p>
+                    <button id="retryLoadProperties" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+                        <i class="fas fa-redo mr-2"></i>Tentar novamente
+                    </button>
+                </div>
+                
+                <!-- Estado vazio (será exibido pelo JavaScript quando não houver imóveis) -->
+                <div class="empty-state col-span-full hidden">
+                    <i class="fas fa-home empty-state-icon"></i>
+                    <h3 class="empty-state-title">Nenhum imóvel cadastrado</h3>
+                    <p class="empty-state-text">Cadastre seu primeiro imóvel para começar a controlar suas receitas e despesas. É simples e rápido!</p>
+                    <button id="addFirstPropertyBtn" class="main-action-btn">
+                        <i class="fas fa-plus btn-icon"></i>Adicionar Primeiro Imóvel
+                    </button>
+                </div>
             </div>
         </div>
         
         <!-- Histórico de Transações Recentes -->
-        <div class="dashboard-card">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold text-gray-800">Transações Recentes</h2>
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <div class="section-header">
+                <h2 class="section-title">Transações Recentes</h2>
+                <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Ver todas</a>
             </div>
+            
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -151,14 +362,74 @@
                         </tr>
                     </thead>
                     <tbody id="recentTransactions" class="bg-white divide-y divide-gray-200">
-                        <!-- As transações serão inseridas aqui via JavaScript -->
+                        <!-- Estado de carregamento -->
+                        <tr>
+                            <td colspan="6" class="px-6 py-10 text-center">
+                                <div class="inline-block">
+                                    <div class="loading-spinner"></div>
+                                </div>
+                                <p class="text-gray-500 mt-2">Carregando transações...</p>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
     
-    <!-- Modais (Incluir os modais como antes) -->
+    <!-- Modal Adicionar Imóvel (reaproveitado e melhorado) -->
+    <div id="addPropertyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Adicionar Novo Imóvel</h2>
+                <button id="closeAddPropertyModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addPropertyForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyName">
+                        Nome do Imóvel
+                    </label>
+                    <input type="text" id="propertyName" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: Apartamento na Praia" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyAddress">
+                        Endereço
+                    </label>
+                    <input type="text" id="propertyAddress" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: Rua das Flores, 123" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyCity">
+                            Cidade
+                        </label>
+                        <input type="text" id="propertyCity" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: Rio de Janeiro" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyState">
+                            Estado
+                        </label>
+                        <input type="text" id="propertyState" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: RJ" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyImage">
+                        URL da Imagem (opcional)
+                    </label>
+                    <input type="text" id="propertyImage" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: https://exemplo.com/imagem.jpg">
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button type="button" id="cancelAddProperty" class="px-4 py-2 text-gray-600 mr-3">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                        Adicionar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
     
     <!-- Scripts do Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -172,10 +443,11 @@
     <script src="../js/transactions.js"></script>
     <script src="../js/dashboard.js"></script>
     
-    <!-- Script para o menu mobile -->
+    <!-- Script para o menu mobile e para melhorar o tratamento de erro -->
     <script>
-        // Adicionar evento para o botão de menu mobile
+        // Esperar o DOM carregar completamente
         document.addEventListener('DOMContentLoaded', function() {
+            // Configurar menu mobile
             const menuToggle = document.querySelector('.menu-toggle');
             const sidebar = document.querySelector('.sidebar');
             
@@ -184,7 +456,108 @@
                     sidebar.classList.toggle('open');
                 });
             }
+            
+            // Aprimorar tratamento de erros
+            const retryLoadPropertiesBtn = document.getElementById('retryLoadProperties');
+            if (retryLoadPropertiesBtn) {
+                retryLoadPropertiesBtn.addEventListener('click', function() {
+                    // Limpar mensagem de erro
+                    const errorState = document.querySelector('.error-state');
+                    if (errorState) {
+                        errorState.classList.add('hidden');
+                    }
+                    
+                    // Mostrar estado de carregamento
+                    const loadingState = document.querySelector('.loading-state');
+                    if (loadingState) {
+                        loadingState.classList.remove('hidden');
+                    }
+                    
+                    // Recarregar imóveis
+                    loadAndDisplayProperties();
+                });
+            }
         });
+        
+        // Função para exibir estado de erro
+        function showErrorState(message) {
+            const propertiesList = document.getElementById('propertiesList');
+            if (!propertiesList) return;
+            
+            // Limpar conteúdo atual
+            propertiesList.innerHTML = '';
+            
+            // Criar e exibir estado de erro
+            const errorState = document.createElement('div');
+            errorState.className = 'error-state col-span-full';
+            errorState.innerHTML = `
+                <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Erro ao carregar imóveis</h3>
+                <p class="text-gray-600 mb-6">${message || 'Não foi possível carregar seus imóveis. Por favor, tente novamente.'}</p>
+                <button id="retryLoadProperties" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+                    <i class="fas fa-redo mr-2"></i>Tentar novamente
+                </button>
+            `;
+            
+            propertiesList.appendChild(errorState);
+            
+            // Adicionar listener ao botão
+            const retryBtn = errorState.querySelector('#retryLoadProperties');
+            if (retryBtn) {
+                retryBtn.addEventListener('click', function() {
+                    // Limpar mensagem de erro
+                    errorState.remove();
+                    
+                    // Mostrar estado de carregamento
+                    showLoadingState();
+                    
+                    // Recarregar imóveis
+                    loadAndDisplayProperties();
+                });
+            }
+        }
+        
+        // Função para exibir estado de carregamento
+        function showLoadingState() {
+            const propertiesList = document.getElementById('propertiesList');
+            if (!propertiesList) return;
+            
+            propertiesList.innerHTML = `
+                <div class="loading-state col-span-full">
+                    <div class="loading-spinner"></div>
+                    <p class="text-gray-500">Carregando seus imóveis...</p>
+                </div>
+            `;
+        }
+        
+        // Função para exibir estado vazio
+        function showEmptyState() {
+            const propertiesList = document.getElementById('propertiesList');
+            if (!propertiesList) return;
+            
+            propertiesList.innerHTML = `
+                <div class="empty-state col-span-full">
+                    <i class="fas fa-home empty-state-icon"></i>
+                    <h3 class="empty-state-title">Nenhum imóvel cadastrado</h3>
+                    <p class="empty-state-text">Cadastre seu primeiro imóvel para começar a controlar suas receitas e despesas. É simples e rápido!</p>
+                    <button id="addFirstPropertyBtn" class="main-action-btn">
+                        <i class="fas fa-plus btn-icon"></i>Adicionar Primeiro Imóvel
+                    </button>
+                </div>
+            `;
+            
+            // Adicionar listener ao botão
+            const addFirstPropertyBtn = document.getElementById('addFirstPropertyBtn');
+            if (addFirstPropertyBtn) {
+                addFirstPropertyBtn.addEventListener('click', function() {
+                    const addPropertyModal = document.getElementById('addPropertyModal');
+                    if (addPropertyModal) {
+                        addPropertyModal.classList.remove('hidden');
+                        addPropertyModal.classList.add('flex');
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>
