@@ -16,7 +16,7 @@ const initDashboard = () => {
       loadDashboardData();
     } else {
       // Redirecionar para a página de login
-      window.location.href = '/index.html';
+      window.location.href = '../index.html';
     }
   });
 };
@@ -40,6 +40,8 @@ const loadDashboardData = async () => {
     setupDashboardListeners();
   } catch (error) {
     console.error('Erro ao carregar dados do dashboard:', error);
+    // Exibir mensagem de erro na interface
+    showErrorState('Ocorreu um erro ao carregar os dados do dashboard.');
   }
 };
 
@@ -54,6 +56,30 @@ const setupDashboardListeners = () => {
     });
   }
   
+  // Botão de adicionar imóvel
+  const addPropertyBtn = document.getElementById('addPropertyBtn');
+  if (addPropertyBtn) {
+    addPropertyBtn.addEventListener('click', () => {
+      const modal = document.getElementById('addPropertyModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    });
+  }
+  
+  // Filtro de mês
+  const monthFilter = document.getElementById('monthFilter');
+  if (monthFilter) {
+    // Preencher mês atual como selecionado
+    const currentMonth = new Date().getMonth() + 1; // getMonth retorna 0-11
+    monthFilter.value = currentMonth.toString();
+    
+    monthFilter.addEventListener('change', () => {
+      loadAndDisplayProperties(monthFilter.value === 'all' ? null : monthFilter.value);
+    });
+  }
+  
   // Menu de usuário
   const userMenuBtn = document.getElementById('userMenuBtn');
   if (userMenuBtn) {
@@ -62,18 +88,6 @@ const setupDashboardListeners = () => {
       // (será implementado em versão futura)
     });
   }
-  
-  // Links do menu lateral
-  const navLinks = document.querySelectorAll('nav a');
-  navLinks.forEach(link => {
-    link.addEventListener('click', e => {
-      // Não implementado nesta versão inicial
-      if (!link.classList.contains('bg-blue-800')) {
-        e.preventDefault();
-        alert('Esta funcionalidade será implementada em breve!');
-      }
-    });
-  });
 };
 
 // Inicializar quando a página for carregada
