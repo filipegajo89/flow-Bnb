@@ -17,7 +17,7 @@
         
         /* Corrigindo o layout da barra lateral - ajustando a cor para combinar com o logo */
         .sidebar {
-            background: #002856; /* Azul marinho mais escuro para harmonizar com o logo */
+            background: #002856; /* Azul marinho escuro do logo */
             width: 240px;
             height: 100vh;
             position: fixed;
@@ -30,16 +30,19 @@
         
         /* Melhorando o espaçamento do logo */
         .logo-container {
-            padding: 1.5rem;
+            padding: 1.75rem;
             display: flex;
+            justify-content: center;
             align-items: center;
-            justify-content: center; /* Centralizar o logo */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 1.5rem;
+            background-color: #001d40; /* Um pouco mais escuro para contrastar */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 1rem;
         }
         
         .logo-image {
-            height: 3rem;
+            height: 3.5rem; /* Aumentando o tamanho para melhor visualização */
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            transition: all 0.3s ease;
         }
         
         /* Menu de navegação na sidebar */
@@ -63,14 +66,13 @@
         
         .nav-item.active {
             color: white;
-            background-color: rgba(255, 255, 255, 0.15);
-            border-left: 3px solid #09b188;
+            background-color: rgba(0, 177, 124, 0.15); /* Verde similar ao logo */
+            border-left: 3px solid #00B17C; /* Verde do logo */
         }
         
         .nav-icon {
-            margin-right: 0.875rem;
-            width: 1.25rem;
-            text-align: center;
+           color: white;
+           background-color: rgba(0, 177, 124, 0.1);
         }
         
         /* Conteúdo principal ajustado para a sidebar */
@@ -280,7 +282,7 @@
         
         /* Botão de ação principal */
         .btn-primary {
-            background-color: #09b188;
+            background-color: #00B17C; /* Verde do logo */
             color: white;
             padding: 0.625rem 1.25rem;
             border-radius: 0.5rem;
@@ -291,7 +293,7 @@
         }
         
         .btn-primary:hover {
-            background-color: #089f7a;
+            background-color: #009e6f;
             transform: translateY(-1px);
         }
         
@@ -406,30 +408,29 @@
     <!-- Barra lateral - Ajustada conforme solicitado -->
     <div class="sidebar">
         <div class="logo-container">
-            <!-- Logo sem texto ao lado -->
-            <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="logo-image">
-        </div>
-        
-        <div class="nav-menu">
-            <a href="dashboard.html" class="nav-item active">
-                <i class="fas fa-tachometer-alt nav-icon"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fas fa-home nav-icon"></i>
-                <span>Imóveis</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fas fa-money-bill-wave nav-icon"></i>
-                <span>Transações</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fas fa-chart-line nav-icon"></i>
-                <span>Relatórios</span>
-            </a>
-            <!-- Removida a opção Configurações da sidebar -->
-        </div>
+        <!-- Logo em destaque -->
+        <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="logo-image">
     </div>
+    
+    <div class="nav-menu">
+        <a href="dashboard.html" class="nav-item active">
+            <i class="fas fa-tachometer-alt nav-icon"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-home nav-icon"></i>
+            <span>Imóveis</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-money-bill-wave nav-icon"></i>
+            <span>Transações</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-chart-line nav-icon"></i>
+            <span>Relatórios</span>
+        </a>
+    </div>
+</div>
     
     <!-- Conteúdo Principal -->
     <div class="main-content">
