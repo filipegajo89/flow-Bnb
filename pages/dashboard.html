@@ -15,9 +15,9 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        /* Corrigindo o layout da barra lateral */
+        /* Corrigindo o layout da barra lateral - ajustando a cor para combinar com o logo */
         .sidebar {
-            background: #0c2e69;
+            background: #002856; /* Azul marinho mais escuro para harmonizar com o logo */
             width: 240px;
             height: 100vh;
             position: fixed;
@@ -33,25 +33,13 @@
             padding: 1.5rem;
             display: flex;
             align-items: center;
+            justify-content: center; /* Centralizar o logo */
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
         }
         
         .logo-image {
-            height: 2.5rem;
-            margin-right: 0.75rem;
-        }
-        
-        .logo-text {
-            color: white;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-        
-        .brand-tagline {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.75rem;
-            display: block;
-            margin-top: 0.125rem;
+            height: 3rem;
         }
         
         /* Menu de navegação na sidebar */
@@ -415,14 +403,11 @@
         <i class="fas fa-bars"></i>
     </button>
     
-    <!-- Barra lateral -->
+    <!-- Barra lateral - Ajustada conforme solicitado -->
     <div class="sidebar">
         <div class="logo-container">
+            <!-- Logo sem texto ao lado -->
             <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="logo-image">
-            <div>
-                <span class="logo-text">FlowBnb</span>
-                <span class="brand-tagline">Gestão de Imóveis</span>
-            </div>
         </div>
         
         <div class="nav-menu">
@@ -442,10 +427,7 @@
                 <i class="fas fa-chart-line nav-icon"></i>
                 <span>Relatórios</span>
             </a>
-            <a href="#" class="nav-item">
-                <i class="fas fa-cog nav-icon"></i>
-                <span>Configurações</span>
-            </a>
+            <!-- Removida a opção Configurações da sidebar -->
         </div>
     </div>
     
@@ -481,6 +463,7 @@
                                 <i class="fas fa-user-circle"></i>
                                 <span>Meu Perfil</span>
                             </a>
+                            <!-- Mantendo opção Configurações apenas no dropdown -->
                             <a href="#" class="dropdown-item">
                                 <i class="fas fa-cog"></i>
                                 <span>Configurações</span>
@@ -707,8 +690,8 @@
                 }
             });
             
-            // Estados de feedback para a listagem de imóveis
-            function showLoadingState() {
+            // Funções para renderizar estados diferentes
+            window.showLoadingState = function() {
                 const propertiesList = document.getElementById('propertiesList');
                 if (propertiesList) {
                     propertiesList.innerHTML = `
@@ -718,9 +701,9 @@
                         </div>
                     `;
                 }
-            }
+            };
             
-            function showEmptyState() {
+            window.showEmptyState = function() {
                 const propertiesList = document.getElementById('propertiesList');
                 if (propertiesList) {
                     propertiesList.innerHTML = `
@@ -746,9 +729,9 @@
                         });
                     }
                 }
-            }
+            };
             
-            function showErrorState(message) {
+            window.showErrorState = function(message) {
                 const propertiesList = document.getElementById('propertiesList');
                 if (propertiesList) {
                     propertiesList.innerHTML = `
@@ -760,9 +743,8 @@
                                 <i class="fas fa-redo btn-icon"></i>Tentar novamente
                             </button>
                         </div>
-                    `;
-                    
-                    // Adicionar listener ao botão de tentar novamente
+                        ;
+                        // Adicionar listener ao botão de tentar novamente
                     const retryBtn = document.getElementById('retryLoadPropertiesBtn');
                     if (retryBtn) {
                         retryBtn.addEventListener('click', function() {
@@ -771,7 +753,7 @@
                         });
                     }
                 }
-            }
+            };
             
             // Atualizar o renderPropertyCard para um visual mais profissional
             window.renderPropertyCard = function(property, financialSummary) {
