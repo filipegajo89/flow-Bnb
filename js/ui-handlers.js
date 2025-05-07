@@ -33,7 +33,8 @@ function closeModal(modalId) {
     }
 }
 
-// Função para adicionar um novo imóvel
+// Modificar a função setupAddPropertyForm no arquivo ui-handlers.js
+
 function setupAddPropertyForm() {
     const addPropertyForm = document.getElementById('addPropertyForm');
     
@@ -57,32 +58,35 @@ function setupAddPropertyForm() {
             console.log('Dados do imóvel:', propertyData);
             
             try {
-                // Verificar se a função addProperty existe
-                if (typeof window.addProperty === 'function') {
-                    // Adicionar o imóvel usando a função global
-                    await window.addProperty(propertyData);
-                    console.log('Imóvel adicionado com sucesso');
-                    
-                    // Fechar o modal
-                    closeModal('addPropertyModal');
-                    
-                    // Limpar o formulário
-                    addPropertyForm.reset();
-                    
-                    // Recarregar a lista de imóveis
-                    if (typeof window.loadAndDisplayProperties === 'function') {
-                        window.loadAndDisplayProperties();
-                    } else {
-                        console.warn('Função loadAndDisplayProperties não encontrada');
-                        // Recarregar a página como alternativa
-                        window.location.reload();
-                    }
-                    
-                    // Exibir mensagem de sucesso
-                    alert('Imóvel adicionado com sucesso!');
-                } else {
-                    throw new Error('Função addProperty não encontrada');
+                // Verificar se o usuário está autenticado
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    throw new Error('Usuário não está autenticado');
                 }
+                
+                // Adicionar imóvel diretamente ao Firestore
+                const newProperty = {
+                    ...propertyData,
+                    userId: user.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                const docRef = await firebase.firestore().collection('properties').add(newProperty);
+                console.log('Imóvel adicionado com ID:', docRef.id);
+                
+                // Fechar o modal
+                closeModal('addPropertyModal');
+                
+                // Limpar o formulário
+                addPropertyForm.reset();
+                
+                // Recarregar a página para mostrar o novo imóvel
+                window.location.reload();
+                
+                // Exibir mensagem de sucesso
+                alert('Imóvel adicionado com sucesso!');
+                
             } catch (error) {
                 console.error('Erro ao adicionar imóvel:', error);
                 alert('Erro ao adicionar imóvel: ' + error.message);
