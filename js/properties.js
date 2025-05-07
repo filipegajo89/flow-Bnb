@@ -464,14 +464,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ADICIONE ESTE NOVO CÓDIGO AQUI - Não substitua o código acima!
-// Evento específico para o botão de adicionar imóvel no cabeçalho da página
+// Adicione este código no final do arquivo properties.js
 document.addEventListener('DOMContentLoaded', function() {
-    // Seleciona o botão Novo Imóvel no cabeçalho (botão verde)
-    const addPropertyTopBtn = document.querySelector('button.btn-primary, button:contains("Novo Imóvel")');
+    // Seleciona o botão específico no cabeçalho usando o ID
+    const addPropertyTopBtn = document.getElementById('addPropertyBtn');
     
     if (addPropertyTopBtn) {
-        console.log('Botão de adicionar imóvel encontrado, adicionando evento de clique');
+        console.log('Botão de adicionar imóvel do cabeçalho encontrado');
         
         addPropertyTopBtn.addEventListener('click', function() {
             console.log('Botão Novo Imóvel clicado');
