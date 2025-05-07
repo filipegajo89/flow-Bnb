@@ -24,6 +24,9 @@ const addProperty = (propertyData) => {
     });
 };
 
+// Tornar a função global (ADICIONE ESTA LINHA)
+window.addProperty = addProperty;
+
 // Obter todos os imóveis do usuário
 const getProperties = () => {
   const userId = auth.currentUser.uid;
