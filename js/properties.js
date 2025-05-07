@@ -435,3 +435,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+Você tem razão, preciso ser mais específico nas instruções. Vou explicar exatamente como implementar a solução para o botão "+ Novo Imóvel".
+Instruções Detalhadas para Implementar a Solução
+Para o arquivo properties.js:
+
+Não substitua o código existente. Mantenha tudo o que já está no arquivo.
+Adicione o novo código no final do arquivo, logo após o último bloco de código existente.
+O código atual tem um event listener que está restrito a páginas específicas:
+javascriptdocument.addEventListener('DOMContentLoaded', () => {
+  auth.onAuthStateChanged(user => {
+    if (user && window.location.pathname.includes('dashboard')) {
+      setupPropertyModalListeners();
+      loadAndDisplayProperties();
+    }
+  });
+});
+
+Adicione o seu novo código abaixo desse bloco. Ficará assim:
+
+javascript// Código original existente
+document.addEventListener('DOMContentLoaded', () => {
+  auth.onAuthStateChanged(user => {
+    if (user && window.location.pathname.includes('dashboard')) {
+      setupPropertyModalListeners();
+      loadAndDisplayProperties();
+    }
+  });
+});
+
+// ADICIONE ESTE NOVO CÓDIGO AQUI - Não substitua o código acima!
+// Evento específico para o botão de adicionar imóvel no cabeçalho da página
+document.addEventListener('DOMContentLoaded', function() {
+    // Seleciona o botão Novo Imóvel no cabeçalho (botão verde)
+    const addPropertyTopBtn = document.querySelector('button.btn-primary, button:contains("Novo Imóvel")');
+    
+    if (addPropertyTopBtn) {
+        console.log('Botão de adicionar imóvel encontrado, adicionando evento de clique');
+        
+        addPropertyTopBtn.addEventListener('click', function() {
+            console.log('Botão Novo Imóvel clicado');
+            // Buscar o modal pelo ID
+            const modal = document.getElementById('addPropertyModal');
+            if (modal) {
+                // Remover a classe hidden e adicionar a classe flex para exibir o modal
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                console.log('Modal de adicionar imóvel aberto');
+            } else {
+                console.error('Modal de adicionar imóvel não encontrado');
+            }
+        });
+    } else {
+        console.warn('Botão de adicionar imóvel do topo não encontrado');
+    }
+});
