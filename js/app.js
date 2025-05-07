@@ -32,3 +32,30 @@ const checkFirstRun = () => {
 
 // Inicializar quando a página for carregada
 document.addEventListener('DOMContentLoaded', initApp);
+
+// Adicione este código no final do arquivo app.js
+document.addEventListener('DOMContentLoaded', function() {
+    // Tente encontrar o botão do menu do usuário - ajuste o seletor conforme necessário
+    const userMenuBtn = document.querySelector('.avatar-button') || document.getElementById('userAvatarBtn');
+    const userMenuDropdown = document.querySelector('.dropdown-menu') || document.getElementById('userDropdownMenu');
+    
+    if (userMenuBtn && userMenuDropdown) {
+        console.log('Menu do usuário encontrado');
+        
+        userMenuBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Botão do menu do usuário clicado');
+            // Alternar a visibilidade do dropdown
+            userMenuDropdown.classList.toggle('show');
+        });
+        
+        // Fechar o dropdown quando clicar fora dele
+        document.addEventListener('click', function(event) {
+            if (!userMenuBtn.contains(event.target) && !userMenuDropdown.contains(event.target)) {
+                userMenuDropdown.classList.remove('show');
+            }
+        });
+    } else {
+        console.warn('Botão de menu de usuário ou dropdown não encontrado');
+    }
+});
