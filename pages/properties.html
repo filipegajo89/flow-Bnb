@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com/firebasejs/ https://cdnjs.cloudflare.com/ https://cdn.jsdelivr.net/; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com/ https://use.typekit.net/; font-src 'self' https://cdnjs.cloudflare.com/ https://use.typekit.net/ data:; img-src 'self' https://via.placeholder.com/ https://i.imgur.com/ data:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app https://firestore.googleapis.com https://*.googleapis.com https://use.typekit.net/">
+    <link rel="icon" href="../assets/icons/favicon.png" type="image/png">
+    <title>FlowBnb - Imóveis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <!-- Botão de menu mobile -->
+    <button class="mobile-menu-toggle hidden md:hidden">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Barra lateral -->
+    <div class="sidebar">
+        <div class="logo-container">
+            <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="logo-image">
+        </div>
+        
+        <div class="nav-menu">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-tachometer-alt nav-icon"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="properties.html" class="nav-item active">
+                <i class="fas fa-home nav-icon"></i>
+                <span>Imóveis</span>
+            </a>
+            <a href="transactions.html" class="nav-item">
+                <i class="fas fa-money-bill-wave nav-icon"></i>
+                <span>Transações</span>
+            </a>
+            <a href="reports.html" class="nav-item">
+                <i class="fas fa-chart-line nav-icon"></i>
+                <span>Relatórios</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <!-- Header móvel (visível apenas em dispositivos móveis) -->
+        <div class="mobile-header md:hidden">
+            <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="mobile-logo">
+            <span class="font-semibold text-gray-800 mobile-title">FlowBnb</span>
+        </div>
+        
+        <!-- Cabeçalho da página -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Imóveis</h1>
+            <div class="flex items-center">
+                <button id="addPropertyBtn" class="btn-primary mr-4">
+                    <i class="fas fa-plus btn-icon"></i>
+                    <span>Novo Imóvel</span>
+                </button>
+                
+                <!-- Avatar do usuário com dropdown -->
+                <div class="user-dropdown">
+                    <div id="userAvatarBtn" class="avatar-button">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div id="userDropdownMenu" class="dropdown-menu">
+                        <div class="dropdown-header">
+                            <div id="dropdownUserName" class="dropdown-user-name">Nome do Usuário</div>
+                            <div id="dropdownUserEmail" class="dropdown-user-email">usuario@email.com</div>
+                        </div>
+                        <div class="dropdown-items">
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Meu Perfil</span>
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                <span>Configurações</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" id="logoutBtn" class="dropdown-item logout-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Sair</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filtros e Pesquisa -->
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center gap-4">
+                <div class="w-full md:w-1/3">
+                    <label class="block text-sm text-gray-600 mb-1">Status</label>
+                    <select id="statusFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="all">Todos os status</option>
+                        <option value="active">Ativos</option>
+                        <option value="inactive">Inativos</option>
+                    </select>
+                </div>
+                
+                <div class="w-full md:w-1/3">
+                    <label class="block text-sm text-gray-600 mb-1">Ordenar por</label>
+                    <select id="sortOrder" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="name_asc">Nome (A-Z)</option>
+                        <option value="name_desc">Nome (Z-A)</option>
+                        <option value="date_desc">Data (mais recente)</option>
+                        <option value="date_asc">Data (mais antigo)</option>
+                        <option value="profit_desc">Lucro (maior)</option>
+                        <option value="profit_asc">Lucro (menor)</option>
+                    </select>
+                </div>
+                
+                <div class="w-full md:w-1/3">
+                    <label class="block text-sm text-gray-600 mb-1">Período de análise</label>
+                    <select id="periodFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="month">Mês atual</option>
+                        <option value="last_month">Mês anterior</option>
+                        <option value="year">Ano atual</option>
+                        <option value="all">Todo o período</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <div class="relative">
+                    <input type="text" id="searchProperty" placeholder="Buscar por nome ou localização..." class="w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resumo Financeiro Total -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="stats-card revenue-card">
+                <div class="stats-icon-wrapper revenue-icon">
+                    <i class="fas fa-money-bill-wave stats-icon"></i>
+                </div>
+                <div class="stats-info">
+                    <div class="stats-label">Receita Total</div>
+                    <div class="stats-value" id="totalPropertiesRevenue">R$ 0,00</div>
+                </div>
+            </div>
+            
+            <div class="stats-card expense-card">
+                <div class="stats-icon-wrapper expense-icon">
+                    <i class="fas fa-hand-holding-usd stats-icon"></i>
+                </div>
+                <div class="stats-info">
+                    <div class="stats-label">Despesa Total</div>
+                    <div class="stats-value" id="totalPropertiesExpenses">R$ 0,00</div>
+                </div>
+            </div>
+            
+            <div class="stats-card profit-card">
+                <div class="stats-icon-wrapper profit-icon">
+                    <i class="fas fa-chart-line stats-icon"></i>
+                </div>
+                <div class="stats-info">
+                    <div class="stats-label">Lucro Líquido</div>
+                    <div class="stats-value" id="totalPropertiesProfit">R$ 0,00</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lista de Imóveis -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <h2 class="text-lg font-semibold text-gray-800">Seus Imóveis</h2>
+                <div class="text-sm text-gray-500" id="propertiesCount">
+                    Total: <span id="totalProperties">0</span> imóveis
+                </div>
+            </div>
+            
+            <div id="propertiesList" class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Estado de carregamento -->
+                <div class="col-span-full loading-state">
+                    <div class="spinner"></div>
+                    <p class="text-gray-500 mt-2">Carregando seus imóveis...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Adicionar Imóvel -->
+    <div id="addPropertyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Adicionar Novo Imóvel</h2>
+                <button id="closeAddPropertyModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addPropertyForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyName">
+                        Nome do Imóvel
+                    </label>
+                    <input type="text" id="propertyName" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: Apartamento na Praia" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyAddress">
+                        Endereço
+                    </label>
+                    <input type="text" id="propertyAddress" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: Rua das Flores, 123" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyCity">
+                            Cidade
+                        </label>
+                        <input type="text" id="propertyCity" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: Rio de Janeiro" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyState">
+                            Estado
+                        </label>
+                        <input type="text" id="propertyState" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: RJ" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyImage">
+                        URL da Imagem (opcional)
+                    </label>
+                    <input type="text" id="propertyImage" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: https://exemplo.com/imagem.jpg">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyStatus">
+                        Status
+                    </label>
+                    <select id="propertyStatus" class="w-full px-3 py-2 border rounded-lg" required>
+                        <option value="active">Ativo</option>
+                        <option value="inactive">Inativo</option>
+                    </select>
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button type="button" id="cancelAddProperty" class="px-4 py-2 text-gray-600 mr-3">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                        Adicionar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal Editar Imóvel -->
+    <div id="editPropertyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Editar Imóvel</h2>
+                <button id="closeEditPropertyModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editPropertyForm">
+                <input type="hidden" id="editPropertyId">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="editPropertyName">
+                        Nome do Imóvel
+                    </label>
+                    <input type="text" id="editPropertyName" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="editPropertyAddress">
+                        Endereço
+                    </label>
+                    <input type="text" id="editPropertyAddress" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="editPropertyCity">
+                            Cidade
+                        </label>
+                        <input type="text" id="editPropertyCity" class="w-full px-3 py-2 border rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="editPropertyState">
+                            Estado
+                        </label>
+                        <input type="text" id="editPropertyState" class="w-full px-3 py-2 border rounded-lg" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="editPropertyImage">
+                        URL da Imagem (opcional)
+                    </label>
+                    <input type="text" id="editPropertyImage" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="editPropertyStatus">
+                        Status
+                    </label>
+                    <select id="editPropertyStatus" class="w-full px-3 py-2 border rounded-lg" required>
+                        <option value="active">Ativo</option>
+                        <option value="inactive">Inativo</option>
+                    </select>
+                </div>
+                <div class="flex justify-between mt-6">
+                    <button type="button" id="deleteProperty" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
+                        Excluir
+                    </button>
+                    <div>
+                        <button type="button" id="cancelEditProperty" class="px-4 py-2 text-gray-600 mr-3">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                            Salvar Alterações
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts do Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Scripts da aplicação -->
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/properties.js"></script>
+    <script src="../js/transactions.js"></script>
+    <script src="../js/properties-page.js"></script>
+</body>
+</html>
