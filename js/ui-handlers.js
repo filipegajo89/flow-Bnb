@@ -86,6 +86,10 @@ function setupAddPropertyForm() {
                 
                 // Exibir mensagem de sucesso
                 alert('Imóvel adicionado com sucesso!');
+
+                setTimeout(function() {
+                    window.location.href = window.location.href;
+                }, 500);
                 
             } catch (error) {
                 console.error('Erro ao adicionar imóvel:', error);
