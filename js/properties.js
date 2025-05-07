@@ -1,4 +1,7 @@
+// ===============================================
+// Arquivo: js/properties.js
 // Funções para gerenciamento de imóveis
+// ===============================================
 
 // Adicionar um novo imóvel
 const addProperty = (propertyData) => {
@@ -24,9 +27,6 @@ const addProperty = (propertyData) => {
     });
 };
 
-// Tornar a função global (ADICIONE ESTA LINHA)
-window.addProperty = addProperty;
-
 // Obter todos os imóveis do usuário
 const getProperties = () => {
   const userId = auth.currentUser.uid;
@@ -43,6 +43,7 @@ const getProperties = () => {
           ...doc.data()
         });
       });
+      console.log(`Encontrados ${properties.length} imóveis`);
       return properties;
     })
     .catch(error => {
@@ -166,141 +167,77 @@ const getPropertyFinancialSummary = async (propertyId, month = null, year = null
   }
 };
 
-// Renderizar card de imóvel com o novo design
-const renderPropertyCard = (property, financialSummary) => {
-  const card = document.createElement('div');
-  card.className = 'property-card';
-  card.dataset.id = property.id;
-  
-  const statusClass = property.status === 'active' ? 'active' : 'inactive';
-  const statusText = property.status === 'active' ? 'Ativo' : 'Inativo';
-  const imageUrl = property.image || 'assets/images/property-placeholder.jpg';
-  
-  card.innerHTML = `
-    <div class="property-image-container">
-      <img src="${imageUrl}" alt="${property.name}" class="property-image">
-      <div class="property-status ${statusClass}">${statusText}</div>
-    </div>
-    <div class="property-content">
-      <h3 class="property-title">${property.name}</h3>
-      <p class="property-location">
-        <i class="fas fa-map-marker-alt property-location-icon"></i>
-        ${property.city}, ${property.state}
-      </p>
-      <div class="property-stats">
-        <div class="property-stat">
-          <p class="property-stat-label">Receita</p>
-          <p class="property-stat-value income">+ ${financialSummary.formattedIncome}</p>
-        </div>
-        <div class="property-stat">
-          <p class="property-stat-label">Despesa</p>
-          <p class="property-stat-value expense">- ${financialSummary.formattedExpense}</p>
-        </div>
+// Mostrar estado de carregamento na lista de imóveis
+function showLoadingState() {
+  const propertiesList = document.getElementById('propertiesList');
+  if (propertiesList) {
+    propertiesList.innerHTML = `
+      <div class="col-span-full text-center py-10">
+        <div class="inline-block w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-500">Carregando seus imóveis...</p>
       </div>
-      <div class="property-profit">
-        <p class="property-profit-label">Lucro Líquido</p>
-        <p class="property-profit-value">${financialSummary.formattedProfit}</p>
-      </div>
-    </div>
-    <div class="property-actions">
-      <button class="property-action-button viewPropertyBtn">
-        <i class="fas fa-eye property-action-icon"></i>Ver Detalhes
-      </button>
-      <button class="property-action-button addTransactionBtn">
-        <i class="fas fa-plus property-action-icon"></i>Transação
-      </button>
-    </div>
-  `;
-  
-  return card;
-};
-
-// Atualização da função loadAndDisplayProperties
-const loadAndDisplayProperties = async (monthFilter = null) => {
-  try {
-    // Obter o elemento onde os imóveis serão exibidos
-    const propertiesList = document.getElementById('propertiesList');
-    if (!propertiesList) return;
-    
-    // Mostrar indicador de carregamento
-    showLoadingState();
-    
-    // Obter imóveis do usuário
-    const properties = await getProperties();
-    
-    // Verificar se há imóveis
-    if (properties.length === 0) {
-      showEmptyState();
-      return;
-    }
-    
-    // Limpar lista
-    propertiesList.innerHTML = '';
-    
-    // Inicializar totais gerais
-    let totalIncome = 0;
-    let totalExpense = 0;
-    let totalProfit = 0;
-    
-    // Data atual para filtro de mês
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = monthFilter ? parseInt(monthFilter) : null;
-    
-    // Para cada imóvel, calcular resumo financeiro e exibir
-    for (const property of properties) {
-      try {
-        const financialSummary = await getPropertyFinancialSummary(property.id, currentMonth, currentYear);
-      
-        // Adicionar aos totais gerais
-        totalIncome += financialSummary.income;
-        totalExpense += financialSummary.expense;
-        totalProfit += financialSummary.profit;
-      
-        // Renderizar card do imóvel
-        const propertyCard = renderPropertyCard(property, financialSummary);
-        propertiesList.appendChild(propertyCard);
-      
-        // Adicionar listeners aos botões
-        const viewBtn = propertyCard.querySelector('.viewPropertyBtn');
-        const addTransactionBtn = propertyCard.querySelector('.addTransactionBtn');
-      
-        if (viewBtn) {
-          viewBtn.addEventListener('click', () => {
-            window.location.href = `property-details.html?id=${property.id}`;
-          });
-        }
-      
-        if (addTransactionBtn) {
-          addTransactionBtn.addEventListener('click', () => {
-            // Abrir modal de adicionar transação
-            const modal = document.getElementById('addTransactionModal');
-            if (modal) {
-              document.getElementById('transactionPropertyId').value = property.id;
-              modal.classList.remove('hidden');
-              modal.classList.add('flex');
-            }
-          });
-        }
-      } catch (propertyError) {
-        console.error('Erro ao processar imóvel:', propertyError);
-        continue; // Continuar com o próximo imóvel mesmo se este falhar
-      }
-    }
-    
-    // Atualizar resumo geral
-    updateDashboardSummary(totalIncome, totalExpense, totalProfit);
-    
-  } catch (error) {
-    console.error('Erro ao carregar imóveis:', error);
-    showErrorState('Não foi possível carregar seus imóveis. Por favor, tente novamente.');
+    `;
   }
-};
+}
 
-// Atualização continuada para a função renderPropertyCard  
+// Mostrar estado vazio (sem imóveis)
+function showEmptyState() {
+  const propertiesList = document.getElementById('propertiesList');
+  if (propertiesList) {
+    propertiesList.innerHTML = `
+      <div class="col-span-full text-center py-10">
+        <i class="fas fa-home text-gray-300 text-5xl mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">Nenhum imóvel cadastrado</h3>
+        <p class="text-gray-500 mb-4">Você ainda não tem imóveis cadastrados. Comece adicionando seu primeiro imóvel.</p>
+        <button id="addFirstPropertyBtn" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+          <i class="fas fa-plus mr-2"></i>Adicionar Imóvel
+        </button>
+      </div>
+    `;
+    
+    // Adicionar evento ao botão
+    const addFirstPropertyBtn = document.getElementById('addFirstPropertyBtn');
+    if (addFirstPropertyBtn) {
+      addFirstPropertyBtn.addEventListener('click', () => {
+        const modal = document.getElementById('addPropertyModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+      });
+    }
+  }
+}
+
+// Mostrar estado de erro
+function showErrorState(message) {
+  const propertiesList = document.getElementById('propertiesList');
+  if (propertiesList) {
+    propertiesList.innerHTML = `
+      <div class="col-span-full text-center py-10">
+        <i class="fas fa-exclamation-circle text-red-500 text-5xl mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">Erro ao carregar imóveis</h3>
+        <p class="text-gray-500 mb-4">${message}</p>
+        <button id="retryLoadBtn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          <i class="fas fa-redo mr-2"></i>Tentar novamente
+        </button>
+      </div>
+    `;
+    
+    // Adicionar evento ao botão de tentar novamente
+    const retryLoadBtn = document.getElementById('retryLoadBtn');
+    if (retryLoadBtn) {
+      retryLoadBtn.addEventListener('click', () => {
+        loadAndDisplayProperties();
+      });
+    }
+  }
+}
+
+// Renderizar card de imóvel
 const renderPropertyCard = (property, financialSummary) => {
   const card = document.createElement('div');
-  card.className = 'bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1';
+  card.className = 'bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1';
   card.dataset.id = property.id;
   
   const statusClass = property.status === 'active' ? 'bg-green-500' : 'bg-gray-500';
@@ -314,8 +251,8 @@ const renderPropertyCard = (property, financialSummary) => {
         ${statusText}
       </div>
     </div>
-    <div class="p-5">
-      <h3 class="text-lg font-bold text-gray-800 mb-2 line-clamp-1">${property.name}</h3>
+    <div class="p-4">
+      <h3 class="text-lg font-bold text-gray-800 mb-2">${property.name}</h3>
       <p class="text-gray-600 text-sm mb-4 flex items-center">
         <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>
         ${property.city}, ${property.state}
@@ -339,10 +276,10 @@ const renderPropertyCard = (property, financialSummary) => {
             <p class="text-blue-600 font-bold">${financialSummary.formattedProfit}</p>
           </div>
           <div class="flex space-x-2">
-            <button class="viewPropertyBtn p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
+            <button class="viewPropertyBtn p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors" title="Ver detalhes">
               <i class="fas fa-eye"></i>
             </button>
-            <button class="addTransactionBtn p-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors">
+            <button class="addTransactionBtn p-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors" title="Adicionar transação">
               <i class="fas fa-plus"></i>
             </button>
           </div>
@@ -365,56 +302,203 @@ const updateDashboardSummary = (income, expense, profit) => {
   if (totalProfitEl) totalProfitEl.textContent = formatCurrency(profit);
 };
 
+// Carregar e exibir imóveis
+const loadAndDisplayProperties = async (monthFilter = null) => {
+  try {
+    console.log('Iniciando carregamento de imóveis...');
+    
+    // Obter o elemento onde os imóveis serão exibidos
+    const propertiesList = document.getElementById('propertiesList');
+    if (!propertiesList) {
+      console.error('Elemento #propertiesList não encontrado no DOM');
+      return;
+    }
+    
+    // Mostrar indicador de carregamento
+    showLoadingState();
+    
+    // Verificar se o usuário está autenticado
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      console.error('Usuário não autenticado');
+      showErrorState('Você precisa estar autenticado para visualizar imóveis.');
+      return;
+    }
+    
+    // Obter imóveis do usuário
+    console.log('Buscando imóveis do usuário...');
+    const properties = await getProperties();
+    console.log(`Obtidos ${properties.length} imóveis`);
+    
+    // Verificar se há imóveis
+    if (properties.length === 0) {
+      console.log('Nenhum imóvel encontrado');
+      showEmptyState();
+      updateDashboardSummary(0, 0, 0);
+      return;
+    }
+    
+    // Limpar lista e preparar para exibir os imóveis
+    propertiesList.innerHTML = '';
+    
+    // Inicializar totais gerais
+    let totalIncome = 0;
+    let totalExpense = 0;
+    let totalProfit = 0;
+    
+    // Data atual para filtro de mês
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = monthFilter ? parseInt(monthFilter) : null;
+    
+    // Para cada imóvel, calcular resumo financeiro e exibir
+    console.log('Renderizando cards de imóveis...');
+    for (const property of properties) {
+      try {
+        console.log(`Processando imóvel: ${property.id} - ${property.name}`);
+        
+        // Calcular resumo financeiro
+        const financialSummary = await getPropertyFinancialSummary(property.id, currentMonth, currentYear);
+        
+        // Adicionar aos totais gerais
+        totalIncome += financialSummary.income;
+        totalExpense += financialSummary.expense;
+        totalProfit += financialSummary.profit;
+        
+        // Renderizar card do imóvel
+        const propertyCard = renderPropertyCard(property, financialSummary);
+        propertiesList.appendChild(propertyCard);
+        
+        // Adicionar listeners aos botões
+        const viewBtn = propertyCard.querySelector('.viewPropertyBtn');
+        const addTransactionBtn = propertyCard.querySelector('.addTransactionBtn');
+        
+        if (viewBtn) {
+          viewBtn.addEventListener('click', () => {
+            window.location.href = `property-details.html?id=${property.id}`;
+          });
+        }
+        
+        if (addTransactionBtn) {
+          addTransactionBtn.addEventListener('click', () => {
+            // Abrir modal de adicionar transação
+            const modal = document.getElementById('addTransactionModal');
+            if (modal) {
+              const propertyIdField = document.getElementById('transactionPropertyId');
+              if (propertyIdField) {
+                propertyIdField.value = property.id;
+              }
+              modal.classList.remove('hidden');
+              modal.classList.add('flex');
+            }
+          });
+        }
+      } catch (propertyError) {
+        console.error(`Erro ao processar imóvel ${property.id}:`, propertyError);
+        continue; // Continuar com o próximo imóvel mesmo se este falhar
+      }
+    }
+    
+    // Atualizar resumo geral
+    console.log('Atualizando resumo financeiro...');
+    updateDashboardSummary(totalIncome, totalExpense, totalProfit);
+    console.log('Carregamento de imóveis concluído com sucesso!');
+    
+  } catch (error) {
+    console.error('Erro ao carregar imóveis:', error);
+    showErrorState('Não foi possível carregar seus imóveis. Por favor, tente novamente.');
+  }
+};
+
 // Configurar listeners para modal de adicionar imóvel
 const setupPropertyModalListeners = () => {
+  console.log('Configurando listeners para o modal de imóveis...');
+  
+  // Botão de adicionar imóvel
   const addPropertyBtn = document.getElementById('addPropertyBtn');
   const addPropertyModal = document.getElementById('addPropertyModal');
-  const closeAddPropertyModal = document.getElementById('closeAddPropertyModal');
-  const cancelAddProperty = document.getElementById('cancelAddProperty');
-  const addPropertyForm = document.getElementById('addPropertyForm');
   
   if (addPropertyBtn && addPropertyModal) {
+    console.log('Botão de adicionar imóvel encontrado');
     addPropertyBtn.addEventListener('click', () => {
+      console.log('Botão de adicionar imóvel clicado');
       addPropertyModal.classList.remove('hidden');
       addPropertyModal.classList.add('flex');
     });
+  } else {
+    console.warn('Botão de adicionar imóvel ou modal não encontrado');
+    console.log('addPropertyBtn:', addPropertyBtn);
+    console.log('addPropertyModal:', addPropertyModal);
   }
   
-  if (closeAddPropertyModal && addPropertyModal) {
+  // Botão X para fechar o modal
+  const closeAddPropertyModal = document.getElementById('closeAddPropertyModal');
+  if (closeAddPropertyModal) {
+    console.log('Botão X para fechar modal encontrado');
     closeAddPropertyModal.addEventListener('click', () => {
+      console.log('Botão X para fechar modal clicado');
       addPropertyModal.classList.remove('flex');
       addPropertyModal.classList.add('hidden');
     });
   }
   
-  if (cancelAddProperty && addPropertyModal) {
+  // Botão Cancelar
+  const cancelAddProperty = document.getElementById('cancelAddProperty');
+  if (cancelAddProperty) {
+    console.log('Botão Cancelar encontrado');
     cancelAddProperty.addEventListener('click', () => {
+      console.log('Botão Cancelar clicado');
       addPropertyModal.classList.remove('flex');
       addPropertyModal.classList.add('hidden');
     });
   }
   
+  // Formulário de adicionar imóvel
+  const addPropertyForm = document.getElementById('addPropertyForm');
   if (addPropertyForm) {
+    console.log('Formulário de adicionar imóvel encontrado');
+    
     addPropertyForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      console.log('Formulário de adicionar imóvel enviado');
+      
+      // Extrair dados do formulário
+      const propertyName = document.getElementById('propertyName').value;
+      const propertyAddress = document.getElementById('propertyAddress').value;
+      const propertyCity = document.getElementById('propertyCity').value;
+      const propertyState = document.getElementById('propertyState').value;
+      const propertyImage = document.getElementById('propertyImage').value || null;
       
       const propertyData = {
-        name: addPropertyForm.propertyName.value,
-        address: addPropertyForm.propertyAddress.value,
-        city: addPropertyForm.propertyCity.value,
-        state: addPropertyForm.propertyState.value,
-        image: addPropertyForm.propertyImage.value || null
+        name: propertyName,
+        address: propertyAddress,
+        city: propertyCity,
+        state: propertyState,
+        image: propertyImage
       };
       
+      console.log('Dados do imóvel a ser adicionado:', propertyData);
+      
       try {
+        // Adicionar o imóvel
         await addProperty(propertyData);
+        console.log('Imóvel adicionado com sucesso');
+        
+        // Fechar o modal
         addPropertyModal.classList.remove('flex');
         addPropertyModal.classList.add('hidden');
+        
+        // Limpar o formulário
         addPropertyForm.reset();
         
-        // Recarregar lista de imóveis
-        loadAndDisplayProperties();
+        // Mostrar mensagem de sucesso
+        alert('Imóvel adicionado com sucesso!');
+        
+        // Recarregar a página para mostrar o novo imóvel
+        window.location.reload();
+        
       } catch (error) {
+        console.error('Erro ao adicionar imóvel:', error);
         alert('Erro ao adicionar imóvel: ' + error.message);
       }
     });
@@ -423,72 +507,61 @@ const setupPropertyModalListeners = () => {
   // Configurar filtro de mês
   const monthFilter = document.getElementById('monthFilter');
   if (monthFilter) {
+    console.log('Filtro de mês encontrado');
     monthFilter.addEventListener('change', () => {
-      loadAndDisplayProperties(monthFilter.value === 'all' ? null : monthFilter.value);
+      const value = monthFilter.value;
+      console.log(`Filtro de mês alterado para: ${value}`);
+      loadAndDisplayProperties(value === 'all' ? null : value);
     });
   }
 };
 
 // Inicializar ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM carregado, iniciando verificação de autenticação...');
+  
   auth.onAuthStateChanged(user => {
-    if (user && window.location.pathname.includes('dashboard')) {
-      setupPropertyModalListeners();
-      loadAndDisplayProperties();
-    }
-  });
-});
-
-Você tem razão, preciso ser mais específico nas instruções. Vou explicar exatamente como implementar a solução para o botão "+ Novo Imóvel".
-Instruções Detalhadas para Implementar a Solução
-Para o arquivo properties.js:
-
-Não substitua o código existente. Mantenha tudo o que já está no arquivo.
-Adicione o novo código no final do arquivo, logo após o último bloco de código existente.
-O código atual tem um event listener que está restrito a páginas específicas:
-javascriptdocument.addEventListener('DOMContentLoaded', () => {
-  auth.onAuthStateChanged(user => {
-    if (user && window.location.pathname.includes('dashboard')) {
-      setupPropertyModalListeners();
-      loadAndDisplayProperties();
-    }
-  });
-});
-
-Adicione o seu novo código abaixo desse bloco. Ficará assim:
-
-javascript// Código original existente
-document.addEventListener('DOMContentLoaded', () => {
-  auth.onAuthStateChanged(user => {
-    if (user && window.location.pathname.includes('dashboard')) {
-      setupPropertyModalListeners();
-      loadAndDisplayProperties();
-    }
-  });
-});
-
-// Adicione este código no final do arquivo properties.js
-document.addEventListener('DOMContentLoaded', function() {
-    // Seleciona o botão específico no cabeçalho usando o ID
-    const addPropertyTopBtn = document.getElementById('addPropertyBtn');
-    
-    if (addPropertyTopBtn) {
-        console.log('Botão de adicionar imóvel do cabeçalho encontrado');
-        
-        addPropertyTopBtn.addEventListener('click', function() {
-            console.log('Botão Novo Imóvel clicado');
-            // Buscar o modal pelo ID
-            const modal = document.getElementById('addPropertyModal');
-            if (modal) {
-                // Remover a classe hidden e adicionar a classe flex para exibir o modal
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                console.log('Modal de adicionar imóvel aberto');
-            } else {
-                console.error('Modal de adicionar imóvel não encontrado');
-            }
-        });
+    if (user) {
+      console.log('Usuário autenticado:', user.email);
+      
+      // Verificar se estamos na página do dashboard
+      if (window.location.pathname.includes('dashboard')) {
+        console.log('Página do dashboard detectada');
+        setupPropertyModalListeners();
+        loadAndDisplayProperties();
+      }
     } else {
-        console.warn('Botão de adicionar imóvel do topo não encontrado');
+      console.log('Usuário não autenticado, redirecionando para login...');
     }
+  });
+});
+
+// Tornar as funções globais para acesso de outros arquivos
+window.addProperty = addProperty;
+window.getProperties = getProperties;
+window.getProperty = getProperty;
+window.updateProperty = updateProperty;
+window.deleteProperty = deleteProperty;
+window.getPropertyFinancialSummary = getPropertyFinancialSummary;
+window.loadAndDisplayProperties = loadAndDisplayProperties;
+
+// Código adicional para corrigir problemas de navegação
+document.addEventListener('DOMContentLoaded', function() {
+  // Menu lateral - link para Imóveis
+  const imoveisLink = document.querySelector('a[href*="imóveis"], a[href*="imoveis"], a[href*="properties"]');
+  
+  if (imoveisLink) {
+    console.log('Link para página de imóveis encontrado:', imoveisLink.href);
+    
+    imoveisLink.addEventListener('click', function(e) {
+      if (window.location.pathname.includes('dashboard')) {
+        // Se estamos no dashboard, apenas recarregar a visualização de imóveis
+        e.preventDefault();
+        console.log('Clique no link de imóveis interceptado - recarregando visualização');
+        loadAndDisplayProperties();
+      }
+    });
+  } else {
+    console.warn('Link para página de imóveis não encontrado');
+  }
 });
