@@ -10,130 +10,159 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <style>
-        /* Estilos personalizados para dashboard profissional */
-        .hero-gradient {
-            background: linear-gradient(135deg, #0c2e69 0%, #09b188 100%);
+        /* Estilos profissionais aprimorados */
+        .dashboard-welcome {
+            background: linear-gradient(135deg, rgba(9, 177, 136, 0.05), rgba(28, 93, 239, 0.05));
+            border-left: 4px solid #09b188;
         }
         
-        .quick-action-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border: 2px solid transparent;
-            background-clip: padding-box;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .quick-action-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        
-        .quick-action-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #09b188, #0c2e69);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-        
-        .quick-action-card:hover::before {
-            transform: scaleX(1);
-        }
-        
-        .floating-action-btn {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 50;
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.5);
+        .quick-action-primary {
+            background: linear-gradient(135deg, #09b188, #08a078);
+            box-shadow: 0 4px 15px rgba(9, 177, 136, 0.3);
+            transform: translateY(0);
             transition: all 0.3s ease;
-            cursor: pointer;
         }
         
-        .floating-action-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.6);
+        .quick-action-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(9, 177, 136, 0.4);
+            background: linear-gradient(135deg, #08a078, #07926b);
+        }
+        
+        .quick-action-secondary {
+            background: linear-gradient(135deg, #1c5def, #1548d4);
+            box-shadow: 0 4px 15px rgba(28, 93, 239, 0.3);
+        }
+        
+        .quick-action-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(28, 93, 239, 0.4);
         }
         
         .property-card-enhanced {
             background: white;
             border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
             border: 1px solid rgba(0, 0, 0, 0.05);
             overflow: hidden;
-            position: relative;
         }
         
         .property-card-enhanced:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
         }
         
-        .stats-card-pro {
+        .stats-card-enhanced {
             background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border-left: 4px solid;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
         }
         
-        .stats-card-pro:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        .stats-card-enhanced:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
         }
         
-        .welcome-banner {
-            background: linear-gradient(135deg, #0c2e69 0%, #1e40af 50%, #09b188 100%);
-            border-radius: 20px;
-            padding: 32px;
+        .action-button-floating {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #09b188, #08a078);
             color: white;
-            margin-bottom: 32px;
-            position: relative;
-            overflow: hidden;
+            border: none;
+            box-shadow: 0 8px 25px rgba(9, 177, 136, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
         }
         
-        .welcome-banner::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            pointer-events: none;
+        .action-button-floating:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(9, 177, 136, 0.5);
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+        
+        .breadcrumb-separator {
+            margin: 0 0.5rem;
+            color: #cbd5e1;
         }
         
         .metric-trend {
-            font-size: 12px;
-            padding: 4px 8px;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
             border-radius: 12px;
-            font-weight: 600;
+            font-weight: 500;
         }
         
-        .trend-up {
-            background: rgba(16, 185, 129, 0.1);
-            color: #059669;
+        .metric-trend.positive {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
         }
         
-        .trend-down {
+        .metric-trend.negative {
             background: rgba(239, 68, 68, 0.1);
             color: #dc2626;
+        }
+        
+        .metric-trend.neutral {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
+        }
+        
+        .empty-state-enhanced {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, rgba(249, 250, 251, 0.5), rgba(243, 244, 246, 0.3));
+            border-radius: 16px;
+            border: 2px dashed #d1d5db;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-icon {
+            margin-right: 0.75rem;
+            color: #09b188;
+        }
+        
+        @media (max-width: 768px) {
+            .action-button-floating {
+                bottom: 1rem;
+                right: 1rem;
+                width: 56px;
+                height: 56px;
+                font-size: 1.25rem;
+            }
         }
     </style>
 </head>
@@ -167,202 +196,183 @@
     <!-- Conteúdo Principal -->
     <div class="main-content">
         <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Bem-vindo de volta!</h1>
-                <p class="text-gray-600 mt-1">Aqui está um resumo dos seus imóveis hoje</p>
-            </div>
-            <div class="flex items-center space-x-4">
-                <!-- Botão Adicionar Imóvel - Menor e Secundário -->
-                <button id="addPropertyBtn" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium">
-                    <i class="fas fa-plus mr-2"></i>Novo Imóvel
-                </button>
-                
-                <!-- Avatar do usuário -->
-                <div class="user-dropdown">
-                    <div id="userAvatarBtn" class="avatar-button">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div id="userDropdownMenu" class="dropdown-menu">
-                        <div class="dropdown-header">
-                            <div id="dropdownUserName" class="dropdown-user-name">Nome do Usuário</div>
-                            <div id="dropdownUserEmail" class="dropdown-user-email">usuario@email.com</div>
-                        </div>
-                        <div class="dropdown-items">
-                            <a href="#" class="dropdown-item">
-                                <i class="fas fa-user-circle"></i>
-                                <span>Meu Perfil</span>
-                            </a>
-                            <a href="#" class="dropdown-item">
-                                <i class="fas fa-cog"></i>
-                                <span>Configurações</span>
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="#" id="logoutBtn" class="dropdown-item logout-item">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span>Sair</span>
-                            </a>
-                        </div>
-                    </div>
+                <div class="breadcrumb">
+                    <span>FlowBnb</span>
+                    <span class="breadcrumb-separator">•</span>
+                    <span class="font-medium text-gray-900">Dashboard</span>
                 </div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Bem-vindo de volta! 👋</h1>
+                <p class="text-gray-600">Aqui está um resumo dos seus imóveis hoje.</p>
             </div>
-        </div>
-
-        <!-- Banner de Boas-vindas com Ações Rápidas -->
-        <div class="welcome-banner">
-            <div class="relative z-10">
-                <h2 class="text-2xl font-bold mb-3">Ações Rápidas</h2>
-                <p class="text-blue-100 mb-6">Gerencie suas propriedades de forma eficiente</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Ação Principal: Adicionar Transação -->
-                    <div class="quick-action-card p-6 rounded-xl cursor-pointer" id="quickAddTransaction">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-plus text-green-600 text-xl"></i>
-                            </div>
-                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-semibold">POPULAR</span>
-                        </div>
-                        <h3 class="text-gray-900 font-bold text-lg mb-2">Nova Transação</h3>
-                        <p class="text-gray-600 text-sm">Registre receitas e despesas rapidamente</p>
+            
+            <!-- Avatar do usuário -->
+            <div class="user-dropdown mt-4 md:mt-0">
+                <div id="userAvatarBtn" class="avatar-button">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div id="userDropdownMenu" class="dropdown-menu">
+                    <div class="dropdown-header">
+                        <div id="dropdownUserName" class="dropdown-user-name">Nome do Usuário</div>
+                        <div id="dropdownUserEmail" class="dropdown-user-email">usuario@email.com</div>
                     </div>
-                    
-                    <!-- Ver Relatórios -->
-                    <div class="quick-action-card p-6 rounded-xl cursor-pointer" id="quickViewReports">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-chart-line text-blue-600 text-xl"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-gray-900 font-bold text-lg mb-2">Ver Relatórios</h3>
-                        <p class="text-gray-600 text-sm">Analise o desempenho dos seus imóveis</p>
-                    </div>
-                    
-                    <!-- Gerenciar Imóveis -->
-                    <div class="quick-action-card p-6 rounded-xl cursor-pointer" id="quickManageProperties">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-home text-purple-600 text-xl"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-gray-900 font-bold text-lg mb-2">Gerenciar Imóveis</h3>
-                        <p class="text-gray-600 text-sm">Visualize e edite suas propriedades</p>
+                    <div class="dropdown-items">
+                        <a href="properties.html" class="dropdown-item">
+                            <i class="fas fa-home"></i>
+                            <span>Gerenciar Imóveis</span>
+                        </a>
+                        <a href="reports.html" class="dropdown-item">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Relatórios</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" id="logoutBtn" class="dropdown-item logout-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Sair</span>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Resumo Financeiro Aprimorado -->
+        <!-- Ações Rápidas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <button id="addTransactionBtn" class="quick-action-primary text-white p-6 rounded-xl text-left transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-plus-circle text-2xl mr-3"></i>
+                            <h3 class="text-lg font-bold">Nova Transação</h3>
+                        </div>
+                        <p class="text-green-100 text-sm">Adicionar receita ou despesa rapidamente</p>
+                    </div>
+                    <i class="fas fa-arrow-right text-xl"></i>
+                </div>
+            </button>
+            
+            <button id="viewReportsBtn" class="quick-action-secondary text-white p-6 rounded-xl text-left transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-chart-line text-2xl mr-3"></i>
+                            <h3 class="text-lg font-bold">Ver Relatórios</h3>
+                        </div>
+                        <p class="text-blue-100 text-sm">Analisar performance dos imóveis</p>
+                    </div>
+                    <i class="fas fa-arrow-right text-xl"></i>
+                </div>
+            </button>
+        </div>
+        
+        <!-- Resumo Financeiro -->
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-chart-pie section-icon"></i>
+                Resumo Financeiro
+            </h2>
+            <select id="monthFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="all">Todos os meses</option>
+                <option value="1">Janeiro</option>
+                <option value="2">Fevereiro</option>
+                <option value="3">Março</option>
+                <option value="4">Abril</option>
+                <option value="5">Maio</option>
+                <option value="6">Junho</option>
+                <option value="7">Julho</option>
+                <option value="8">Agosto</option>
+                <option value="9">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+            </select>
+        </div>
+        
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="stats-card-pro border-l-green-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <div class="flex items-center space-x-2 mb-1">
-                            <i class="fas fa-arrow-up text-green-500"></i>
-                            <span class="text-sm font-medium text-gray-600">Receita Total</span>
+            <div class="stats-card-enhanced">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-arrow-up text-green-600 text-lg"></i>
                         </div>
-                        <div class="text-2xl font-bold text-gray-900" id="totalRevenue">R$ 0,00</div>
-                        <div class="metric-trend trend-up mt-2">
-                            <i class="fas fa-trend-up mr-1"></i>+0% vs mês anterior
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">Receita Total</p>
+                            <p class="text-2xl font-bold text-gray-900" id="totalRevenue">R$ 0,00</p>
                         </div>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-money-bill-wave text-green-600"></i>
-                    </div>
+                </div>
+                <div class="metric-trend neutral">
+                    <i class="fas fa-minus mr-1"></i>
+                    Sem dados do mês anterior
                 </div>
             </div>
             
-            <div class="stats-card-pro border-l-red-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <div class="flex items-center space-x-2 mb-1">
-                            <i class="fas fa-arrow-down text-red-500"></i>
-                            <span class="text-sm font-medium text-gray-600">Despesa Total</span>
+            <div class="stats-card-enhanced">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-arrow-down text-red-600 text-lg"></i>
                         </div>
-                        <div class="text-2xl font-bold text-gray-900" id="totalExpenses">R$ 0,00</div>
-                        <div class="metric-trend trend-down mt-2">
-                            <i class="fas fa-trend-down mr-1"></i>+0% vs mês anterior
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">Despesa Total</p>
+                            <p class="text-2xl font-bold text-gray-900" id="totalExpenses">R$ 0,00</p>
                         </div>
                     </div>
-                    <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-credit-card text-red-600"></i>
-                    </div>
+                </div>
+                <div class="metric-trend neutral">
+                    <i class="fas fa-minus mr-1"></i>
+                    Sem dados do mês anterior
                 </div>
             </div>
             
-            <div class="stats-card-pro border-l-blue-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <div class="flex items-center space-x-2 mb-1">
-                            <i class="fas fa-chart-line text-blue-500"></i>
-                            <span class="text-sm font-medium text-gray-600">Lucro Líquido</span>
+            <div class="stats-card-enhanced">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-chart-line text-blue-600 text-lg"></i>
                         </div>
-                        <div class="text-2xl font-bold text-gray-900" id="totalProfit">R$ 0,00</div>
-                        <div class="metric-trend trend-up mt-2">
-                            <i class="fas fa-trend-up mr-1"></i>+0% vs mês anterior
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">Lucro Líquido</p>
+                            <p class="text-2xl font-bold text-gray-900" id="totalProfit">R$ 0,00</p>
                         </div>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-chart-pie text-blue-600"></i>
-                    </div>
+                </div>
+                <div class="metric-trend neutral">
+                    <i class="fas fa-minus mr-1"></i>
+                    Sem dados do mês anterior
                 </div>
             </div>
         </div>
         
-        <!-- Seção de Imóveis com Design Aprimorado -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
-            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-900">Seus Imóveis</h2>
-                        <p class="text-gray-600 text-sm mt-1">Gerencie e monitore suas propriedades</p>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <select id="monthFilter" class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="all">Todos os meses</option>
-                            <option value="1">Janeiro</option>
-                            <option value="2">Fevereiro</option>
-                            <option value="3">Março</option>
-                            <option value="4">Abril</option>
-                            <option value="5">Maio</option>
-                            <option value="6">Junho</option>
-                            <option value="7">Julho</option>
-                            <option value="8">Agosto</option>
-                            <option value="9">Setembro</option>
-                            <option value="10">Outubro</option>
-                            <option value="11">Novembro</option>
-                            <option value="12">Dezembro</option>
-                        </select>
-                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full" id="propertiesCount">0 imóveis</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="p-6">
-                <div id="propertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Loading state -->
-                    <div class="col-span-full text-center py-12">
-                        <div class="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                        <p class="text-gray-500">Carregando seus imóveis...</p>
-                    </div>
-                </div>
-            </div>
+        <!-- Seus Imóveis -->
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-home section-icon"></i>
+                Seus Imóveis
+            </h2>
+            <a href="properties.html" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
+                Gerenciar todos
+                <i class="fas fa-arrow-right ml-1"></i>
+            </a>
         </div>
         
-        <!-- Transações Recentes Aprimoradas -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-900">Atividade Recente</h2>
-                        <p class="text-gray-600 text-sm mt-1">Últimas transações dos seus imóveis</p>
-                    </div>
-                    <a href="transactions.html" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
-                        Ver todas <i class="fas fa-arrow-right ml-1"></i>
-                    </a>
-                </div>
-            </div>
-            
+        <div id="propertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Estados de carregamento serão inseridos aqui -->
+        </div>
+        
+        <!-- Transações Recentes -->
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-history section-icon"></i>
+                Atividade Recente
+            </h2>
+            <a href="transactions.html" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
+                Ver todas
+                <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
             <div class="overflow-x-auto">
                 <table class="min-w-full">
                     <thead class="bg-gray-50 border-b border-gray-100">
@@ -372,82 +382,218 @@
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Descrição</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Categoria</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Valor</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ações</th>
                         </tr>
                     </thead>
                     <tbody id="recentTransactions" class="bg-white divide-y divide-gray-100">
-                        <tr>
-                            <td colspan="6" class="px-6 py-12 text-center">
-                                <div class="inline-block">
-                                    <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                                </div>
-                                <p class="text-gray-500">Carregando transações...</p>
-                            </td>
-                        </tr>
+                        <!-- Transações serão inseridas aqui -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
     
-    <!-- Botão Flutuante para Adicionar Transação -->
-    <div class="floating-action-btn" id="floatingAddTransaction" title="Adicionar Transação">
+    <!-- Botão Flutuante para Nova Transação (Mobile) -->
+    <button id="floatingAddTransaction" class="action-button-floating md:hidden" title="Nova Transação">
         <i class="fas fa-plus"></i>
-    </div>
+    </button>
     
-    <!-- Modal de Adicionar Imóvel (mantido) -->
-    <div id="addPropertyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
+    <!-- Modal Nova Transação Rápida -->
+    <div id="quickTransactionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6 shadow-2xl">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-800">Adicionar Novo Imóvel</h2>
-                <button id="closeAddPropertyModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
+                <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-zap text-yellow-500 mr-2"></i>
+                    Transação Rápida
+                </h2>
+                <button id="closeQuickTransactionModal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <form id="addPropertyForm">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyName">
-                        Nome do Imóvel
-                    </label>
-                    <input type="text" id="propertyName" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: Apartamento na Praia" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyAddress">
-                        Endereço
-                    </label>
-                    <input type="text" id="propertyAddress" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: Rua das Flores, 123" required>
-                </div>
+            
+            <form id="quickTransactionForm">
                 <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyCity">
-                            Cidade
-                        </label>
-                        <input type="text" id="propertyCity" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: Rio de Janeiro" required>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyState">
-                            Estado
-                        </label>
-                        <input type="text" id="propertyState" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: RJ" required>
-                    </div>
+                    <button type="button" class="transaction-type-btn active" data-type="income">
+                        <i class="fas fa-plus-circle text-green-500 text-xl mb-2"></i>
+                        <span>Receita</span>
+                    </button>
+                    <button type="button" class="transaction-type-btn" data-type="expense">
+                        <i class="fas fa-minus-circle text-red-500 text-xl mb-2"></i>
+                        <span>Despesa</span>
+                    </button>
                 </div>
+                
+                <input type="hidden" id="quickTransactionType" value="income">
+                
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-medium mb-2" for="propertyImage">
-                        URL da Imagem (opcional)
-                    </label>
-                    <input type="text" id="propertyImage" class="w-full px-3 py-2 border rounded-lg" placeholder="Ex: https://exemplo.com/imagem.jpg">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Imóvel</label>
+                    <select id="quickTransactionProperty" class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        <option value="">Selecione um imóvel</option>
+                    </select>
                 </div>
-                <div class="flex justify-end mt-6">
-                    <button type="button" id="cancelAddProperty" class="px-4 py-2 text-gray-600 mr-3">
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Valor (R$)</label>
+                    <input type="number" step="0.01" min="0.01" id="quickTransactionAmount" 
+                           class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg font-semibold" 
+                           placeholder="0,00" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Descrição</label>
+                    <input type="text" id="quickTransactionDescription" 
+                           class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                           placeholder="Ex: Aluguel de março" required>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancelQuickTransaction" class="px-4 py-2 text-gray-600 hover:text-gray-800">
                         Cancelar
                     </button>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                    <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+                        <i class="fas fa-check mr-2"></i>
                         Adicionar
                     </button>
                 </div>
             </form>
         </div>
     </div>
+    
+    <style>
+        .transaction-type-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .transaction-type-btn:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+        
+        .transaction-type-btn.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .avatar-button {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e8eef9, #d4e1f8);
+            color: #1c5def;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        
+        .avatar-button:hover {
+            background: linear-gradient(135deg, #d4e1f8, #c1d4f7);
+            border-color: #1c5def;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            width: 220px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            margin-top: 0.5rem;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-header {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .dropdown-user-name {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.25rem;
+        }
+        
+        .dropdown-user-email {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        
+        .dropdown-items {
+            padding: 0.5rem 0;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #334155;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        
+        .dropdown-item:hover {
+            background: #f8fafc;
+            color: #1c5def;
+        }
+        
+        .dropdown-item i {
+            width: 1.25rem;
+            margin-right: 0.75rem;
+            color: #64748b;
+        }
+        
+        .dropdown-item:hover i {
+            color: #1c5def;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin: 0.5rem 0;
+        }
+        
+        .logout-item {
+            color: #ef4444;
+        }
+        
+        .logout-item i {
+            color: #ef4444;
+        }
+        
+        .logout-item:hover {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .logout-item:hover i {
+            color: #dc2626;
+        }
+    </style>
 
     <!-- Scripts do Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -458,68 +604,66 @@
     <script src="../js/firebase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/properties.js"></script>
-    <script src="../js/ui-handlers.js"></script>
     <script src="../js/transactions.js"></script>
     <script src="../js/dashboard.js"></script>
-    
-    <script>
+    <script src="../js/ui-handlers.js"></script>
+
+<script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Configurar ações rápidas
-            document.getElementById('quickAddTransaction')?.addEventListener('click', () => {
-                window.location.href = 'transactions.html';
-            });
+            console.log('🚀 Dashboard Profissional carregado');
             
-            document.getElementById('quickViewReports')?.addEventListener('click', () => {
-                window.location.href = 'reports.html';
-            });
+            // Configurar dropdown do usuário
+            setupUserDropdown();
             
-            document.getElementById('quickManageProperties')?.addEventListener('click', () => {
-                window.location.href = 'properties.html';
-            });
+            // Configurar modal de transação rápida
+            setupQuickTransactionModal();
             
-            // Botão flutuante
-            document.getElementById('floatingAddTransaction')?.addEventListener('click', () => {
-                window.location.href = 'transactions.html';
-            });
+            // Configurar botões de ação
+            setupActionButtons();
             
-            // Dropdown do usuário
+            // Aguardar autenticação e carregar dados
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    console.log('✅ Usuário autenticado:', user.email);
+                    updateUserInfo(user);
+                    loadDashboardData();
+                } else {
+                    console.log('❌ Usuário não autenticado - redirecionando');
+                    window.location.href = '../index.html';
+                }
+            });
+        });
+        
+        // Configurar dropdown do usuário
+        function setupUserDropdown() {
             const userAvatarBtn = document.getElementById('userAvatarBtn');
             const userDropdownMenu = document.getElementById('userDropdownMenu');
             
             if (userAvatarBtn && userDropdownMenu) {
-                userAvatarBtn.addEventListener('click', function() {
+                userAvatarBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     userDropdownMenu.classList.toggle('show');
                 });
                 
+                // Fechar ao clicar fora
                 document.addEventListener('click', function(event) {
                     if (!userAvatarBtn.contains(event.target) && !userDropdownMenu.contains(event.target)) {
                         userDropdownMenu.classList.remove('show');
                     }
                 });
+                
+                // Logout
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        auth.signOut().then(() => {
+                            window.location.href = '../index.html';
+                        });
+                    });
+                }
             }
-            
-            // Preencher dados do usuário
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    const dropdownUserName = document.getElementById('dropdownUserName');
-                    const dropdownUserEmail = document.getElementById('dropdownUserEmail');
-                    
-                    if (dropdownUserName && dropdownUserEmail) {
-                        const userName = user.email.split('@')[0];
-                        dropdownUserName.textContent = userName.charAt(0).toUpperCase() + userName.slice(1);
-                        dropdownUserEmail.textContent = user.email;
-                    }
-                }
-            });
-            
-            // Função para atualizar contador de propriedades
-            window.updatePropertiesCount = function(count) {
-                const countEl = document.getElementById('propertiesCount');
-                if (countEl) {
-                    countEl.textContent = `${count} ${count === 1 ? 'imóvel' : 'imóveis'}`;
-                }
-            };
-        });
-    </script>
-</body>
-</html>
+        }
+    }
+<script>
+   
