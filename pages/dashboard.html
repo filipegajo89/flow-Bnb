@@ -24,7 +24,7 @@
         /* Sidebar Styles */
         .sidebar {
             width: var(--sidebar-width);
-            background: white;
+            background: #effaf0;
             color: #374151;
             position: fixed;
             height: 100vh;
@@ -848,10 +848,10 @@
                 
                 console.log('Buscando transações para usuário:', user.uid);
                 
+                // Removendo orderBy para evitar erro de índice
                 const snapshot = await db.collection('transactions')
                     .where('userId', '==', user.uid)
-                    .orderBy('createdAt', 'desc')
-                    .limit(5)
+                    .limit(10)
                     .get();
                 
                 const tbody = document.getElementById('recentTransactions');
@@ -871,21 +871,46 @@
                     return;
                 }
                 
-                for (const doc of snapshot.docs) {
-                    const transaction = doc.data();
-                    console.log('Processando transação:', doc.id, transaction);
+                // Converter para array e ordenar manualmente por data
+                const transactions = [];
+                snapshot.forEach(doc => {
+                    transactions.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Ordenar por createdAt ou date
+                transactions.sort((a, b) => {
+                    const dateA = a.createdAt || a.date || new Date(0);
+                    const dateB = b.createdAt || b.date || new Date(0);
+                    
+                    if (dateA.toDate && dateB.toDate) {
+                        return dateB.toDate().getTime() - dateA.toDate().getTime();
+                    }
+                    return new Date(dateB).getTime() - new Date(dateA).getTime();
+                });
+                
+                // Pegar apenas as 5 mais recentes
+                const recentTransactions = transactions.slice(0, 5);
+                
+                for (const transaction of recentTransactions) {
+                    console.log('Processando transação:', transaction.id, transaction);
                     
                     // Buscar nome do imóvel
-                    let propertyName = 'Imóvel não encontrado';
+                    let propertyName = 'Carregando...';
                     try {
                         if (transaction.propertyId) {
                             const propertyDoc = await db.collection('properties').doc(transaction.propertyId).get();
                             if (propertyDoc.exists) {
                                 propertyName = propertyDoc.data().name;
+                            } else {
+                                propertyName = 'Imóvel não encontrado';
                             }
                         }
                     } catch (error) {
                         console.warn('Erro ao buscar nome do imóvel:', error);
+                        propertyName = 'Erro ao carregar';
                     }
                     
                     const row = document.createElement('tr');
@@ -898,14 +923,19 @@
                     
                     // Formatação da data
                     let formattedDate = 'Data inválida';
-                    if (transaction.date) {
-                        if (transaction.date.toDate) {
+                    try {
+                        if (transaction.createdAt && transaction.createdAt.toDate) {
+                            formattedDate = transaction.createdAt.toDate().toLocaleDateString('pt-BR');
+                        } else if (transaction.date && transaction.date.toDate) {
                             formattedDate = transaction.date.toDate().toLocaleDateString('pt-BR');
-                        } else if (transaction.date instanceof Date) {
-                            formattedDate = transaction.date.toLocaleDateString('pt-BR');
-                        } else {
+                        } else if (transaction.date) {
                             formattedDate = new Date(transaction.date).toLocaleDateString('pt-BR');
+                        } else {
+                            formattedDate = new Date().toLocaleDateString('pt-BR');
                         }
+                    } catch (error) {
+                        console.warn('Erro ao formatar data:', error);
+                        formattedDate = 'Data inválida';
                     }
                     
                     row.innerHTML = `
@@ -922,13 +952,18 @@
                     
                     tbody.appendChild(row);
                 }
+                
+                console.log('Transações carregadas com sucesso');
+                
             } catch (error) {
                 console.error('Erro detalhado ao carregar transações:', error);
                 const tbody = document.getElementById('recentTransactions');
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="5" class="px-6 py-8 text-center text-red-500">
-                            Erro ao carregar transações. ${error.message}
+                            <i class="fas fa-exclamation-triangle mb-2"></i>
+                            <p>Erro ao carregar transações</p>
+                            <small class="text-gray-500">${error.message}</small>
                         </td>
                     </tr>
                 `;
