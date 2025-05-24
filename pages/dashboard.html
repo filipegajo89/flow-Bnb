@@ -24,29 +24,29 @@
         /* Sidebar Styles */
         .sidebar {
             width: var(--sidebar-width);
-            background: linear-gradient(to bottom, var(--primary-color), #041c44);
-            color: white;
+            background: white;
+            color: #374151;
             position: fixed;
             height: 100vh;
             left: 0;
             top: 0;
             overflow-y: auto;
             transition: var(--transition-standard);
-            box-shadow: var(--shadow-medium);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             z-index: 10;
+            border-right: 1px solid #e5e7eb;
         }
 
         .logo-container {
             padding: 2rem 1.5rem;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            margin-bottom: 1rem;
         }
 
         .logo-image {
             height: 2.5rem;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
 
         .nav-menu {
@@ -56,31 +56,29 @@
         .nav-item {
             display: flex;
             align-items: center;
-            padding: 1rem 1.5rem;
-            color: rgba(255, 255, 255, 0.8);
+            padding: 0.875rem 1rem;
+            color: #6b7280;
             text-decoration: none;
             transition: var(--transition-standard);
-            border-left: 3px solid transparent;
+            border-radius: 8px;
             margin: 0.25rem 0;
-            border-radius: 0 12px 12px 0;
+            font-weight: 500;
         }
 
         .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-left: 3px solid var(--secondary-color);
+            background-color: #f3f4f6;
+            color: #374151;
         }
 
         .nav-item.active {
-            background-color: rgba(255, 255, 255, 0.15);
-            color: white;
-            border-left: 3px solid var(--secondary-color);
+            background-color: #dbeafe;
+            color: #1d4ed8;
         }
 
         .nav-icon {
-            width: 1.5rem;
-            height: 1.5rem;
-            margin-right: 1rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.75rem;
         }
 
         /* Main Content */
@@ -789,25 +787,53 @@
         async function loadProperties() {
             try {
                 const user = auth.currentUser;
-                if (!user) return [];
+                if (!user) {
+                    console.log('Usuário não autenticado');
+                    return [];
+                }
+                
+                console.log('Buscando propriedades para usuário:', user.uid);
                 
                 const snapshot = await db.collection('properties')
                     .where('userId', '==', user.uid)
-                    .orderBy('createdAt', 'desc')
                     .get();
                 
                 const properties = [];
                 snapshot.forEach(doc => {
+                    const data = doc.data();
+                    console.log('Propriedade encontrada:', doc.id, data);
                     properties.push({
                         id: doc.id,
-                        ...doc.data()
+                        ...data
                     });
                 });
                 
+                console.log('Total de propriedades encontradas:', properties.length);
                 return properties;
             } catch (error) {
-                console.error('Erro ao carregar propriedades:', error);
-                return [];
+                console.error('Erro detalhado ao carregar propriedades:', error);
+                // Se der erro de índice, tentar sem orderBy
+                try {
+                    const user = auth.currentUser;
+                    if (!user) return [];
+                    
+                    const snapshot = await db.collection('properties')
+                        .where('userId', '==', user.uid)
+                        .get();
+                    
+                    const properties = [];
+                    snapshot.forEach(doc => {
+                        properties.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    
+                    return properties;
+                } catch (fallbackError) {
+                    console.error('Erro no fallback:', fallbackError);
+                    return [];
+                }
             }
         }
 
@@ -815,16 +841,23 @@
         async function loadRecentTransactions() {
             try {
                 const user = auth.currentUser;
-                if (!user) return;
+                if (!user) {
+                    console.log('Usuário não autenticado para transações');
+                    return;
+                }
+                
+                console.log('Buscando transações para usuário:', user.uid);
                 
                 const snapshot = await db.collection('transactions')
                     .where('userId', '==', user.uid)
-                    .orderBy('date', 'desc')
+                    .orderBy('createdAt', 'desc')
                     .limit(5)
                     .get();
                 
                 const tbody = document.getElementById('recentTransactions');
                 tbody.innerHTML = '';
+                
+                console.log('Transações encontradas:', snapshot.size);
                 
                 if (snapshot.empty) {
                     tbody.innerHTML = `
@@ -840,13 +873,16 @@
                 
                 for (const doc of snapshot.docs) {
                     const transaction = doc.data();
+                    console.log('Processando transação:', doc.id, transaction);
                     
                     // Buscar nome do imóvel
                     let propertyName = 'Imóvel não encontrado';
                     try {
-                        const propertyDoc = await db.collection('properties').doc(transaction.propertyId).get();
-                        if (propertyDoc.exists) {
-                            propertyName = propertyDoc.data().name;
+                        if (transaction.propertyId) {
+                            const propertyDoc = await db.collection('properties').doc(transaction.propertyId).get();
+                            if (propertyDoc.exists) {
+                                propertyName = propertyDoc.data().name;
+                            }
                         }
                     } catch (error) {
                         console.warn('Erro ao buscar nome do imóvel:', error);
@@ -860,27 +896,39 @@
                     const badgeClass = transaction.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
                     const badgeText = transaction.type === 'income' ? 'Receita' : 'Despesa';
                     
+                    // Formatação da data
+                    let formattedDate = 'Data inválida';
+                    if (transaction.date) {
+                        if (transaction.date.toDate) {
+                            formattedDate = transaction.date.toDate().toLocaleDateString('pt-BR');
+                        } else if (transaction.date instanceof Date) {
+                            formattedDate = transaction.date.toLocaleDateString('pt-BR');
+                        } else {
+                            formattedDate = new Date(transaction.date).toLocaleDateString('pt-BR');
+                        }
+                    }
+                    
                     row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${formatDate(transaction.date)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${formattedDate}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${propertyName}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">${transaction.description}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${transaction.description || 'Sem descrição'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}">
                                 ${badgeText}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${valueClass}">${valuePrefix}${formatCurrency(transaction.amount)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${valueClass}">${valuePrefix}${formatCurrency(transaction.amount || 0)}</td>
                     `;
                     
                     tbody.appendChild(row);
                 }
             } catch (error) {
-                console.error('Erro ao carregar transações recentes:', error);
+                console.error('Erro detalhado ao carregar transações:', error);
                 const tbody = document.getElementById('recentTransactions');
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="5" class="px-6 py-8 text-center text-red-500">
-                            Erro ao carregar transações. Tente novamente.
+                            Erro ao carregar transações. ${error.message}
                         </td>
                     </tr>
                 `;
