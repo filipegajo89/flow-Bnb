@@ -185,7 +185,21 @@ const renderPropertyCard = (property, financialSummary) => {
   
   const statusClass = property.status === 'active' ? 'bg-green-500' : 'bg-gray-500';
   const statusText = property.status === 'active' ? 'Ativo' : 'Inativo';
-  const imageUrl = property.image || 'https://via.placeholder.com/800x400?text=Imóvel';
+  
+  // Usar imagem local ou criar placeholder
+  let imageUrl = '';
+  if (property.image && !property.image.includes('via.placeholder.com')) {
+    imageUrl = property.image;
+  } else {
+    // Criar placeholder usando CSS ao invés de URL externa
+    imageUrl = 'data:image/svg+xml;base64,' + btoa(`
+      <svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+        <rect width="800" height="400" fill="#f3f4f6"/>
+        <text x="400" y="180" font-family="Arial" font-size="24" fill="#6b7280" text-anchor="middle">🏠</text>
+        <text x="400" y="220" font-family="Arial" font-size="16" fill="#6b7280" text-anchor="middle">Imóvel</text>
+      </svg>
+    `);
+  }
   
   // Classe para o lucro (positivo ou negativo)
   const profitClass = financialSummary.profit >= 0 ? 'text-blue-600' : 'text-red-600';
@@ -193,7 +207,10 @@ const renderPropertyCard = (property, financialSummary) => {
   card.innerHTML = `
     <div class="relative h-44 overflow-hidden bg-gray-200">
       <img src="${imageUrl}" alt="${property.name}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" 
-           onerror="this.src='https://via.placeholder.com/800x400?text=Imóvel'">
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 text-4xl" style="display:none;">
+        🏠
+      </div>
       <div class="absolute top-3 right-3 ${statusClass} text-white text-xs font-bold px-2 py-1 rounded-full">
         ${statusText}
       </div>
