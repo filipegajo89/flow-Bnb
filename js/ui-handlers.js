@@ -1,5 +1,9 @@
-// Arquivo: js/ui-handlers.js
-console.log('UI Handlers carregado');
+// ===============================================
+// Arquivo: js/ui-handlers.js - VERSÃO CORRIGIDA
+// Manipuladores de interface do usuário
+// ===============================================
+
+console.log('🚀 UI Handlers carregado');
 
 // Função para abrir qualquer modal
 function openModal(modalId) {
@@ -7,14 +11,10 @@ function openModal(modalId) {
     if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
-        console.log(`Modal ${modalId} aberto`);
-        // Após abrir o modal, verificar sua estrutura para depuração
-        setTimeout(function() {
-            logModalStructure(modalId);
-        }, 100);
+        console.log(`✅ Modal ${modalId} aberto`);
         return true;
     } else {
-        console.error(`Modal ${modalId} não encontrado`);
+        console.error(`❌ Modal ${modalId} não encontrado`);
         return false;
     }
 }
@@ -25,152 +25,187 @@ function closeModal(modalId) {
     if (modal) {
         modal.classList.remove('flex');
         modal.classList.add('hidden');
-        console.log(`Modal ${modalId} fechado`);
+        console.log(`✅ Modal ${modalId} fechado`);
         return true;
     } else {
-        console.error(`Modal ${modalId} não encontrado`);
+        console.error(`❌ Modal ${modalId} não encontrado`);
         return false;
     }
 }
 
-// Modificar a função setupAddPropertyForm no arquivo ui-handlers.js
+// Função para exibir notificações
+function showNotification(message, type = 'success') {
+    // Remover notificação existente se houver
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
 
+    // Criar nova notificação
+    const notification = document.createElement('div');
+    notification.className = `notification fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium transition-all duration-300 transform translate-x-full`;
+    
+    // Definir cor baseada no tipo
+    switch (type) {
+        case 'success':
+            notification.classList.add('bg-green-500');
+            break;
+        case 'error':
+            notification.classList.add('bg-red-500');
+            break;
+        case 'warning':
+            notification.classList.add('bg-yellow-500');
+            break;
+        default:
+            notification.classList.add('bg-blue-500');
+    }
+    
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animar entrada
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Remover após 4 segundos
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 4000);
+}
+
+// FUNÇÃO PRINCIPAL - Configurar formulário de adicionar imóvel
 function setupAddPropertyForm() {
     const addPropertyForm = document.getElementById('addPropertyForm');
     
-    if (addPropertyForm) {
-        console.log('Formulário de adicionar imóvel encontrado e configurado');
+    if (!addPropertyForm) {
+        console.warn('⚠️ Formulário de adicionar imóvel não encontrado');
+        return;
+    }
+    
+    console.log('✅ Formulário de adicionar imóvel encontrado e configurado');
+    
+    addPropertyForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        console.log('📝 Formulário de adicionar imóvel enviado');
         
-        addPropertyForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            console.log('Formulário de adicionar imóvel enviado');
+        // Desabilitar botão de envio para evitar duplo clique
+        const submitBtn = addPropertyForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn ? submitBtn.innerHTML : '';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Adicionando...';
+        }
+        
+        try {
+            // Verificar autenticação
+            const user = auth.currentUser;
+            if (!user) {
+                throw new Error('Usuário não está autenticado');
+            }
+            console.log('✅ Usuário autenticado:', user.email);
             
-            // Obter dados do formulário
+            // Coletar dados do formulário
             const propertyData = {
-                name: addPropertyForm.querySelector('#propertyName').value,
-                address: addPropertyForm.querySelector('#propertyAddress').value,
-                city: addPropertyForm.querySelector('#propertyCity').value,
-                state: addPropertyForm.querySelector('#propertyState').value,
-                image: addPropertyForm.querySelector('#propertyImage').value || null,
-                status: 'active' // Status padrão
+                name: addPropertyForm.querySelector('#propertyName').value.trim(),
+                address: addPropertyForm.querySelector('#propertyAddress').value.trim(),
+                city: addPropertyForm.querySelector('#propertyCity').value.trim(),
+                state: addPropertyForm.querySelector('#propertyState').value.trim(),
+                image: addPropertyForm.querySelector('#propertyImage').value.trim() || null,
+                status: 'active'
             };
             
-            console.log('Dados do imóvel:', propertyData);
+            console.log('📋 Dados coletados:', propertyData);
             
-            try {
-                // Verificar se o usuário está autenticado
-                const user = firebase.auth().currentUser;
-                if (!user) {
-                    throw new Error('Usuário não está autenticado');
-                }
-                
-                // Adicionar imóvel diretamente ao Firestore
-                const newProperty = {
-                    ...propertyData,
-                    userId: user.uid,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                const docRef = await firebase.firestore().collection('properties').add(newProperty);
-                console.log('Imóvel adicionado com ID:', docRef.id);
-                
-                // Fechar o modal
-                closeModal('addPropertyModal');
-                
-                // Limpar o formulário
-                addPropertyForm.reset();
-                
-                // Recarregar a página para mostrar o novo imóvel
-                window.location.reload();
-                
-                // Exibir mensagem de sucesso
-                alert('Imóvel adicionado com sucesso!');
-
-                setTimeout(function() {
-                    window.location.href = window.location.href;
-                }, 500);
-                
-            } catch (error) {
-                console.error('Erro ao adicionar imóvel:', error);
-                alert('Erro ao adicionar imóvel: ' + error.message);
+            // Validar dados básicos
+            if (!propertyData.name || !propertyData.address || !propertyData.city || !propertyData.state) {
+                throw new Error('Todos os campos obrigatórios devem ser preenchidos');
             }
-        });
-    } else {
-        console.warn('Formulário de adicionar imóvel não encontrado');
-    }
+            
+            // Chamar função de adicionar imóvel
+            console.log('💾 Salvando imóvel no Firestore...');
+            const propertyId = await addProperty(propertyData);
+            console.log('✅ Imóvel salvo com ID:', propertyId);
+            
+            // Fechar modal
+            closeModal('addPropertyModal');
+            
+            // Limpar formulário
+            addPropertyForm.reset();
+            
+            // Mostrar notificação de sucesso
+            showNotification('Imóvel adicionado com sucesso!', 'success');
+            
+            // IMPORTANTE: Recarregar a lista de imóveis SEM recarregar a página
+            console.log('🔄 Recarregando lista de imóveis...');
+            await loadAndDisplayProperties();
+            console.log('✅ Lista de imóveis atualizada!');
+            
+        } catch (error) {
+            console.error('❌ Erro ao adicionar imóvel:', error);
+            showNotification(`Erro ao adicionar imóvel: ${error.message}`, 'error');
+        } finally {
+            // Reabilitar botão
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+    });
 }
 
-// Função para registrar botões de fechamento do modal
+// Configurar listeners para botões de fechar modal
 function setupModalCloseButtons(modalId) {
-    // Botão X no topo
+    // Botão X no header
     const closeBtn = document.getElementById(`close${modalId}`);
     if (closeBtn) {
-        console.log(`Botão X para fechar ${modalId} encontrado`);
-        closeBtn.addEventListener('click', function() {
-            console.log(`Botão X para ${modalId} clicado`);
-            closeModal(modalId);
-        });
-    } else {
-        console.warn(`Botão X para fechar ${modalId} não encontrado`);
+        console.log(`✅ Botão X para ${modalId} configurado`);
+        closeBtn.addEventListener('click', () => closeModal(modalId));
     }
     
     // Botão Cancelar
     const cancelBtn = document.getElementById(`cancel${modalId.replace('Modal', '')}`);
     if (cancelBtn) {
-        console.log(`Botão Cancelar para ${modalId} encontrado`);
-        cancelBtn.addEventListener('click', function() {
-            console.log(`Botão Cancelar para ${modalId} clicado`);
-            closeModal(modalId);
-        });
-    } else {
-        console.warn(`Botão Cancelar para ${modalId} não encontrado`);
+        console.log(`✅ Botão Cancelar para ${modalId} configurado`);
+        cancelBtn.addEventListener('click', () => closeModal(modalId));
     }
-}
-
-// Função para depuração da estrutura do modal
-function logModalStructure(modalId) {
-    console.log(`=== ESTRUTURA DO MODAL ${modalId} ===`);
-    const modal = document.getElementById(modalId);
-    console.log('Elemento do modal:', modal);
     
+    // Fechar ao clicar fora do modal
+    const modal = document.getElementById(modalId);
     if (modal) {
-        // Registrar todos os elementos importantes
-        console.log(`Botão fechar: ${modalId.replace('Modal', '')}`, modal.querySelector(`#close${modalId}`));
-        console.log(`Botão cancelar: ${modalId.replace('Modal', '')}`, modal.querySelector(`#cancel${modalId.replace('Modal', '')}`));
-        console.log('Formulário:', modal.querySelector(`#${modalId.replace('Modal', '')}Form`));
-        
-        // Se for o modal de adicionar imóvel, registrar campos específicos
-        if (modalId === 'addPropertyModal') {
-            const form = modal.querySelector('#addPropertyForm');
-            if (form) {
-                console.log('Campo nome:', form.querySelector('#propertyName'));
-                console.log('Campo endereço:', form.querySelector('#propertyAddress'));
-                console.log('Campo cidade:', form.querySelector('#propertyCity'));
-                console.log('Campo estado:', form.querySelector('#propertyState'));
-                console.log('Campo imagem:', form.querySelector('#propertyImage'));
-                console.log('Botão submit:', form.querySelector('button[type="submit"]'));
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(modalId);
             }
-        }
+        });
     }
-    console.log(`=== FIM DA ESTRUTURA DO MODAL ${modalId} ===`);
 }
 
-// Função para configurar botão do menu de usuário
+// Configurar menu do usuário
 function setupUserMenu() {
-    const userMenuBtn = document.querySelector('.avatar-button') || document.getElementById('userAvatarBtn');
-    const userMenuDropdown = document.querySelector('.dropdown-menu') || document.getElementById('userDropdownMenu');
+    const userMenuBtn = document.getElementById('userAvatarBtn');
+    const userMenuDropdown = document.getElementById('userDropdownMenu');
     
     if (userMenuBtn && userMenuDropdown) {
-        console.log('Menu de usuário encontrado');
+        console.log('✅ Menu de usuário configurado');
+        
         userMenuBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation(); // Impedir propagação para o documento
-            console.log('Botão do menu do usuário clicado');
+            e.stopPropagation();
+            console.log('👤 Menu do usuário clicado');
             userMenuDropdown.classList.toggle('show');
         });
         
-        // Fechar o dropdown quando clicar fora dele
+        // Fechar ao clicar fora
         document.addEventListener('click', function(event) {
             if (userMenuDropdown.classList.contains('show') && 
                 !userMenuBtn.contains(event.target) && 
@@ -178,76 +213,117 @@ function setupUserMenu() {
                 userMenuDropdown.classList.remove('show');
             }
         });
+        
+        // Preencher dados do usuário
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                const dropdownUserName = document.getElementById('dropdownUserName');
+                const dropdownUserEmail = document.getElementById('dropdownUserEmail');
+                
+                if (dropdownUserName && dropdownUserEmail) {
+                    // Extrair nome do email
+                    const userName = user.email.split('@')[0];
+                    dropdownUserName.textContent = userName.charAt(0).toUpperCase() + userName.slice(1);
+                    dropdownUserEmail.textContent = user.email;
+                }
+            }
+        });
     } else {
-        console.warn('Menu de usuário não encontrado completamente');
-        console.warn('Botão encontrado:', !!userMenuBtn);
-        console.warn('Dropdown encontrado:', !!userMenuDropdown);
+        console.warn('⚠️ Menu de usuário não encontrado completamente');
     }
 }
 
-// Inicializar todos os handlers de UI quando o DOM estiver pronto
+// Configurar filtro de mês
+function setupMonthFilter() {
+    const monthFilter = document.getElementById('monthFilter');
+    if (monthFilter) {
+        console.log('✅ Filtro de mês configurado');
+        
+        // Definir mês atual como padrão
+        const currentMonth = new Date().getMonth() + 1;
+        monthFilter.value = currentMonth.toString();
+        
+        monthFilter.addEventListener('change', async () => {
+            const value = monthFilter.value;
+            console.log(`📅 Filtro alterado para: ${value}`);
+            
+            try {
+                showLoadingState();
+                await loadAndDisplayProperties(value === 'all' ? null : value);
+            } catch (error) {
+                console.error('❌ Erro ao aplicar filtro:', error);
+                showNotification('Erro ao aplicar filtro', 'error');
+            }
+        });
+    }
+}
+
+// Configurar menu mobile
+function setupMobileMenu() {
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (mobileMenuToggle && sidebar) {
+        console.log('✅ Menu mobile configurado');
+        
+        mobileMenuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+        });
+        
+        // Fechar ao clicar fora em mobile
+        document.addEventListener('click', function(event) {
+            if (sidebar.classList.contains('open') && 
+                !sidebar.contains(event.target) && 
+                !mobileMenuToggle.contains(event.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+    }
+}
+
+// INICIALIZAÇÃO PRINCIPAL
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM carregado para ui-handlers.js');
+    console.log('🎯 DOM carregado - Inicializando UI Handlers');
     
-    // Capturar botão de adicionar imóvel
-    const addPropertyBtn = document.getElementById('addPropertyBtn');
-    if (addPropertyBtn) {
-        console.log('Botão "Novo Imóvel" encontrado');
-        addPropertyBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Botão "Novo Imóvel" clicado');
-            openModal('addPropertyModal');
-        });
-    } else {
-        console.warn('Botão "Novo Imóvel" não encontrado no DOM');
-    }
-    
-    // Configurar botões específicos para o modal de adicionar imóvel
-    setupModalCloseButtons('addPropertyModal');
-    
-    // Configurar formulário de adicionar imóvel
-    setupAddPropertyForm();
-    
-    // Configurar menu do usuário
-    setupUserMenu();
-    
-    // Capturar todos os botões de fechar modais de forma genérica
-    const closeButtons = document.querySelectorAll('[id^="close"][id$="Modal"]');
-    closeButtons.forEach(button => {
-        const modalId = button.id.replace('close', '');
-        button.addEventListener('click', function() {
-            closeModal(modalId);
-        });
+    // Aguardar o Firebase Auth estar pronto
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            console.log('🔐 Usuário autenticado, configurando interface');
+            
+            // Configurar botão de adicionar imóvel
+            const addPropertyBtn = document.getElementById('addPropertyBtn');
+            if (addPropertyBtn) {
+                console.log('✅ Botão "Novo Imóvel" encontrado');
+                addPropertyBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('🏠 Botão "Novo Imóvel" clicado');
+                    openModal('addPropertyModal');
+                });
+            } else {
+                console.warn('⚠️ Botão "Novo Imóvel" não encontrado');
+            }
+            
+            // Configurar todos os componentes
+            setupModalCloseButtons('addPropertyModal');
+            setupAddPropertyForm();
+            setupUserMenu();
+            setupMonthFilter();
+            setupMobileMenu();
+            
+            // Carregar imóveis inicialmente se estivermos no dashboard
+            if (window.location.pathname.includes('dashboard')) {
+                console.log('📊 Página dashboard detectada - carregando imóveis');
+                loadAndDisplayProperties();
+            }
+            
+            console.log('🎉 Interface configurada com sucesso!');
+        } else {
+            console.log('🚫 Usuário não autenticado');
+        }
     });
-    
-    // Capturar todos os botões de cancelar de forma genérica
-    const cancelButtons = document.querySelectorAll('[id^="cancel"]');
-    cancelButtons.forEach(button => {
-        const baseId = button.id.replace('cancel', '');
-        button.addEventListener('click', function() {
-            closeModal(baseId + 'Modal');
-        });
-    });
-    
-    // Adicionar fixadores diretos para elementos problemáticos
-    // estes são backups caso os métodos acima falhem
-    const directCloseBtn = document.getElementById('closeAddPropertyModal');
-    if (directCloseBtn) {
-        directCloseBtn.onclick = function() {
-            document.getElementById('addPropertyModal').classList.add('hidden');
-            document.getElementById('addPropertyModal').classList.remove('flex');
-        };
-    }
-    
-    const directCancelBtn = document.getElementById('cancelAddProperty');
-    if (directCancelBtn) {
-        directCancelBtn.onclick = function() {
-            document.getElementById('addPropertyModal').classList.add('hidden');
-            document.getElementById('addPropertyModal').classList.remove('flex');
-        };
-    }
 });
 
-// Registrar no objeto window para acesso global
+// Tornar funções globais para acesso de outros scripts
 window.openModal = openModal;
 window.closeModal = closeModal;
+window.showNotification = showNotification;
