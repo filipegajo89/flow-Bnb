@@ -323,35 +323,74 @@ const updateDashboardSummary = (income, expense, profit) => {
 };
 
 // FUNÇÃO PRINCIPAL - Carregar e exibir imóveis
+// Substitua a função loadAndDisplayProperties em js/properties.js por esta versão
 const loadAndDisplayProperties = async (monthFilter = null) => {
+  console.log('🔄 Iniciando carregamento de imóveis...');
+  
   try {
-    console.log('🔄 Iniciando carregamento de imóveis...');
-    
     const propertiesList = document.getElementById('propertiesList');
     if (!propertiesList) {
-      console.error('❌ Elemento #propertiesList não encontrado no DOM');
+      console.error('❌ Elemento propertiesList não encontrado');
       return;
     }
     
     // Mostrar loading
-    showLoadingState();
+    propertiesList.innerHTML = `
+      <div class="col-span-full text-center py-10">
+        <div class="inline-block w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-500">Carregando seus imóveis...</p>
+      </div>
+    `;
     
     // Verificar autenticação
     const user = auth.currentUser;
     if (!user) {
       console.error('❌ Usuário não autenticado');
-      showErrorState('Você precisa estar autenticado para visualizar imóveis.');
+      propertiesList.innerHTML = `
+        <div class="col-span-full text-center py-10">
+          <p class="text-red-500">Erro: Usuário não autenticado</p>
+        </div>
+      `;
       return;
     }
+    
     console.log('✅ Usuário autenticado:', user.email);
     
-    // Buscar imóveis
-    const properties = await getProperties();
-    console.log(`📋 Obtidos ${properties.length} imóveis`);
+    // Buscar propriedades diretamente do Firestore
+    console.log('📡 Buscando propriedades...');
+    const snapshot = await db.collection('properties')
+      .where('userId', '==', user.uid)
+      .orderBy('createdAt', 'desc')
+      .get();
     
-    if (properties.length === 0) {
-      console.log('📭 Nenhum imóvel encontrado');
-      showEmptyState();
+    console.log(`📋 Encontradas ${snapshot.size} propriedades`);
+    
+    if (snapshot.empty) {
+      console.log('📭 Nenhuma propriedade encontrada');
+      propertiesList.innerHTML = `
+        <div class="col-span-full text-center py-10">
+          <i class="fas fa-home text-gray-300 text-5xl mb-4"></i>
+          <h3 class="text-xl font-semibold text-gray-700 mb-2">Nenhum imóvel cadastrado</h3>
+          <p class="text-gray-500 mb-4">Você ainda não tem imóveis cadastrados. Comece adicionando seu primeiro imóvel.</p>
+          <button id="addFirstPropertyBtn" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+            <i class="fas fa-plus mr-2"></i>Adicionar Primeiro Imóvel
+          </button>
+        </div>
+      `;
+      
+      // Adicionar evento ao botão
+      const addFirstPropertyBtn = document.getElementById('addFirstPropertyBtn');
+      if (addFirstPropertyBtn) {
+        addFirstPropertyBtn.addEventListener('click', () => {
+          const modal = document.getElementById('addPropertyModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+        });
+      }
+      
+      // Zerar resumo
       updateDashboardSummary(0, 0, 0);
       return;
     }
@@ -359,7 +398,7 @@ const loadAndDisplayProperties = async (monthFilter = null) => {
     // Limpar lista
     propertiesList.innerHTML = '';
     
-    // Calcular totais
+    // Processar cada propriedade
     let totalIncome = 0;
     let totalExpense = 0;
     
@@ -367,24 +406,65 @@ const loadAndDisplayProperties = async (monthFilter = null) => {
     const currentYear = currentDate.getFullYear();
     const currentMonth = monthFilter ? parseInt(monthFilter) : null;
     
-    console.log('💰 Calculando resumos financeiros...');
+    console.log('💰 Processando propriedades...');
     
-    // Renderizar cada imóvel
-    for (const property of properties) {
+    for (const doc of snapshot.docs) {
       try {
+        const property = { id: doc.id, ...doc.data() };
         console.log(`🏠 Processando: ${property.name}`);
         
-        const financialSummary = await getPropertyFinancialSummary(property.id, currentMonth, currentYear);
+        // Calcular resumo financeiro (simplificado para teste)
+        let propertyIncome = 0;
+        let propertyExpense = 0;
         
-        totalIncome += financialSummary.income;
-        totalExpense += financialSummary.expense;
+        try {
+          let transactionQuery = db.collection('transactions')
+            .where('propertyId', '==', property.id);
+          
+          if (currentMonth && currentYear) {
+            const startDate = new Date(currentYear, currentMonth - 1, 1);
+            const endDate = new Date(currentYear, currentMonth, 0);
+            transactionQuery = transactionQuery
+              .where('date', '>=', startDate)
+              .where('date', '<=', endDate);
+          }
+          
+          const transactionSnapshot = await transactionQuery.get();
+          
+          transactionSnapshot.forEach(transactionDoc => {
+            const transaction = transactionDoc.data();
+            const amount = parseFloat(transaction.amount) || 0;
+            
+            if (transaction.type === 'income') {
+              propertyIncome += amount;
+            } else if (transaction.type === 'expense') {
+              propertyExpense += amount;
+            }
+          });
+        } catch (transactionError) {
+          console.warn('⚠️ Erro ao buscar transações para', property.name, ':', transactionError);
+        }
         
-        const propertyCard = renderPropertyCard(property, financialSummary);
-        propertiesList.appendChild(propertyCard);
+        const propertyProfit = propertyIncome - propertyExpense;
+        totalIncome += propertyIncome;
+        totalExpense += propertyExpense;
         
-        // Adicionar eventos aos botões
-        const viewBtn = propertyCard.querySelector('.viewPropertyBtn');
-        const addTransactionBtn = propertyCard.querySelector('.addTransactionBtn');
+        const financialSummary = {
+          income: propertyIncome,
+          expense: propertyExpense,
+          profit: propertyProfit,
+          formattedIncome: formatCurrency(propertyIncome),
+          formattedExpense: formatCurrency(propertyExpense),
+          formattedProfit: formatCurrency(propertyProfit)
+        };
+        
+        // Criar card da propriedade
+        const card = renderPropertyCard(property, financialSummary);
+        propertiesList.appendChild(card);
+        
+        // Adicionar eventos
+        const viewBtn = card.querySelector('.viewPropertyBtn');
+        const addTransactionBtn = card.querySelector('.addTransactionBtn');
         
         if (viewBtn) {
           viewBtn.addEventListener('click', () => {
@@ -405,21 +485,44 @@ const loadAndDisplayProperties = async (monthFilter = null) => {
             }
           });
         }
+        
       } catch (propertyError) {
-        console.error(`❌ Erro ao processar imóvel ${property.id}:`, propertyError);
+        console.error('❌ Erro ao processar propriedade:', propertyError);
         continue;
       }
     }
     
+    // Atualizar resumo
     const totalProfit = totalIncome - totalExpense;
-    console.log('💯 Atualizando resumo financeiro:', { totalIncome, totalExpense, totalProfit });
     updateDashboardSummary(totalIncome, totalExpense, totalProfit);
     
     console.log('✅ Carregamento concluído com sucesso!');
+    console.log(`💰 Resumo: Receita=${formatCurrency(totalIncome)}, Despesa=${formatCurrency(totalExpense)}, Lucro=${formatCurrency(totalProfit)}`);
     
   } catch (error) {
-    console.error('❌ Erro crítico ao carregar imóveis:', error);
-    showErrorState('Não foi possível carregar seus imóveis. Por favor, tente novamente.');
+    console.error('❌ Erro crítico:', error);
+    
+    const propertiesList = document.getElementById('propertiesList');
+    if (propertiesList) {
+      let errorMessage = 'Erro ao carregar imóveis.';
+      
+      if (error.code === 'permission-denied') {
+        errorMessage = 'Acesso negado. Verifique as regras de segurança do Firestore.';
+      } else if (error.code === 'failed-precondition') {
+        errorMessage = 'Índice do Firestore necessário. Verifique o console do Firebase.';
+      }
+      
+      propertiesList.innerHTML = `
+        <div class="col-span-full text-center py-10">
+          <i class="fas fa-exclamation-circle text-red-500 text-5xl mb-4"></i>
+          <h3 class="text-xl font-semibold text-gray-700 mb-2">Erro ao carregar imóveis</h3>
+          <p class="text-gray-500 mb-4">${errorMessage}</p>
+          <button onclick="loadAndDisplayProperties()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+            <i class="fas fa-redo mr-2"></i>Tentar novamente
+          </button>
+        </div>
+      `;
+    }
   }
 };
 
