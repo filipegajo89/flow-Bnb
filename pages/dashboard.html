@@ -664,6 +664,359 @@
                 }
             }
         }
-    }
-<script>
+        
+        // Configurar modal de transação rápida
+        function setupQuickTransactionModal() {
+            const modal = document.getElementById('quickTransactionModal');
+            const closeBtn = document.getElementById('closeQuickTransactionModal');
+            const cancelBtn = document.getElementById('cancelQuickTransaction');
+            const form = document.getElementById('quickTransactionForm');
+            const typeButtons = document.querySelectorAll('.transaction-type-btn');
+            const typeInput = document.getElementById('quickTransactionType');
+            
+            // Abrir modal
+            function openQuickTransactionModal() {
+                loadPropertiesForQuickTransaction();
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+            
+            // Fechar modal
+            function closeQuickTransactionModal() {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+                form.reset();
+                typeInput.value = 'income';
+                typeButtons.forEach(btn => btn.classList.remove('active'));
+                typeButtons[0].classList.add('active');
+            }
+            
+            // Event listeners para fechar
+            closeBtn?.addEventListener('click', closeQuickTransactionModal);
+            cancelBtn?.addEventListener('click', closeQuickTransactionModal);
+            
+            // Fechar ao clicar fora
+            modal?.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeQuickTransactionModal();
+                }
+            });
+            
+            // Seleção de tipo de transação
+            typeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    typeButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    typeInput.value = this.dataset.type;
+                });
+            });
+            
+            // Submissão do formulário
+            form?.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await handleQuickTransactionSubmit();
+            });
+            
+            // Tornar função global para uso em botões
+            window.openQuickTransactionModal = openQuickTransactionModal;
+        }
+        
+        // Carregar propriedades para o modal de transação rápida
+        async function loadPropertiesForQuickTransaction() {
+            try {
+                const propertySelect = document.getElementById('quickTransactionProperty');
+                if (!propertySelect) return;
+                
+                propertySelect.innerHTML = '<option value="">Carregando...</option>';
+                
+                const user = auth.currentUser;
+                if (!user) return;
+                
+                const snapshot = await db.collection('properties')
+                    .where('userId', '==', user.uid)
+                    .get();
+                
+                propertySelect.innerHTML = '<option value="">Selecione um imóvel</option>';
+                
+                snapshot.forEach(doc => {
+                    const property = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = property.name;
+                    propertySelect.appendChild(option);
+                });
+                
+                if (snapshot.empty) {
+                    propertySelect.innerHTML = '<option value="">Nenhum imóvel cadastrado</option>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar propriedades:', error);
+            }
+        }
+        
+        // Processar submissão da transação rápida
+        async function handleQuickTransactionSubmit() {
+            try {
+                const submitBtn = document.querySelector('#quickTransactionForm button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                // Loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Adicionando...';
+                
+                const transactionData = {
+                    propertyId: document.getElementById('quickTransactionProperty').value,
+                    type: document.getElementById('quickTransactionType').value,
+                    amount: parseFloat(document.getElementById('quickTransactionAmount').value),
+                    description: document.getElementById('quickTransactionDescription').value,
+                    date: new Date(),
+                    category: document.getElementById('quickTransactionType').value === 'income' ? 'rent' : 'maintenance'
+                };
+                
+                // Validações
+                if (!transactionData.propertyId) {
+                    throw new Error('Selecione um imóvel');
+                }
+                if (!transactionData.amount || transactionData.amount <= 0) {
+                    throw new Error('Valor deve ser maior que zero');
+                }
+                if (!transactionData.description.trim()) {
+                    throw new Error('Descrição é obrigatória');
+                }
+                
+                // Adicionar transação
+                await addTransaction(transactionData);
+                
+                // Sucesso
+                showNotification('Transação adicionada com sucesso!', 'success');
+                
+                // Fechar modal e recarregar dados
+                window.openQuickTransactionModal && document.getElementById('cancelQuickTransaction').click();
+                loadDashboardData();
+                
+            } catch (error) {
+                console.error('Erro ao adicionar transação:', error);
+                showNotification(error.message || 'Erro ao adicionar transação', 'error');
+            } finally {
+                const submitBtn = document.querySelector('#quickTransactionForm button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Adicionar';
+                }
+            }
+        }
+        
+        // Configurar botões de ação
+        function setupActionButtons() {
+            // Botão principal de nova transação
+            const addTransactionBtn = document.getElementById('addTransactionBtn');
+            const floatingBtn = document.getElementById('floatingAddTransaction');
+            const viewReportsBtn = document.getElementById('viewReportsBtn');
+            
+            // Nova transação
+            [addTransactionBtn, floatingBtn].forEach(btn => {
+                btn?.addEventListener('click', function() {
+                    window.openQuickTransactionModal();
+                });
+            });
+            
+            // Ver relatórios
+            viewReportsBtn?.addEventListener('click', function() {
+                window.location.href = 'reports.html';
+            });
+        }
+        
+        // Atualizar informações do usuário
+        function updateUserInfo(user) {
+            const dropdownUserName = document.getElementById('dropdownUserName');
+            const dropdownUserEmail = document.getElementById('dropdownUserEmail');
+            
+            if (dropdownUserName && dropdownUserEmail) {
+                const userName = user.email.split('@')[0];
+                dropdownUserName.textContent = userName.charAt(0).toUpperCase() + userName.slice(1);
+                dropdownUserEmail.textContent = user.email;
+            }
+        }
+        
+        // Carregar dados do dashboard
+        async function loadDashboardData() {
+            try {
+                console.log('📊 Carregando dados do dashboard...');
+                
+                // Carregar imóveis
+                await loadAndDisplayProperties();
+                
+                // Carregar transações recentes
+                await loadRecentTransactions();
+                
+                // Configurar filtro de mês
+                setupMonthFilter();
+                
+                console.log('✅ Dashboard carregado com sucesso');
+            } catch (error) {
+                console.error('❌ Erro ao carregar dashboard:', error);
+                showNotification('Erro ao carregar dados do dashboard', 'error');
+            }
+        }
+        
+        // Configurar filtro de mês
+        function setupMonthFilter() {
+            const monthFilter = document.getElementById('monthFilter');
+            if (monthFilter) {
+                const currentMonth = new Date().getMonth() + 1;
+                monthFilter.value = currentMonth.toString();
+                
+                monthFilter.addEventListener('change', async function() {
+                    const value = this.value;
+                    console.log('📅 Filtro alterado para:', value);
+                    await loadAndDisplayProperties(value === 'all' ? null : value);
+                });
+            }
+        }
+        
+        // Função melhorada para renderizar cards de propriedades
+        function renderPropertyCardEnhanced(property, financialSummary) {
+            const card = document.createElement('div');
+            card.className = 'property-card-enhanced';
+            card.dataset.id = property.id;
+            
+            const statusClass = property.status === 'active' ? 'bg-green-500' : 'bg-gray-500';
+            const statusText = property.status === 'active' ? 'Ativo' : 'Inativo';
+            const profitClass = financialSummary.profit >= 0 ? 'text-blue-600' : 'text-red-600';
+            
+            // Criar placeholder SVG otimizado
+            const placeholderSvg = `data:image/svg+xml;base64,${btoa(`
+                <svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="400" height="200" fill="#f3f4f6"/>
+                    <text x="200" y="90" font-family="Arial" font-size="40" fill="#9ca3af" text-anchor="middle">🏠</text>
+                    <text x="200" y="130" font-family="Arial" font-size="14" fill="#6b7280" text-anchor="middle">Imóvel</text>
+                </svg>
+            `)}`;
+            
+            const imageUrl = (property.image && !property.image.includes('placeholder')) ? property.image : placeholderSvg;
+            
+            card.innerHTML = `
+                <div class="relative h-48 overflow-hidden">
+                    <img src="${imageUrl}" alt="${property.name}" 
+                         class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                         onerror="this.src='${placeholderSvg}'">
+                    <div class="absolute top-3 right-3 ${statusClass} text-white text-xs font-bold px-3 py-1 rounded-full">
+                        ${statusText}
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+                <div class="p-5">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2 truncate">${property.name}</h3>
+                    <p class="text-gray-600 text-sm mb-4 flex items-center">
+                        <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>
+                        ${property.city}, ${property.state}
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div class="text-center p-3 bg-green-50 rounded-lg border border-green-100">
+                            <p class="text-xs text-green-600 font-medium mb-1">Receitas</p>
+                            <p class="text-green-700 font-bold">${financialSummary.formattedIncome}</p>
+                        </div>
+                        <div class="text-center p-3 bg-red-50 rounded-lg border border-red-100">
+                            <p class="text-xs text-red-600 font-medium mb-1">Despesas</p>
+                            <p class="text-red-700 font-bold">${financialSummary.formattedExpense}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-100 pt-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-xs text-gray-500 font-medium">Lucro Líquido</p>
+                                <p class="${profitClass} font-bold text-lg">${financialSummary.formattedProfit}</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="viewPropertyBtn p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors" 
+                                        title="Ver detalhes" data-id="${property.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="addQuickTransactionBtn p-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors" 
+                                        title="Nova transação" data-id="${property.id}">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Adicionar eventos
+            const viewBtn = card.querySelector('.viewPropertyBtn');
+            const addTransactionBtn = card.querySelector('.addQuickTransactionBtn');
+            
+            viewBtn?.addEventListener('click', function() {
+                window.location.href = `property-details.html?id=${property.id}`;
+            });
+            
+            addTransactionBtn?.addEventListener('click', function() {
+                // Abrir modal com propriedade pré-selecionada
+                window.openQuickTransactionModal();
+                setTimeout(() => {
+                    const propertySelect = document.getElementById('quickTransactionProperty');
+                    if (propertySelect) {
+                        propertySelect.value = property.id;
+                    }
+                }, 100);
+            });
+            
+            return card;
+        }
+        
+        // Sobrescrever função de renderização de cards
+        window.renderPropertyCard = renderPropertyCardEnhanced;
+        
+        // Função para mostrar notificações
+        function showNotification(message, type = 'success') {
+            // Remover notificação existente
+            const existing = document.querySelector('.notification-toast');
+            if (existing) existing.remove();
+            
+            const notification = document.createElement('div');
+            notification.className = `notification-toast fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium max-w-sm transform translate-x-full transition-transform duration-300`;
+            
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500',
+                info: 'bg-blue-500'
+            };
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle'
+            };
+            
+            notification.classList.add(colors[type] || colors.info);
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="${icons[type] || icons.info} mr-3"></i>
+                    <span>${message}</span>
+                    <button class="ml-4 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animar entrada
+            setTimeout(() => notification.classList.remove('translate-x-full'), 100);
+            
+            // Auto remover
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+        
+        // Tornar função global
+        window.showNotification = showNotification;
+    </script>
    
