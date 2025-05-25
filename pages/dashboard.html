@@ -3,284 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com/firebasejs/ https://cdnjs.cloudflare.com/ https://cdn.jsdelivr.net/; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com/ https://use.typekit.net/; font-src 'self' https://cdnjs.cloudflare.com/ https://use.typekit.net/ data:; img-src 'self' https://via.placeholder.com/ https://i.imgur.com/ data: blob:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app https://firestore.googleapis.com https://*.googleapis.com https://use.typekit.net/">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com/firebasejs/ https://cdnjs.cloudflare.com/ https://cdn.jsdelivr.net/; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com/ https://use.typekit.net/; font-src 'self' https://cdnjs.cloudflare.com/ https://use.typekit.net/ data:; img-src 'self' https://via.placeholder.com/ https://i.imgur.com/ data:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app https://firestore.googleapis.com https://*.googleapis.com https://use.typekit.net;">
     <title>FlowBnb - Dashboard</title>
-    <link rel="icon" href="../assets/icons/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="../assets/icons/favicon.png" type="image/png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">
     <style>
-        /* Mobile Menu Styles */
-        .mobile-menu {
+        /* Variáveis CSS customizadas */
+        :root {
+            --primary-color: #0c2e69;
+            --secondary-color: #09b188;
+            --accent-color: #1c5def;
+            --light-bg: #f8f9fc;
+            --dark-text: #2c3e50;
+            --sidebar-width: 280px;
+            --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition-standard: all 0.3s ease;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #f0f4f8;
+            color: #374151;
             position: fixed;
-            bottom: 0;
+            height: 100vh;
             left: 0;
-            right: 0;
-            background: white;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            display: none;
-            border-top: 1px solid #e5e7eb;
+            top: 0;
+            overflow-y: auto;
+            transition: var(--transition-standard);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            border-right: 1px solid #e5e7eb;
         }
 
-        @media (max-width: 768px) {
-            .mobile-menu {
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-                padding: 0.5rem 0;
-            }
-            
-            .main-content {
-                padding-bottom: 80px;
-                padding-top: 70px;
-                margin-left: 0;
-            }
-            
-            .sidebar {
-                display: none;
-            }
-        }
-
-        .mobile-menu-item {
+        .logo-container {
+            padding: 2rem 1.5rem;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 0.5rem 1rem;
-            text-decoration: none;
+            border-bottom: 1px solid #f3f4f6;
+            margin-bottom: 1rem;
+        }
+
+        .logo-image {
+            height: 2.5rem;
+        }
+
+        .nav-menu {
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1rem;
             color: #6b7280;
-            transition: all 0.2s ease;
-            position: relative;
-            min-width: 60px;
-        }
-
-        .mobile-menu-item.active {
-            color: #09b188;
-        }
-
-        .mobile-menu-item.active::before {
-            content: '';
-            position: absolute;
-            top: -0.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 3px;
-            background: #09b188;
-            border-radius: 0 0 3px 3px;
-        }
-
-        .mobile-menu-icon {
-            font-size: 1.25rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .mobile-menu-label {
-            font-size: 0.75rem;
+            text-decoration: none;
+            transition: var(--transition-standard);
+            border-radius: 8px;
+            margin: 0.25rem 0;
             font-weight: 500;
         }
 
-        /* Mobile FAB */
-        .mobile-fab {
-            position: fixed;
-            bottom: 90px;
-            right: 1rem;
-            width: 56px;
-            height: 56px;
+        .nav-item:hover {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .nav-item.active {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .nav-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.75rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            transition: var(--transition-standard);
+        }
+
+        /* Botões de ação rápida */
+        .quick-action-btn {
             background: linear-gradient(135deg, #09b188, #08a078);
             color: white;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(9, 177, 136, 0.4);
-            z-index: 999;
-            transition: all 0.3s ease;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: left;
             border: none;
             cursor: pointer;
+            transition: var(--transition-standard);
+            box-shadow: 0 4px 15px rgba(9, 177, 136, 0.3);
+            width: 100%;
+            display: block;
         }
 
-        @media (max-width: 768px) {
-            .mobile-fab {
-                display: flex;
-            }
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(9, 177, 136, 0.4);
+            background: linear-gradient(135deg, #08a078, #07926b);
         }
 
-        .mobile-fab:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(9, 177, 136, 0.5);
+        .quick-action-btn.reports {
+            background: linear-gradient(135deg, #1c5def, #1548d4);
+            box-shadow: 0 4px 15px rgba(28, 93, 239, 0.3);
         }
 
-        /* Mobile Header */
-        .mobile-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+        .quick-action-btn.reports:hover {
+            box-shadow: 0 8px 25px rgba(28, 93, 239, 0.4);
+            background: linear-gradient(135deg, #1548d4, #1240c1);
+        }
+
+        /* Cards de estatísticas */
+        .stats-card {
             background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            z-index: 100;
-            padding: 1rem;
-            display: none;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition-standard);
         }
 
-        @media (max-width: 768px) {
-            .mobile-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
         }
 
-        .mobile-header-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #0c2e69;
-            display: flex;
-            align-items: center;
+        /* Dropdown do usuário */
+        .user-dropdown {
+            position: relative;
         }
 
-        .mobile-header-logo {
-            height: 2rem;
-            margin-right: 0.5rem;
-        }
-
-        .mobile-profile-btn {
-            width: 40px;
-            height: 40px;
+        .avatar-button {
+            width: 2.5rem;
+            height: 2.5rem;
             border-radius: 50%;
-            background: linear-gradient(135deg, #e8eef9, #d4e1f8);
-            color: #1c5def;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: linear-gradient(135deg, #e8eef9, #d4e1f8);
+            color: #1c5def;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: var(--transition-standard);
             border: 2px solid transparent;
         }
 
-        .mobile-profile-btn:hover {
+        .avatar-button:hover {
             background: linear-gradient(135deg, #d4e1f8, #c1d4f7);
             border-color: #1c5def;
         }
 
-        /* Mobile Dropdown */
-        .mobile-dropdown {
-            position: fixed;
-            top: 60px;
-            right: 1rem;
-            width: 250px;
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            width: 220px;
             background: white;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            z-index: 1001;
+            margin-top: 0.5rem;
+            z-index: 50;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.2s ease;
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
-        .mobile-dropdown.show {
+        .dropdown-menu.show {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
 
-        /* Quick Actions */
-        .mobile-quick-actions {
-            position: fixed;
-            bottom: 160px;
-            right: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            opacity: 0;
-            visibility: hidden;
-            transform: scale(0.8);
-            transition: all 0.3s ease;
+        .dropdown-header {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        .mobile-quick-actions.show {
-            opacity: 1;
-            visibility: visible;
-            transform: scale(1);
+        .dropdown-user-name {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.25rem;
         }
 
-        .mobile-quick-action {
-            width: 48px;
-            height: 48px;
-            background: white;
-            border-radius: 50%;
+        .dropdown-user-email {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .dropdown-items {
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
+            padding: 0.75rem 1rem;
+            color: #334155;
             transition: all 0.2s ease;
+            text-decoration: none;
         }
 
-        .mobile-quick-action:hover {
-            transform: scale(1.1);
+        .dropdown-item:hover {
+            background: #f8fafc;
+            color: #1c5def;
         }
 
-        .mobile-quick-action.property {
-            color: #3b82f6;
+        .dropdown-item i {
+            width: 1.25rem;
+            margin-right: 0.75rem;
+            color: #64748b;
         }
 
-        .mobile-quick-action.transaction {
-            color: #10b981;
+        .dropdown-item:hover i {
+            color: #1c5def;
         }
 
-        /* Overlay */
-        .mobile-overlay {
+        .dropdown-divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin: 0.5rem 0;
+        }
+
+        .logout-item {
+            color: #ef4444 !important;
+        }
+
+        .logout-item i {
+            color: #ef4444 !important;
+        }
+
+        .logout-item:hover {
+            background: #fef2f2 !important;
+            color: #dc2626 !important;
+        }
+
+        .logout-item:hover i {
+            color: #dc2626 !important;
+        }
+
+        /* Modal styles */
+        .transaction-type-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .transaction-type-btn:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+
+        .transaction-type-btn.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                width: var(--sidebar-width);
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        /* Notificações */
+        .notification-toast {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 998;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+            top: 1rem;
+            right: 1rem;
+            z-index: 100;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            font-weight: 500;
+            max-width: 24rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
         }
 
-        .mobile-overlay.show {
-            opacity: 1;
-            visibility: visible;
+        .notification-toast.show {
+            transform: translateX(0);
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 640px) {
-            .stats-card {
-                padding: 1rem;
-            }
-            
-            .quick-action-btn {
-                padding: 1rem;
-                font-size: 0.875rem;
-            }
-            
-            .dropdown-menu {
-                display: none;
-            }
+        .notification-toast.success {
+            background-color: #10b981;
+        }
+
+        .notification-toast.error {
+            background-color: #ef4444;
+        }
+
+        .notification-toast.warning {
+            background-color: #f59e0b;
+        }
+
+        .notification-toast.info {
+            background-color: #3b82f6;
         }
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Mobile Header -->
-    <div class="mobile-header">
-        <div class="mobile-header-title">
-            <img src="../assets/images/logo.png" alt="FlowBnb" class="mobile-header-logo">
-            <span>FlowBnb</span>
-        </div>
-        <button id="mobileProfileBtn" class="mobile-profile-btn">
-            <i class="fas fa-user"></i>
-        </button>
-    </div>
-
-    <!-- Sidebar (Desktop) -->
+    <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo-container">
             <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="logo-image">
@@ -306,22 +355,22 @@
         </div>
     </div>
     
-    <!-- Main Content -->
+    <!-- Conteúdo Principal -->
     <div class="main-content">
-        <!-- Header Desktop -->
+        <!-- Header -->
         <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-8">
             <div class="mb-4 md:mb-0">
-                <div class="hidden md:flex items-center text-sm text-gray-500 mb-2">
+                <div class="flex items-center text-sm text-gray-500 mb-2">
                     <span>FlowBnb</span>
                     <span class="mx-2">•</span>
                     <span class="font-medium text-gray-900">Dashboard</span>
                 </div>
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Bem-vindo de volta! 👋</h1>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Bem-vindo de volta! 👋</h1>
                 <p class="text-gray-600">Aqui está um resumo dos seus imóveis hoje.</p>
             </div>
             
-            <!-- Desktop User Avatar -->
-            <div class="hidden md:block user-dropdown">
+            <!-- Avatar do usuário -->
+            <div class="user-dropdown">
                 <button id="userAvatarBtn" class="avatar-button">
                     <i class="fas fa-user"></i>
                 </button>
@@ -349,7 +398,7 @@
             </div>
         </div>
         
-        <!-- Quick Actions -->
+        <!-- Ações Rápidas -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <button id="addTransactionBtn" class="quick-action-btn">
                 <div class="flex items-center justify-between">
@@ -378,7 +427,7 @@
             </button>
         </div>
         
-        <!-- Financial Summary -->
+        <!-- Resumo Financeiro -->
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-bold text-gray-800 flex items-center">
                 <i class="fas fa-chart-pie text-green-500 mr-3"></i>
@@ -401,7 +450,7 @@
             </select>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="stats-card">
                 <div class="flex items-center mb-4">
                     <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
@@ -451,7 +500,7 @@
             </div>
         </div>
         
-        <!-- Properties Section -->
+        <!-- Seus Imóveis -->
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-bold text-gray-800 flex items-center">
                 <i class="fas fa-home text-green-500 mr-3"></i>
@@ -463,14 +512,15 @@
             </a>
         </div>
         
-        <div id="propertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
+        <div id="propertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Estados de carregamento serão inseridos aqui -->
             <div class="col-span-full text-center py-10">
                 <div class="inline-block w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
                 <p class="text-gray-500">Carregando seus imóveis...</p>
             </div>
         </div>
         
-        <!-- Recent Transactions -->
+        <!-- Transações Recentes -->
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-bold text-gray-800 flex items-center">
                 <i class="fas fa-history text-green-500 mr-3"></i>
@@ -488,9 +538,9 @@
                     <thead class="bg-gray-50 border-b border-gray-100">
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Data</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">Imóvel</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Imóvel</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Descrição</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">Categoria</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Categoria</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Valor</th>
                         </tr>
                     </thead>
@@ -507,66 +557,10 @@
         </div>
     </div>
     
-    <!-- Mobile Bottom Menu -->
-    <div class="mobile-menu">
-        <a href="dashboard.html" class="mobile-menu-item active" data-page="dashboard">
-            <i class="fas fa-home mobile-menu-icon"></i>
-            <span class="mobile-menu-label">Início</span>
-        </a>
-        <a href="properties.html" class="mobile-menu-item" data-page="properties">
-            <i class="fas fa-building mobile-menu-icon"></i>
-            <span class="mobile-menu-label">Imóveis</span>
-        </a>
-        <a href="transactions.html" class="mobile-menu-item" data-page="transactions">
-            <i class="fas fa-exchange-alt mobile-menu-icon"></i>
-            <span class="mobile-menu-label">Transações</span>
-        </a>
-        <a href="reports.html" class="mobile-menu-item" data-page="reports">
-            <i class="fas fa-chart-bar mobile-menu-icon"></i>
-            <span class="mobile-menu-label">Relatórios</span>
-        </a>
-    </div>
-    
-    <!-- Mobile FAB -->
-    <button class="mobile-fab" id="mobileFAB">
-        <i class="fas fa-plus"></i>
+    <!-- Botão Flutuante para Nova Transação (Mobile) -->
+    <button id="floatingAddTransaction" class="fixed bottom-6 right-6 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center md:hidden z-50">
+        <i class="fas fa-plus text-xl"></i>
     </button>
-    
-    <!-- Mobile Quick Actions -->
-    <div class="mobile-quick-actions" id="mobileQuickActions">
-        <button class="mobile-quick-action property" title="Novo Imóvel">
-            <i class="fas fa-home"></i>
-        </button>
-        <button class="mobile-quick-action transaction" title="Nova Transação">
-            <i class="fas fa-dollar-sign"></i>
-        </button>
-    </div>
-    
-    <!-- Mobile Overlay -->
-    <div class="mobile-overlay" id="mobileOverlay"></div>
-    
-    <!-- Mobile Dropdown -->
-    <div class="mobile-dropdown" id="mobileDropdown">
-        <div class="dropdown-header">
-            <div class="dropdown-user-name">Nome do Usuário</div>
-            <div class="dropdown-user-email">usuario@email.com</div>
-        </div>
-        <div class="dropdown-items">
-            <a href="#" class="dropdown-item" onclick="showNotification('Perfil em desenvolvimento', 'info'); return false;">
-                <i class="fas fa-user-circle"></i>
-                <span>Meu Perfil</span>
-            </a>
-            <a href="#" class="dropdown-item" onclick="showNotification('Configurações em desenvolvimento', 'info'); return false;">
-                <i class="fas fa-cog"></i>
-                <span>Configurações</span>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item logout-item" id="mobileLogoutBtn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Sair</span>
-            </a>
-        </div>
-    </div>
     
     <!-- Modal Nova Transação Rápida -->
     <div id="quickTransactionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
