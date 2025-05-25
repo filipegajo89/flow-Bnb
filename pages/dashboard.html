@@ -3,333 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com/firebasejs/ https://cdnjs.cloudflare.com/ https://cdn.jsdelivr.net/; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com/ https://use.typekit.net/; font-src 'self' https://cdnjs.cloudflare.com/ https://use.typekit.net/ data:; img-src 'self' https://via.placeholder.com/ https://i.imgur.com/ data:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app https://firestore.googleapis.com https://*.googleapis.com https://use.typekit.net;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com/firebasejs/ https://cdnjs.cloudflare.com/ https://cdn.jsdelivr.net/; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com/ https://use.typekit.net/; font-src 'self' https://cdnjs.cloudflare.com/ https://use.typekit.net/ data:; img-src 'self' https://via.placeholder.com/ https://i.imgur.com/ data: blob:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app https://firestore.googleapis.com https://*.googleapis.com https://use.typekit.net/">
     <title>FlowBnb - Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="../assets/icons/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
     <style>
-        /* Variáveis CSS customizadas */
-        :root {
-            --primary-color: #0c2e69;
-            --secondary-color: #09b188;
-            --accent-color: #1c5def;
-            --light-bg: #f8f9fc;
-            --dark-text: #2c3e50;
-            --sidebar-width: 280px;
-            --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
-            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --transition-standard: all 0.3s ease;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: #f0f4f8;
-            color: #374151;
+        /* Mobile Menu Styles */
+        .mobile-menu {
             position: fixed;
-            height: 100vh;
+            bottom: 0;
             left: 0;
-            top: 0;
-            overflow-y: auto;
-            transition: var(--transition-standard);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            z-index: 10;
-            border-right: 1px solid #e5e7eb;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+            border-top: 1px solid #e5e7eb;
         }
 
-        .logo-container {
-            padding: 2rem 1.5rem;
+        @media (max-width: 768px) {
+            .mobile-menu {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                padding: 0.5rem 0;
+            }
+            
+            .main-content {
+                padding-bottom: 80px;
+                padding-top: 70px;
+                margin-left: 0;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+        }
+
+        .mobile-menu-item {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            border-bottom: 1px solid #f3f4f6;
-            margin-bottom: 1rem;
-        }
-
-        .logo-image {
-            height: 2.5rem;
-        }
-
-        .nav-menu {
-            padding: 0 1rem;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 0.875rem 1rem;
-            color: #6b7280;
+            justify-content: center;
+            padding: 0.5rem 1rem;
             text-decoration: none;
-            transition: var(--transition-standard);
-            border-radius: 8px;
-            margin: 0.25rem 0;
+            color: #6b7280;
+            transition: all 0.2s ease;
+            position: relative;
+            min-width: 60px;
+        }
+
+        .mobile-menu-item.active {
+            color: #09b188;
+        }
+
+        .mobile-menu-item.active::before {
+            content: '';
+            position: absolute;
+            top: -0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 3px;
+            background: #09b188;
+            border-radius: 0 0 3px 3px;
+        }
+
+        .mobile-menu-icon {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .mobile-menu-label {
+            font-size: 0.75rem;
             font-weight: 500;
         }
 
-        .nav-item:hover {
-            background-color: #f3f4f6;
-            color: #374151;
-        }
-
-        .nav-item.active {
-            background-color: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .nav-icon {
-            width: 1.25rem;
-            height: 1.25rem;
-            margin-right: 0.75rem;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 2rem;
-            background-color: var(--light-bg);
-            min-height: 100vh;
-            transition: var(--transition-standard);
-        }
-
-        /* Botões de ação rápida */
-        .quick-action-btn {
+        /* Mobile FAB */
+        .mobile-fab {
+            position: fixed;
+            bottom: 90px;
+            right: 1rem;
+            width: 56px;
+            height: 56px;
             background: linear-gradient(135deg, #09b188, #08a078);
             color: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            text-align: left;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(9, 177, 136, 0.4);
+            z-index: 999;
+            transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            transition: var(--transition-standard);
-            box-shadow: 0 4px 15px rgba(9, 177, 136, 0.3);
-            width: 100%;
-            display: block;
         }
 
-        .quick-action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(9, 177, 136, 0.4);
-            background: linear-gradient(135deg, #08a078, #07926b);
+        @media (max-width: 768px) {
+            .mobile-fab {
+                display: flex;
+            }
         }
 
-        .quick-action-btn.reports {
-            background: linear-gradient(135deg, #1c5def, #1548d4);
-            box-shadow: 0 4px 15px rgba(28, 93, 239, 0.3);
+        .mobile-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(9, 177, 136, 0.5);
         }
 
-        .quick-action-btn.reports:hover {
-            box-shadow: 0 8px 25px rgba(28, 93, 239, 0.4);
-            background: linear-gradient(135deg, #1548d4, #1240c1);
-        }
-
-        /* Cards de estatísticas */
-        .stats-card {
+        /* Mobile Header */
+        .mobile-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             background: white;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: var(--transition-standard);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+            padding: 1rem;
+            display: none;
         }
 
-        .stats-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-medium);
+        @media (max-width: 768px) {
+            .mobile-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
         }
 
-        /* Dropdown do usuário */
-        .user-dropdown {
-            position: relative;
+        .mobile-header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0c2e69;
+            display: flex;
+            align-items: center;
         }
 
-        .avatar-button {
-            width: 2.5rem;
-            height: 2.5rem;
+        .mobile-header-logo {
+            height: 2rem;
+            margin-right: 0.5rem;
+        }
+
+        .mobile-profile-btn {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            background: linear-gradient(135deg, #e8eef9, #d4e1f8);
+            color: #1c5def;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #e8eef9, #d4e1f8);
-            color: #1c5def;
             cursor: pointer;
-            transition: var(--transition-standard);
+            transition: all 0.2s ease;
             border: 2px solid transparent;
         }
 
-        .avatar-button:hover {
+        .mobile-profile-btn:hover {
             background: linear-gradient(135deg, #d4e1f8, #c1d4f7);
             border-color: #1c5def;
         }
 
-        .dropdown-menu {
-            position: absolute;
-            right: 0;
-            top: 100%;
-            width: 220px;
+        /* Mobile Dropdown */
+        .mobile-dropdown {
+            position: fixed;
+            top: 60px;
+            right: 1rem;
+            width: 250px;
             background: white;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            margin-top: 0.5rem;
-            z-index: 50;
+            z-index: 1001;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.2s ease;
-            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
-        .dropdown-menu.show {
+        .mobile-dropdown.show {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
 
-        .dropdown-header {
-            padding: 1rem;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .dropdown-user-name {
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 0.25rem;
-        }
-
-        .dropdown-user-email {
-            font-size: 0.75rem;
-            color: #64748b;
-        }
-
-        .dropdown-items {
-            padding: 0.5rem 0;
-        }
-
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            color: #334155;
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-        .dropdown-item:hover {
-            background: #f8fafc;
-            color: #1c5def;
-        }
-
-        .dropdown-item i {
-            width: 1.25rem;
-            margin-right: 0.75rem;
-            color: #64748b;
-        }
-
-        .dropdown-item:hover i {
-            color: #1c5def;
-        }
-
-        .dropdown-divider {
-            height: 1px;
-            background: #f1f5f9;
-            margin: 0.5rem 0;
-        }
-
-        .logout-item {
-            color: #ef4444 !important;
-        }
-
-        .logout-item i {
-            color: #ef4444 !important;
-        }
-
-        .logout-item:hover {
-            background: #fef2f2 !important;
-            color: #dc2626 !important;
-        }
-
-        .logout-item:hover i {
-            color: #dc2626 !important;
-        }
-
-        /* Modal styles */
-        .transaction-type-btn {
+        /* Quick Actions */
+        .mobile-quick-actions {
+            position: fixed;
+            bottom: 160px;
+            right: 1rem;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
+            gap: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-quick-actions.show {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        .mobile-quick-action {
+            width: 48px;
+            height: 48px;
             background: white;
-            transition: all 0.2s ease;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .transaction-type-btn:hover {
-            border-color: #3b82f6;
-            background: #f8fafc;
+        .mobile-quick-action:hover {
+            transform: scale(1.1);
         }
 
-        .transaction-type-btn.active {
-            border-color: #3b82f6;
-            background: #eff6ff;
+        .mobile-quick-action.property {
+            color: #3b82f6;
         }
 
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 0;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                width: var(--sidebar-width);
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
+        .mobile-quick-action.transaction {
+            color: #10b981;
         }
 
-        /* Notificações */
-        .notification-toast {
+        /* Overlay */
+        .mobile-overlay {
             position: fixed;
-            top: 1rem;
-            right: 1rem;
-            z-index: 100;
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            color: white;
-            font-weight: 500;
-            max-width: 24rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
 
-        .notification-toast.show {
-            transform: translateX(0);
+        .mobile-overlay.show {
+            opacity: 1;
+            visibility: visible;
         }
 
-        .notification-toast.success {
-            background-color: #10b981;
-        }
-
-        .notification-toast.error {
-            background-color: #ef4444;
-        }
-
-        .notification-toast.warning {
-            background-color: #f59e0b;
-        }
-
-        .notification-toast.info {
-            background-color: #3b82f6;
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .stats-card {
+                padding: 1rem;
+            }
+            
+            .quick-action-btn {
+                padding: 1rem;
+                font-size: 0.875rem;
+            }
+            
+            .dropdown-menu {
+                display: none;
+            }
         }
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Sidebar -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div class="mobile-header-title">
+            <img src="../assets/images/logo.png" alt="FlowBnb" class="mobile-header-logo">
+            <span>FlowBnb</span>
+        </div>
+        <button id="mobileProfileBtn" class="mobile-profile-btn">
+            <i class="fas fa-user"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar (Desktop) -->
     <div class="sidebar">
         <div class="logo-container">
             <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="logo-image">
@@ -355,22 +306,22 @@
         </div>
     </div>
     
-    <!-- Conteúdo Principal -->
+    <!-- Main Content -->
     <div class="main-content">
-        <!-- Header -->
+        <!-- Header Desktop -->
         <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-8">
             <div class="mb-4 md:mb-0">
-                <div class="flex items-center text-sm text-gray-500 mb-2">
+                <div class="hidden md:flex items-center text-sm text-gray-500 mb-2">
                     <span>FlowBnb</span>
                     <span class="mx-2">•</span>
                     <span class="font-medium text-gray-900">Dashboard</span>
                 </div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">Bem-vindo de volta! 👋</h1>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Bem-vindo de volta! 👋</h1>
                 <p class="text-gray-600">Aqui está um resumo dos seus imóveis hoje.</p>
             </div>
             
-            <!-- Avatar do usuário -->
-            <div class="user-dropdown">
+            <!-- Desktop User Avatar -->
+            <div class="hidden md:block user-dropdown">
                 <button id="userAvatarBtn" class="avatar-button">
                     <i class="fas fa-user"></i>
                 </button>
@@ -398,7 +349,7 @@
             </div>
         </div>
         
-        <!-- Ações Rápidas -->
+        <!-- Quick Actions -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <button id="addTransactionBtn" class="quick-action-btn">
                 <div class="flex items-center justify-between">
@@ -427,7 +378,7 @@
             </button>
         </div>
         
-        <!-- Resumo Financeiro -->
+        <!-- Financial Summary -->
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-bold text-gray-800 flex items-center">
                 <i class="fas fa-chart-pie text-green-500 mr-3"></i>
@@ -450,7 +401,7 @@
             </select>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
             <div class="stats-card">
                 <div class="flex items-center mb-4">
                     <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
@@ -500,7 +451,7 @@
             </div>
         </div>
         
-        <!-- Seus Imóveis -->
+        <!-- Properties Section -->
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-bold text-gray-800 flex items-center">
                 <i class="fas fa-home text-green-500 mr-3"></i>
@@ -512,15 +463,14 @@
             </a>
         </div>
         
-        <div id="propertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Estados de carregamento serão inseridos aqui -->
+        <div id="propertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
             <div class="col-span-full text-center py-10">
                 <div class="inline-block w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
                 <p class="text-gray-500">Carregando seus imóveis...</p>
             </div>
         </div>
         
-        <!-- Transações Recentes -->
+        <!-- Recent Transactions -->
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-bold text-gray-800 flex items-center">
                 <i class="fas fa-history text-green-500 mr-3"></i>
@@ -538,9 +488,9 @@
                     <thead class="bg-gray-50 border-b border-gray-100">
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Data</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Imóvel</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">Imóvel</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Descrição</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Categoria</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">Categoria</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Valor</th>
                         </tr>
                     </thead>
@@ -557,10 +507,66 @@
         </div>
     </div>
     
-    <!-- Botão Flutuante para Nova Transação (Mobile) -->
-    <button id="floatingAddTransaction" class="fixed bottom-6 right-6 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center md:hidden z-50">
-        <i class="fas fa-plus text-xl"></i>
+    <!-- Mobile Bottom Menu -->
+    <div class="mobile-menu">
+        <a href="dashboard.html" class="mobile-menu-item active" data-page="dashboard">
+            <i class="fas fa-home mobile-menu-icon"></i>
+            <span class="mobile-menu-label">Início</span>
+        </a>
+        <a href="properties.html" class="mobile-menu-item" data-page="properties">
+            <i class="fas fa-building mobile-menu-icon"></i>
+            <span class="mobile-menu-label">Imóveis</span>
+        </a>
+        <a href="transactions.html" class="mobile-menu-item" data-page="transactions">
+            <i class="fas fa-exchange-alt mobile-menu-icon"></i>
+            <span class="mobile-menu-label">Transações</span>
+        </a>
+        <a href="reports.html" class="mobile-menu-item" data-page="reports">
+            <i class="fas fa-chart-bar mobile-menu-icon"></i>
+            <span class="mobile-menu-label">Relatórios</span>
+        </a>
+    </div>
+    
+    <!-- Mobile FAB -->
+    <button class="mobile-fab" id="mobileFAB">
+        <i class="fas fa-plus"></i>
     </button>
+    
+    <!-- Mobile Quick Actions -->
+    <div class="mobile-quick-actions" id="mobileQuickActions">
+        <button class="mobile-quick-action property" title="Novo Imóvel">
+            <i class="fas fa-home"></i>
+        </button>
+        <button class="mobile-quick-action transaction" title="Nova Transação">
+            <i class="fas fa-dollar-sign"></i>
+        </button>
+    </div>
+    
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    
+    <!-- Mobile Dropdown -->
+    <div class="mobile-dropdown" id="mobileDropdown">
+        <div class="dropdown-header">
+            <div class="dropdown-user-name">Nome do Usuário</div>
+            <div class="dropdown-user-email">usuario@email.com</div>
+        </div>
+        <div class="dropdown-items">
+            <a href="#" class="dropdown-item" onclick="showNotification('Perfil em desenvolvimento', 'info'); return false;">
+                <i class="fas fa-user-circle"></i>
+                <span>Meu Perfil</span>
+            </a>
+            <a href="#" class="dropdown-item" onclick="showNotification('Configurações em desenvolvimento', 'info'); return false;">
+                <i class="fas fa-cog"></i>
+                <span>Configurações</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item logout-item" id="mobileLogoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </a>
+        </div>
+    </div>
     
     <!-- Modal Nova Transação Rápida -->
     <div id="quickTransactionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
@@ -678,841 +684,153 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
+    <!-- Scripts da aplicação -->
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/properties.js"></script>
+    <script src="../js/transactions.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script src="../js/mobile-menu.js"></script>
+
     <script>
-        // Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDqv5HcYLf8PWLx57qB8TuB3RJUxD3-gDg",
-            authDomain: "flowbnb-86591.firebaseapp.com",
-            projectId: "flowbnb-86591",
-            storageBucket: "flowbnb-86591.firebasestorage.app",
-            messagingSenderId: "417382171684",
-            appId: "1:417382171684:web:f1b19bc1ec07cc4302c4b1"
-        };
-
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // Formato para valor em reais (BRL)
-        const formatCurrency = (value) => {
-            return new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            }).format(value);
-        };
-
-        // Converte timestamp do Firestore para data legível
-        const formatDate = (timestamp) => {
-            if (!timestamp) return '';
-            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-            return date.toLocaleDateString('pt-BR');
-        };
-
-        // Função para mostrar notificações
+        // Funções específicas do dashboard integradas com mobile
         function showNotification(message, type = 'success') {
-            // Remover notificação existente
-            const existing = document.querySelector('.notification-toast');
-            if (existing) existing.remove();
-            
             const notification = document.createElement('div');
             notification.className = `notification-toast ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+                z-index: 9999;
+                padding: 1rem 1.5rem;
+                border-radius: 0.75rem;
+                color: white;
+                font-weight: 500;
+                max-width: 24rem;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                background-color: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+            `;
             
             notification.innerHTML = `
                 <div class="flex items-center">
                     <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-3"></i>
                     <span>${message}</span>
-                    <button class="ml-4 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
                 </div>
             `;
             
             document.body.appendChild(notification);
             
-            // Animar entrada
-            setTimeout(() => notification.classList.add('show'), 100);
-            
-            // Auto remover
             setTimeout(() => {
-                notification.classList.remove('show');
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
                 setTimeout(() => notification.remove(), 300);
-            }, 5000);
+            }, 3000);
         }
 
-        // Função para adicionar transação
-        async function addTransaction(transactionData) {
-            try {
-                const user = auth.currentUser;
-                if (!user) throw new Error('Usuário não autenticado');
-                
-                const newTransaction = {
-                    ...transactionData,
-                    userId: user.uid,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                const docRef = await db.collection('transactions').add(newTransaction);
-                console.log('Transação adicionada com ID:', docRef.id);
-                return docRef.id;
-            } catch (error) {
-                console.error('Erro ao adicionar transação:', error);
-                throw error;
-            }
-        }
-
-        // Função para adicionar imóvel
-        async function addProperty(propertyData) {
-            try {
-                const user = auth.currentUser;
-                if (!user) throw new Error('Usuário não autenticado');
-                
-                const newProperty = {
-                    ...propertyData,
-                    userId: user.uid,
-                    status: 'active',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                const docRef = await db.collection('properties').add(newProperty);
-                console.log('Imóvel adicionado com ID:', docRef.id);
-                return docRef.id;
-            } catch (error) {
-                console.error('Erro ao adicionar imóvel:', error);
-                throw error;
-            }
-        }
-
-        // Função para carregar propriedades
-        async function loadProperties() {
-            try {
-                const user = auth.currentUser;
-                if (!user) {
-                    console.log('Usuário não autenticado');
-                    return [];
-                }
-                
-                console.log('Buscando propriedades para usuário:', user.uid);
-                
-                const snapshot = await db.collection('properties')
-                    .where('userId', '==', user.uid)
-                    .get();
-                
-                const properties = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    console.log('Propriedade encontrada:', doc.id, data);
-                    properties.push({
-                        id: doc.id,
-                        ...data
-                    });
+        // Configuração mobile específica
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile FAB
+            const mobileFAB = document.getElementById('mobileFAB');
+            const mobileQuickActions = document.getElementById('mobileQuickActions');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            
+            if (mobileFAB) {
+                mobileFAB.addEventListener('click', function() {
+                    const isOpen = mobileQuickActions.classList.contains('show');
+                    
+                    if (isOpen) {
+                        mobileQuickActions.classList.remove('show');
+                        mobileOverlay.classList.remove('show');
+                        mobileFAB.innerHTML = '<i class="fas fa-plus"></i>';
+                    } else {
+                        mobileQuickActions.classList.add('show');
+                        mobileOverlay.classList.add('show');
+                        mobileFAB.innerHTML = '<i class="fas fa-times"></i>';
+                    }
                 });
-                
-                console.log('Total de propriedades encontradas:', properties.length);
-                return properties;
-            } catch (error) {
-                console.error('Erro detalhado ao carregar propriedades:', error);
-                // Se der erro de índice, tentar sem orderBy
-                try {
-                    const user = auth.currentUser;
-                    if (!user) return [];
-                    
-                    const snapshot = await db.collection('properties')
-                        .where('userId', '==', user.uid)
-                        .get();
-                    
-                    const properties = [];
-                    snapshot.forEach(doc => {
-                        properties.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
-                    });
-                    
-                    return properties;
-                } catch (fallbackError) {
-                    console.error('Erro no fallback:', fallbackError);
-                    return [];
-                }
             }
-        }
-
-        // Função para carregar transações recentes
-        async function loadRecentTransactions() {
-            try {
-                const user = auth.currentUser;
-                if (!user) {
-                    console.log('Usuário não autenticado para transações');
-                    return;
-                }
-                
-                console.log('Buscando transações para usuário:', user.uid);
-                
-                // Removendo orderBy para evitar erro de índice
-                const snapshot = await db.collection('transactions')
-                    .where('userId', '==', user.uid)
-                    .limit(10)
-                    .get();
-                
-                const tbody = document.getElementById('recentTransactions');
-                tbody.innerHTML = '';
-                
-                console.log('Transações encontradas:', snapshot.size);
-                
-                if (snapshot.empty) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                                <i class="fas fa-receipt text-gray-300 text-3xl mb-3"></i>
-                                <p>Nenhuma transação registrada ainda.</p>
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-                
-                // Converter para array e ordenar manualmente por data
-                const transactions = [];
-                snapshot.forEach(doc => {
-                    transactions.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
+            
+            if (mobileOverlay) {
+                mobileOverlay.addEventListener('click', function() {
+                    mobileQuickActions.classList.remove('show');
+                    mobileOverlay.classList.remove('show');
+                    mobileFAB.innerHTML = '<i class="fas fa-plus"></i>';
                 });
-                
-                // Ordenar por createdAt ou date
-                transactions.sort((a, b) => {
-                    const dateA = a.createdAt || a.date || new Date(0);
-                    const dateB = b.createdAt || b.date || new Date(0);
+            }
+            
+            // Quick actions mobile
+            const propertyBtn = document.querySelector('.mobile-quick-action.property');
+            const transactionBtn = document.querySelector('.mobile-quick-action.transaction');
+            
+            if (propertyBtn) {
+                propertyBtn.addEventListener('click', function() {
+                    mobileQuickActions.classList.remove('show');
+                    mobileOverlay.classList.remove('show');
+                    mobileFAB.innerHTML = '<i class="fas fa-plus"></i>';
                     
-                    if (dateA.toDate && dateB.toDate) {
-                        return dateB.toDate().getTime() - dateA.toDate().getTime();
+                    const modal = document.getElementById('addPropertyModal');
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
                     }
-                    return new Date(dateB).getTime() - new Date(dateA).getTime();
                 });
-                
-                // Pegar apenas as 5 mais recentes
-                const recentTransactions = transactions.slice(0, 5);
-                
-                for (const transaction of recentTransactions) {
-                    console.log('Processando transação:', transaction.id, transaction);
-                    
-                    // Buscar nome do imóvel
-                    let propertyName = 'Carregando...';
-                    try {
-                        if (transaction.propertyId) {
-                            const propertyDoc = await db.collection('properties').doc(transaction.propertyId).get();
-                            if (propertyDoc.exists) {
-                                propertyName = propertyDoc.data().name;
-                            } else {
-                                propertyName = 'Imóvel não encontrado';
-                            }
-                        }
-                    } catch (error) {
-                        console.warn('Erro ao buscar nome do imóvel:', error);
-                        propertyName = 'Erro ao carregar';
-                    }
-                    
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50';
-                    
-                    const valueClass = transaction.type === 'income' ? 'text-green-600' : 'text-red-600';
-                    const valuePrefix = transaction.type === 'income' ? '+ ' : '- ';
-                    const badgeClass = transaction.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-                    const badgeText = transaction.type === 'income' ? 'Receita' : 'Despesa';
-                    
-                    // Formatação da data
-                    let formattedDate = 'Data inválida';
-                    try {
-                        if (transaction.createdAt && transaction.createdAt.toDate) {
-                            formattedDate = transaction.createdAt.toDate().toLocaleDateString('pt-BR');
-                        } else if (transaction.date && transaction.date.toDate) {
-                            formattedDate = transaction.date.toDate().toLocaleDateString('pt-BR');
-                        } else if (transaction.date) {
-                            formattedDate = new Date(transaction.date).toLocaleDateString('pt-BR');
-                        } else {
-                            formattedDate = new Date().toLocaleDateString('pt-BR');
-                        }
-                    } catch (error) {
-                        console.warn('Erro ao formatar data:', error);
-                        formattedDate = 'Data inválida';
-                    }
-                    
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${formattedDate}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${propertyName}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">${transaction.description || 'Sem descrição'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}">
-                                ${badgeText}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${valueClass}">${valuePrefix}${formatCurrency(transaction.amount || 0)}</td>
-                    `;
-                    
-                    tbody.appendChild(row);
-                }
-                
-                console.log('Transações carregadas com sucesso');
-                
-            } catch (error) {
-                console.error('Erro detalhado ao carregar transações:', error);
-                const tbody = document.getElementById('recentTransactions');
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="px-6 py-8 text-center text-red-500">
-                            <i class="fas fa-exclamation-triangle mb-2"></i>
-                            <p>Erro ao carregar transações</p>
-                            <small class="text-gray-500">${error.message}</small>
-                        </td>
-                    </tr>
-                `;
             }
-        }
-
-        // Função para carregar e exibir imóveis
-        async function loadAndDisplayProperties(monthFilter = null) {
-            try {
-                const propertiesList = document.getElementById('propertiesList');
-                
-                // Mostrar loading
-                propertiesList.innerHTML = `
-                    <div class="col-span-full text-center py-10">
-                        <div class="inline-block w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                        <p class="text-gray-500">Carregando seus imóveis...</p>
-                    </div>
-                `;
-                
-                const properties = await loadProperties();
-                
-                if (properties.length === 0) {
-                    propertiesList.innerHTML = `
-                        <div class="col-span-full text-center py-10">
-                            <i class="fas fa-home text-gray-300 text-5xl mb-4"></i>
-                            <h3 class="text-xl font-semibold text-gray-700 mb-2">Nenhum imóvel cadastrado</h3>
-                            <p class="text-gray-500 mb-4">Você ainda não tem imóveis cadastrados. Comece adicionando seu primeiro imóvel.</p>
-                            <button id="addFirstPropertyBtn" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                                <i class="fas fa-plus mr-2"></i>Adicionar Primeiro Imóvel
-                            </button>
-                        </div>
-                    `;
+            
+            if (transactionBtn) {
+                transactionBtn.addEventListener('click', function() {
+                    mobileQuickActions.classList.remove('show');
+                    mobileOverlay.classList.remove('show');
+                    mobileFAB.innerHTML = '<i class="fas fa-plus"></i>';
                     
-                    // Configurar botão de adicionar primeiro imóvel
-                    const addFirstPropertyBtn = document.getElementById('addFirstPropertyBtn');
-                    if (addFirstPropertyBtn) {
-                        addFirstPropertyBtn.addEventListener('click', () => {
-                            document.getElementById('addPropertyModal').classList.remove('hidden');
-                            document.getElementById('addPropertyModal').classList.add('flex');
-                        });
+                    if (window.openQuickTransactionModal) {
+                        window.openQuickTransactionModal();
                     }
-                    
-                    // Zerar resumo
-                    updateFinancialSummary(0, 0, 0);
-                    return;
-                }
-                
-                // Limpar lista
-                propertiesList.innerHTML = '';
-                
-                let totalIncome = 0;
-                let totalExpense = 0;
-                
-                // Renderizar cada propriedade
-                for (const property of properties) {
-                    // Calcular resumo financeiro da propriedade
-                    let propertyIncome = 0;
-                    let propertyExpense = 0;
-                    
-                    try {
-                        let query = db.collection('transactions').where('propertyId', '==', property.id);
-                        
-                        if (monthFilter && monthFilter !== 'all') {
-                            const currentYear = new Date().getFullYear();
-                            const month = parseInt(monthFilter);
-                            const startDate = new Date(currentYear, month - 1, 1);
-                            const endDate = new Date(currentYear, month, 0);
-                            
-                            query = query.where('date', '>=', startDate).where('date', '<=', endDate);
-                        }
-                        
-                        const transactionSnapshot = await query.get();
-                        
-                        transactionSnapshot.forEach(doc => {
-                            const transaction = doc.data();
-                            const amount = parseFloat(transaction.amount) || 0;
-                            
-                            if (transaction.type === 'income') {
-                                propertyIncome += amount;
-                            } else if (transaction.type === 'expense') {
-                                propertyExpense += amount;
-                            }
-                        });
-                    } catch (error) {
-                        console.warn('Erro ao calcular finanças da propriedade:', error);
-                    }
-                    
-                    const propertyProfit = propertyIncome - propertyExpense;
-                    totalIncome += propertyIncome;
-                    totalExpense += propertyExpense;
-                    
-                    // Criar card da propriedade
-                    const card = createPropertyCard(property, {
-                        income: propertyIncome,
-                        expense: propertyExpense,
-                        profit: propertyProfit
-                    });
-                    
-                    propertiesList.appendChild(card);
-                }
-                
-                // Atualizar resumo financeiro
-                const totalProfit = totalIncome - totalExpense;
-                updateFinancialSummary(totalIncome, totalExpense, totalProfit);
-                
-            } catch (error) {
-                console.error('Erro ao carregar imóveis:', error);
-                const propertiesList = document.getElementById('propertiesList');
-                propertiesList.innerHTML = `
-                    <div class="col-span-full text-center py-10">
-                        <i class="fas fa-exclamation-circle text-red-500 text-5xl mb-4"></i>
-                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Erro ao carregar imóveis</h3>
-                        <p class="text-gray-500 mb-4">Ocorreu um erro ao carregar seus imóveis. Tente novamente.</p>
-                        <button onclick="loadAndDisplayProperties()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                            <i class="fas fa-redo mr-2"></i>Tentar novamente
-                        </button>
-                    </div>
-                `;
+                });
             }
-        }
-
-        // Função para criar card de propriedade
-        function createPropertyCard(property, financialSummary) {
-            const card = document.createElement('div');
-            card.className = 'bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 overflow-hidden';
             
-            const statusClass = property.status === 'active' ? 'bg-green-500' : 'bg-gray-500';
-            const statusText = property.status === 'active' ? 'Ativo' : 'Inativo';
-            const profitClass = financialSummary.profit >= 0 ? 'text-blue-600' : 'text-red-600';
+            // Mobile profile dropdown
+            const mobileProfileBtn = document.getElementById('mobileProfileBtn');
+            const mobileDropdown = document.getElementById('mobileDropdown');
             
-            // Criar placeholder SVG
-            const placeholderSvg = `data:image/svg+xml;base64,${btoa(`
-                <svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="400" height="200" fill="#f3f4f6"/>
-                    <text x="200" y="90" font-family="Arial" font-size="40" fill="#9ca3af" text-anchor="middle">🏠</text>
-                    <text x="200" y="130" font-family="Arial" font-size="14" fill="#6b7280" text-anchor="middle">Imóvel</text>
-                </svg>
-            `)}`;
-            
-            const imageUrl = (property.image && !property.image.includes('placeholder')) ? property.image : placeholderSvg;
-            
-            card.innerHTML = `
-                <div class="relative h-48 overflow-hidden">
-                    <img src="${imageUrl}" alt="${property.name}" 
-                         class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                         onerror="this.src='${placeholderSvg}'">
-                    <div class="absolute top-3 right-3 ${statusClass} text-white text-xs font-bold px-3 py-1 rounded-full">
-                        ${statusText}
-                    </div>
-                </div>
-                <div class="p-5">
-                    <h3 class="text-lg font-bold text-gray-900 mb-2 truncate">${property.name}</h3>
-                    <p class="text-gray-600 text-sm mb-4 flex items-center">
-                        <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>
-                        ${property.city}, ${property.state}
-                    </p>
-                    
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <div class="text-center p-3 bg-green-50 rounded-lg border border-green-100">
-                            <p class="text-xs text-green-600 font-medium mb-1">Receitas</p>
-                            <p class="text-green-700 font-bold">${formatCurrency(financialSummary.income)}</p>
-                        </div>
-                        <div class="text-center p-3 bg-red-50 rounded-lg border border-red-100">
-                            <p class="text-xs text-red-600 font-medium mb-1">Despesas</p>
-                            <p class="text-red-700 font-bold">${formatCurrency(financialSummary.expense)}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="border-t border-gray-100 pt-4">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="text-xs text-gray-500 font-medium">Lucro Líquido</p>
-                                <p class="${profitClass} font-bold text-lg">${formatCurrency(financialSummary.profit)}</p>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button class="viewPropertyBtn p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors" 
-                                        title="Ver detalhes" data-id="${property.id}">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="addQuickTransactionBtn p-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors" 
-                                        title="Nova transação" data-id="${property.id}">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Adicionar eventos aos botões
-            const viewBtn = card.querySelector('.viewPropertyBtn');
-            const addTransactionBtn = card.querySelector('.addQuickTransactionBtn');
-            
-            viewBtn?.addEventListener('click', function() {
-                window.location.href = `property-details.html?id=${property.id}`;
-            });
-            
-            addTransactionBtn?.addEventListener('click', function() {
-                openQuickTransactionModal();
-                setTimeout(() => {
-                    const propertySelect = document.getElementById('quickTransactionProperty');
-                    if (propertySelect) {
-                        propertySelect.value = property.id;
-                    }
-                }, 100);
-            });
-            
-            return card;
-        }
-
-        // Função para atualizar resumo financeiro
-        function updateFinancialSummary(income, expense, profit) {
-            document.getElementById('totalRevenue').textContent = formatCurrency(income);
-            document.getElementById('totalExpenses').textContent = formatCurrency(expense);
-            document.getElementById('totalProfit').textContent = formatCurrency(profit);
-        }
-
-        // Configurar dropdown do usuário
-        function setupUserDropdown() {
-            const userAvatarBtn = document.getElementById('userAvatarBtn');
-            const userDropdownMenu = document.getElementById('userDropdownMenu');
-            
-            if (userAvatarBtn && userDropdownMenu) {
-                userAvatarBtn.addEventListener('click', function(e) {
+            if (mobileProfileBtn) {
+                mobileProfileBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    userDropdownMenu.classList.toggle('show');
-                });
-                
-                // Fechar ao clicar fora
-                document.addEventListener('click', function(event) {
-                    if (!userAvatarBtn.contains(event.target) && !userDropdownMenu.contains(event.target)) {
-                        userDropdownMenu.classList.remove('show');
+                    mobileDropdown.classList.toggle('show');
+                    
+                    // Update user info
+                    const user = auth.currentUser;
+                    if (user) {
+                        const userName = user.email.split('@')[0];
+                        document.querySelector('.mobile-dropdown .dropdown-user-name').textContent = userName.charAt(0).toUpperCase() + userName.slice(1);
+                        document.querySelector('.mobile-dropdown .dropdown-user-email').textContent = user.email;
                     }
                 });
-                
-                // Logout
-                const logoutBtn = document.getElementById('logoutBtn');
-                if (logoutBtn) {
-                    logoutBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
+            }
+            
+            // Close mobile dropdown on outside click
+            document.addEventListener('click', function(e) {
+                if (mobileDropdown && !mobileDropdown.contains(e.target) && e.target !== mobileProfileBtn) {
+                    mobileDropdown.classList.remove('show');
+                }
+            });
+            
+            // Mobile logout
+            const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Tem certeza que deseja sair?')) {
                         auth.signOut().then(() => {
                             window.location.href = '../index.html';
                         });
-                    });
-                }
-            }
-        }
-
-        // Configurar modal de transação rápida
-        function setupQuickTransactionModal() {
-            const modal = document.getElementById('quickTransactionModal');
-            const closeBtn = document.getElementById('closeQuickTransactionModal');
-            const cancelBtn = document.getElementById('cancelQuickTransaction');
-            const form = document.getElementById('quickTransactionForm');
-            const typeButtons = document.querySelectorAll('.transaction-type-btn');
-            const typeInput = document.getElementById('quickTransactionType');
-            
-            // Abrir modal
-            window.openQuickTransactionModal = function() {
-                loadPropertiesForQuickTransaction();
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            };
-            
-            // Fechar modal
-            function closeQuickTransactionModal() {
-                modal.classList.remove('flex');
-                modal.classList.add('hidden');
-                form.reset();
-                typeInput.value = 'income';
-                typeButtons.forEach(btn => btn.classList.remove('active'));
-                typeButtons[0].classList.add('active');
-            }
-            
-            // Event listeners para fechar
-            closeBtn?.addEventListener('click', closeQuickTransactionModal);
-            cancelBtn?.addEventListener('click', closeQuickTransactionModal);
-            
-            // Fechar ao clicar fora
-            modal?.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    closeQuickTransactionModal();
-                }
-            });
-            
-            // Seleção de tipo de transação
-            typeButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    typeButtons.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    typeInput.value = this.dataset.type;
-                });
-            });
-            
-            // Submissão do formulário
-            form?.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await handleQuickTransactionSubmit();
-            });
-        }
-
-        // Configurar modal de adicionar imóvel
-        function setupAddPropertyModal() {
-            const modal = document.getElementById('addPropertyModal');
-            const closeBtn = document.getElementById('closeAddPropertyModal');
-            const cancelBtn = document.getElementById('cancelAddProperty');
-            const form = document.getElementById('addPropertyForm');
-            
-            // Fechar modal
-            function closeAddPropertyModal() {
-                modal.classList.remove('flex');
-                modal.classList.add('hidden');
-                form.reset();
-            }
-            
-            // Event listeners para fechar
-            closeBtn?.addEventListener('click', closeAddPropertyModal);
-            cancelBtn?.addEventListener('click', closeAddPropertyModal);
-            
-            // Fechar ao clicar fora
-            modal?.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    closeAddPropertyModal();
-                }
-            });
-            
-            // Submissão do formulário
-            form?.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await handleAddPropertySubmit();
-            });
-        }
-
-        // Carregar propriedades para o modal de transação rápida
-        async function loadPropertiesForQuickTransaction() {
-            try {
-                const propertySelect = document.getElementById('quickTransactionProperty');
-                if (!propertySelect) return;
-                
-                propertySelect.innerHTML = '<option value="">Carregando...</option>';
-                
-                const properties = await loadProperties();
-                
-                propertySelect.innerHTML = '<option value="">Selecione um imóvel</option>';
-                
-                properties.forEach(property => {
-                    const option = document.createElement('option');
-                    option.value = property.id;
-                    option.textContent = property.name;
-                    propertySelect.appendChild(option);
-                });
-                
-                if (properties.length === 0) {
-                    propertySelect.innerHTML = '<option value="">Nenhum imóvel cadastrado</option>';
-                }
-            } catch (error) {
-                console.error('Erro ao carregar propriedades:', error);
-            }
-        }
-
-        // Processar submissão da transação rápida
-        async function handleQuickTransactionSubmit() {
-            try {
-                const submitBtn = document.querySelector('#quickTransactionForm button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                
-                // Loading state
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Adicionando...';
-                
-                const transactionData = {
-                    propertyId: document.getElementById('quickTransactionProperty').value,
-                    type: document.getElementById('quickTransactionType').value,
-                    amount: parseFloat(document.getElementById('quickTransactionAmount').value),
-                    description: document.getElementById('quickTransactionDescription').value,
-                    date: new Date(),
-                    category: document.getElementById('quickTransactionType').value === 'income' ? 'rent' : 'maintenance'
-                };
-                
-                // Validações
-                if (!transactionData.propertyId) {
-                    throw new Error('Selecione um imóvel');
-                }
-                if (!transactionData.amount || transactionData.amount <= 0) {
-                    throw new Error('Valor deve ser maior que zero');
-                }
-                if (!transactionData.description.trim()) {
-                    throw new Error('Descrição é obrigatória');
-                }
-                
-                // Adicionar transação
-                await addTransaction(transactionData);
-                
-                // Sucesso
-                showNotification('Transação adicionada com sucesso!', 'success');
-                
-                // Fechar modal e recarregar dados
-                document.getElementById('cancelQuickTransaction').click();
-                loadDashboardData();
-                
-            } catch (error) {
-                console.error('Erro ao adicionar transação:', error);
-                showNotification(error.message || 'Erro ao adicionar transação', 'error');
-            } finally {
-                const submitBtn = document.querySelector('#quickTransactionForm button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Adicionar';
-                }
-            }
-        }
-
-        // Processar submissão do imóvel
-        async function handleAddPropertySubmit() {
-            try {
-                const submitBtn = document.querySelector('#addPropertyForm button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                
-                // Loading state
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Adicionando...';
-                
-                const propertyData = {
-                    name: document.getElementById('propertyName').value.trim(),
-                    address: document.getElementById('propertyAddress').value.trim(),
-                    city: document.getElementById('propertyCity').value.trim(),
-                    state: document.getElementById('propertyState').value.trim(),
-                    image: document.getElementById('propertyImage').value.trim() || null
-                };
-                
-                // Validações
-                if (!propertyData.name || !propertyData.address || !propertyData.city || !propertyData.state) {
-                    throw new Error('Todos os campos obrigatórios devem ser preenchidos');
-                }
-                
-                // Adicionar imóvel
-                await addProperty(propertyData);
-                
-                // Sucesso
-                showNotification('Imóvel adicionado com sucesso!', 'success');
-                
-                // Fechar modal e recarregar dados
-                document.getElementById('cancelAddProperty').click();
-                loadAndDisplayProperties();
-                
-            } catch (error) {
-                console.error('Erro ao adicionar imóvel:', error);
-                showNotification(error.message || 'Erro ao adicionar imóvel', 'error');
-            } finally {
-                const submitBtn = document.querySelector('#addPropertyForm button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-plus mr-2"></i>Adicionar Imóvel';
-                }
-            }
-        }
-
-        // Configurar botões de ação
-        function setupActionButtons() {
-            // Botão principal de nova transação
-            const addTransactionBtn = document.getElementById('addTransactionBtn');
-            const floatingBtn = document.getElementById('floatingAddTransaction');
-            const viewReportsBtn = document.getElementById('viewReportsBtn');
-            
-            // Nova transação
-            [addTransactionBtn, floatingBtn].forEach(btn => {
-                btn?.addEventListener('click', function() {
-                    console.log('Botão Nova Transação clicado');
-                    openQuickTransactionModal();
-                });
-            });
-            
-            // Ver relatórios
-            viewReportsBtn?.addEventListener('click', function() {
-                console.log('Botão Relatórios clicado');
-                window.location.href = 'reports.html';
-            });
-        }
-
-        // Atualizar informações do usuário
-        function updateUserInfo(user) {
-            const dropdownUserName = document.getElementById('dropdownUserName');
-            const dropdownUserEmail = document.getElementById('dropdownUserEmail');
-            
-            if (dropdownUserName && dropdownUserEmail) {
-                const userName = user.email.split('@')[0];
-                dropdownUserName.textContent = userName.charAt(0).toUpperCase() + userName.slice(1);
-                dropdownUserEmail.textContent = user.email;
-            }
-        }
-
-        // Carregar dados do dashboard
-        async function loadDashboardData() {
-            try {
-                console.log('📊 Carregando dados do dashboard...');
-                
-                // Carregar imóveis
-                await loadAndDisplayProperties();
-                
-                // Carregar transações recentes
-                await loadRecentTransactions();
-                
-                // Configurar filtro de mês
-                setupMonthFilter();
-                
-                console.log('✅ Dashboard carregado com sucesso');
-            } catch (error) {
-                console.error('❌ Erro ao carregar dashboard:', error);
-                showNotification('Erro ao carregar dados do dashboard', 'error');
-            }
-        }
-
-        // Configurar filtro de mês
-        function setupMonthFilter() {
-            const monthFilter = document.getElementById('monthFilter');
-            if (monthFilter) {
-                const currentMonth = new Date().getMonth() + 1;
-                monthFilter.value = currentMonth.toString();
-                
-                monthFilter.addEventListener('change', async function() {
-                    const value = this.value;
-                    console.log('📅 Filtro alterado para:', value);
-                    await loadAndDisplayProperties(value === 'all' ? null : value);
+                    }
                 });
             }
-        }
-
-        // Inicialização principal
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Dashboard carregado');
-            
-            // Configurar todos os componentes
-            setupUserDropdown();
-            setupQuickTransactionModal();
-            setupAddPropertyModal();
-            setupActionButtons();
-            
-            // Aguardar autenticação e carregar dados
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    console.log('✅ Usuário autenticado:', user.email);
-                    updateUserInfo(user);
-                    loadDashboardData();
-                } else {
-                    console.log('❌ Usuário não autenticado - redirecionando');
-                    window.location.href = '../index.html';
-                }
-            });
         });
     </script>
 </body>
