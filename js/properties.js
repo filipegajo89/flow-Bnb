@@ -44,9 +44,9 @@ const getProperties = async () => {
     
     console.log('Buscando imóveis para o usuário:', user.uid);
     
+    // Buscar sem orderBy para evitar problemas de índice
     const snapshot = await db.collection('properties')
       .where('userId', '==', user.uid)
-      .orderBy('createdAt', 'desc')
       .get();
     
     const properties = [];
@@ -58,6 +58,13 @@ const getProperties = async () => {
         // Garantir que createdAt seja tratado corretamente
         createdAt: data.createdAt ? data.createdAt : null
       });
+    });
+    
+    // Ordenar manualmente por createdAt
+    properties.sort((a, b) => {
+      const dateA = a.createdAt ? (a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)) : new Date(0);
+      const dateB = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : new Date(0);
+      return dateB - dateA;
     });
     
     console.log(`Encontrados ${properties.length} imóveis:`, properties);
@@ -135,24 +142,42 @@ const getPropertyFinancialSummary = async (propertyId, month = null, year = null
     let query = db.collection('transactions')
       .where('propertyId', '==', propertyId);
     
+    // Se especificado mês e ano, aplicar filtro
     if (month !== null && year !== null) {
       const startDate = new Date(year, month - 1, 1);
-      const endDate = new Date(year, month, 0);
+      const endDate = new Date(year, month, 0, 23, 59, 59);
       
-      query = query.where('date', '>=', startDate)
-                  .where('date', '<=', endDate);
+      // Buscar transações sem filtro de data no Firestore
+      const snapshot = await query.get();
+      
+      // Filtrar manualmente por data
+      snapshot.forEach(doc => {
+        const transaction = doc.data();
+        const transactionDate = transaction.date ? 
+          (transaction.date.toDate ? transaction.date.toDate() : new Date(transaction.date)) : 
+          null;
+        
+        if (transactionDate && transactionDate >= startDate && transactionDate <= endDate) {
+          if (transaction.type === 'income') {
+            totalIncome += parseFloat(transaction.amount);
+          } else if (transaction.type === 'expense') {
+            totalExpense += parseFloat(transaction.amount);
+          }
+        }
+      });
+    } else {
+      // Sem filtro de data
+      const snapshot = await query.get();
+      
+      snapshot.forEach(doc => {
+        const transaction = doc.data();
+        if (transaction.type === 'income') {
+          totalIncome += parseFloat(transaction.amount);
+        } else if (transaction.type === 'expense') {
+          totalExpense += parseFloat(transaction.amount);
+        }
+      });
     }
-    
-    const snapshot = await query.get();
-    
-    snapshot.forEach(doc => {
-      const transaction = doc.data();
-      if (transaction.type === 'income') {
-        totalIncome += parseFloat(transaction.amount);
-      } else if (transaction.type === 'expense') {
-        totalExpense += parseFloat(transaction.amount);
-      }
-    });
     
     const profit = totalIncome - totalExpense;
     
@@ -340,7 +365,6 @@ const updateDashboardSummary = (income, expense, profit) => {
 };
 
 // FUNÇÃO PRINCIPAL - Carregar e exibir imóveis
-// Substitua a função loadAndDisplayProperties em js/properties.js por esta versão
 const loadAndDisplayProperties = async (monthFilter = null) => {
   console.log('🔄 Iniciando carregamento de imóveis...');
   
@@ -352,62 +376,26 @@ const loadAndDisplayProperties = async (monthFilter = null) => {
     }
     
     // Mostrar loading
-    propertiesList.innerHTML = `
-      <div class="col-span-full text-center py-10">
-        <div class="inline-block w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-gray-500">Carregando seus imóveis...</p>
-      </div>
-    `;
+    showLoadingState();
     
     // Verificar autenticação
     const user = auth.currentUser;
     if (!user) {
       console.error('❌ Usuário não autenticado');
-      propertiesList.innerHTML = `
-        <div class="col-span-full text-center py-10">
-          <p class="text-red-500">Erro: Usuário não autenticado</p>
-        </div>
-      `;
+      showErrorState('Usuário não autenticado');
       return;
     }
     
     console.log('✅ Usuário autenticado:', user.email);
     
-    // Buscar propriedades diretamente do Firestore
-    console.log('📡 Buscando propriedades...');
-    const snapshot = await db.collection('properties')
-      .where('userId', '==', user.uid)
-      .orderBy('createdAt', 'desc')
-      .get();
+    // Buscar propriedades
+    const properties = await getProperties();
     
-    console.log(`📋 Encontradas ${snapshot.size} propriedades`);
+    console.log(`📋 Encontradas ${properties.length} propriedades`);
     
-    if (snapshot.empty) {
+    if (properties.length === 0) {
       console.log('📭 Nenhuma propriedade encontrada');
-      propertiesList.innerHTML = `
-        <div class="col-span-full text-center py-10">
-          <i class="fas fa-home text-gray-300 text-5xl mb-4"></i>
-          <h3 class="text-xl font-semibold text-gray-700 mb-2">Nenhum imóvel cadastrado</h3>
-          <p class="text-gray-500 mb-4">Você ainda não tem imóveis cadastrados. Comece adicionando seu primeiro imóvel.</p>
-          <button id="addFirstPropertyBtn" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
-            <i class="fas fa-plus mr-2"></i>Adicionar Primeiro Imóvel
-          </button>
-        </div>
-      `;
-      
-      // Adicionar evento ao botão
-      const addFirstPropertyBtn = document.getElementById('addFirstPropertyBtn');
-      if (addFirstPropertyBtn) {
-        addFirstPropertyBtn.addEventListener('click', () => {
-          const modal = document.getElementById('addPropertyModal');
-          if (modal) {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-          }
-        });
-      }
-      
-      // Zerar resumo
+      showEmptyState();
       updateDashboardSummary(0, 0, 0);
       return;
     }
@@ -425,55 +413,19 @@ const loadAndDisplayProperties = async (monthFilter = null) => {
     
     console.log('💰 Processando propriedades...');
     
-    for (const doc of snapshot.docs) {
+    for (const property of properties) {
       try {
-        const property = { id: doc.id, ...doc.data() };
         console.log(`🏠 Processando: ${property.name}`);
         
-        // Calcular resumo financeiro (simplificado para teste)
-        let propertyIncome = 0;
-        let propertyExpense = 0;
+        // Calcular resumo financeiro
+        const financialSummary = await getPropertyFinancialSummary(
+          property.id, 
+          currentMonth, 
+          currentMonth ? currentYear : null
+        );
         
-        try {
-          let transactionQuery = db.collection('transactions')
-            .where('propertyId', '==', property.id);
-          
-          if (currentMonth && currentYear) {
-            const startDate = new Date(currentYear, currentMonth - 1, 1);
-            const endDate = new Date(currentYear, currentMonth, 0);
-            transactionQuery = transactionQuery
-              .where('date', '>=', startDate)
-              .where('date', '<=', endDate);
-          }
-          
-          const transactionSnapshot = await transactionQuery.get();
-          
-          transactionSnapshot.forEach(transactionDoc => {
-            const transaction = transactionDoc.data();
-            const amount = parseFloat(transaction.amount) || 0;
-            
-            if (transaction.type === 'income') {
-              propertyIncome += amount;
-            } else if (transaction.type === 'expense') {
-              propertyExpense += amount;
-            }
-          });
-        } catch (transactionError) {
-          console.warn('⚠️ Erro ao buscar transações para', property.name, ':', transactionError);
-        }
-        
-        const propertyProfit = propertyIncome - propertyExpense;
-        totalIncome += propertyIncome;
-        totalExpense += propertyExpense;
-        
-        const financialSummary = {
-          income: propertyIncome,
-          expense: propertyExpense,
-          profit: propertyProfit,
-          formattedIncome: formatCurrency(propertyIncome),
-          formattedExpense: formatCurrency(propertyExpense),
-          formattedProfit: formatCurrency(propertyProfit)
-        };
+        totalIncome += financialSummary.income;
+        totalExpense += financialSummary.expense;
         
         // Criar card da propriedade
         const card = renderPropertyCard(property, financialSummary);
@@ -518,28 +470,7 @@ const loadAndDisplayProperties = async (monthFilter = null) => {
     
   } catch (error) {
     console.error('❌ Erro crítico:', error);
-    
-    const propertiesList = document.getElementById('propertiesList');
-    if (propertiesList) {
-      let errorMessage = 'Erro ao carregar imóveis.';
-      
-      if (error.code === 'permission-denied') {
-        errorMessage = 'Acesso negado. Verifique as regras de segurança do Firestore.';
-      } else if (error.code === 'failed-precondition') {
-        errorMessage = 'Índice do Firestore necessário. Verifique o console do Firebase.';
-      }
-      
-      propertiesList.innerHTML = `
-        <div class="col-span-full text-center py-10">
-          <i class="fas fa-exclamation-circle text-red-500 text-5xl mb-4"></i>
-          <h3 class="text-xl font-semibold text-gray-700 mb-2">Erro ao carregar imóveis</h3>
-          <p class="text-gray-500 mb-4">${errorMessage}</p>
-          <button onclick="loadAndDisplayProperties()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-            <i class="fas fa-redo mr-2"></i>Tentar novamente
-          </button>
-        </div>
-      `;
-    }
+    showErrorState('Ocorreu um erro ao carregar os imóveis. Por favor, tente novamente.');
   }
 };
 
