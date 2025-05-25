@@ -31,8 +31,7 @@ const addTransaction = (transactionData) => {
 // Obter transações de um imóvel
 const getPropertyTransactions = (propertyId, limit = null) => {
   let query = db.collection('transactions')
-    .where('propertyId', '==', propertyId)
-    .orderBy('date', 'desc');
+    .where('propertyId', '==', propertyId);
   
   if (limit) {
     query = query.limit(limit);
@@ -47,6 +46,14 @@ const getPropertyTransactions = (propertyId, limit = null) => {
           ...doc.data()
         });
       });
+      
+      // Ordenar manualmente por data
+      transactions.sort((a, b) => {
+        const dateA = a.date ? (a.date.toDate ? a.date.toDate() : new Date(a.date)) : new Date(0);
+        const dateB = b.date ? (b.date.toDate ? b.date.toDate() : new Date(b.date)) : new Date(0);
+        return dateB - dateA;
+      });
+      
       return transactions;
     })
     .catch(error => {
@@ -60,8 +67,7 @@ const getAllTransactions = (limit = null) => {
   const userId = auth.currentUser.uid;
   
   let query = db.collection('transactions')
-    .where('userId', '==', userId)
-    .orderBy('date', 'desc');
+    .where('userId', '==', userId);
   
   if (limit) {
     query = query.limit(limit);
@@ -76,6 +82,14 @@ const getAllTransactions = (limit = null) => {
           ...doc.data()
         });
       });
+      
+      // Ordenar manualmente por data
+      transactions.sort((a, b) => {
+        const dateA = a.date ? (a.date.toDate ? a.date.toDate() : new Date(a.date)) : new Date(0);
+        const dateB = b.date ? (b.date.toDate ? b.date.toDate() : new Date(b.date)) : new Date(0);
+        return dateB - dateA;
+      });
+      
       return transactions;
     })
     .catch(error => {
@@ -124,38 +138,35 @@ const deleteTransaction = (transactionId) => {
 
 // Renderizar linha de transação na tabela
 const renderTransactionRow = async (transaction) => {
-  // Obter informações do imóvel para exibir o nome
-  const property = await getProperty(transaction.propertyId);
-  
-  const row = document.createElement('tr');
-  
-  // Definir classe e cor com base no tipo de transação
-  const valueClass = transaction.type === 'income' ? 'text-green-600' : 'text-red-600';
-  const valuePrefix = transaction.type === 'income' ? '+ ' : '- ';
-  const badgeClass = transaction.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-  const badgeText = transaction.type === 'income' ? 'Receita' : 'Despesa';
-  
-  row.innerHTML = `
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${formatDate(transaction.date)}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${property ? property.name : 'Imóvel não encontrado'}</td>
-    <td class="px-6 py-4 text-sm text-gray-600">${transaction.description}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm">
-      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}">
-        ${badgeText}
-      </span>
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${valueClass}">${valuePrefix}${formatCurrency(transaction.amount)}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-      <button class="editTransactionBtn text-blue-600 hover:text-blue-800 mr-3" data-id="${transaction.id}">
-        <i class="fas fa-edit"></i>
-      </button>
-      <button class="deleteTransactionBtn text-red-600 hover:text-red-800" data-id="${transaction.id}">
-        <i class="fas fa-trash"></i>
-      </button>
-    </td>
-  `;
-  
-  return row;
+  try {
+    // Obter informações do imóvel para exibir o nome
+    const property = await getProperty(transaction.propertyId);
+    
+    const row = document.createElement('tr');
+    
+    // Definir classe e cor com base no tipo de transação
+    const valueClass = transaction.type === 'income' ? 'text-green-600' : 'text-red-600';
+    const valuePrefix = transaction.type === 'income' ? '+ ' : '- ';
+    const badgeClass = transaction.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+    const badgeText = transaction.type === 'income' ? 'Receita' : 'Despesa';
+    
+    row.innerHTML = `
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${formatDate(transaction.date)}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden md:table-cell">${property ? property.name : 'Imóvel não encontrado'}</td>
+      <td class="px-6 py-4 text-sm text-gray-600">${transaction.description}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm hidden md:table-cell">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}">
+          ${badgeText}
+        </span>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${valueClass}">${valuePrefix}${formatCurrency(transaction.amount)}</td>
+    `;
+    
+    return row;
+  } catch (error) {
+    console.error('Erro ao renderizar transação:', error);
+    return null;
+  }
 };
 
 // Carregar e exibir transações recentes no dashboard
@@ -167,11 +178,9 @@ const loadRecentTransactions = async () => {
     // Mostrar indicador de carregamento
     recentTransactionsEl.innerHTML = `
       <tr>
-        <td colspan="6" class="px-6 py-10 text-center">
-          <div class="inline-block">
-            <div class="loading-spinner"></div>
-          </div>
-          <p class="text-gray-500 mt-2">Carregando transações...</p>
+        <td colspan="5" class="px-6 py-10 text-center">
+          <div class="inline-block w-8 h-8 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin mb-2"></div>
+          <p class="text-gray-500">Carregando transações...</p>
         </td>
       </tr>
     `;
@@ -183,7 +192,7 @@ const loadRecentTransactions = async () => {
     if (transactions.length === 0) {
       recentTransactionsEl.innerHTML = `
         <tr>
-          <td colspan="6" class="px-6 py-10 text-center">
+          <td colspan="5" class="px-6 py-10 text-center">
             <i class="fas fa-receipt text-gray-300 text-4xl mb-3"></i>
             <p class="text-gray-500">Nenhuma transação registrada ainda.</p>
             <button id="addFirstTransactionBtn" class="mt-3 text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center mx-auto">
@@ -197,26 +206,11 @@ const loadRecentTransactions = async () => {
       const addFirstTransactionBtn = document.getElementById('addFirstTransactionBtn');
       if (addFirstTransactionBtn) {
         addFirstTransactionBtn.addEventListener('click', () => {
-          // Verificar se há imóveis cadastrados
-          getProperties().then(properties => {
-            if (properties.length > 0) {
-              // Abrir modal de adicionar transação
-              const modal = document.getElementById('addTransactionModal');
-              if (modal) {
-                document.getElementById('transactionPropertyId').value = properties[0].id;
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-              }
-            } else {
-              alert('Você precisa cadastrar um imóvel primeiro!');
-              // Abrir modal de adicionar imóvel
-              const propertyModal = document.getElementById('addPropertyModal');
-              if (propertyModal) {
-                propertyModal.classList.remove('hidden');
-                propertyModal.classList.add('flex');
-              }
-            }
-          });
+          const modal = document.getElementById('quickTransactionModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
         });
       }
       
@@ -230,33 +224,8 @@ const loadRecentTransactions = async () => {
     for (const transaction of transactions) {
       try {
         const row = await renderTransactionRow(transaction);
-        recentTransactionsEl.appendChild(row);
-        
-        // Adicionar listeners aos botões
-        const editBtn = row.querySelector('.editTransactionBtn');
-        const deleteBtn = row.querySelector('.deleteTransactionBtn');
-        
-        if (editBtn) {
-          editBtn.addEventListener('click', () => {
-            // Implementar edição de transação
-            alert('Funcionalidade de edição será implementada em breve.');
-          });
-        }
-        
-        if (deleteBtn) {
-          deleteBtn.addEventListener('click', async () => {
-            if (confirm('Tem certeza que deseja excluir esta transação?')) {
-              try {
-                await deleteTransaction(transaction.id);
-                row.remove();
-                
-                // Recarregar resumo financeiro
-                loadAndDisplayProperties();
-              } catch (error) {
-                alert('Erro ao excluir transação: ' + error.message);
-              }
-            }
-          });
+        if (row) {
+          recentTransactionsEl.appendChild(row);
         }
       } catch (transactionError) {
         console.error('Erro ao processar transação:', transactionError);
@@ -269,7 +238,7 @@ const loadRecentTransactions = async () => {
     if (recentTransactionsEl) {
       recentTransactionsEl.innerHTML = `
         <tr>
-          <td colspan="6" class="px-6 py-10 text-center">
+          <td colspan="5" class="px-6 py-10 text-center">
             <i class="fas fa-exclamation-circle text-red-500 text-2xl mb-2"></i>
             <p class="text-red-500 font-medium mb-2">Erro ao carregar transações</p>
             <p class="text-gray-600 mb-3">Não foi possível carregar suas transações. Por favor, tente novamente.</p>
