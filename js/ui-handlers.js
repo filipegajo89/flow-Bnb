@@ -250,6 +250,8 @@ function setupMonthFilter() {
             try {
                 showLoadingState();
                 await loadAndDisplayProperties(value === 'all' ? null : value);
+                // Recarregar transações também
+                await loadRecentTransactions();
             } catch (error) {
                 console.error('❌ Erro ao aplicar filtro:', error);
                 showNotification('Erro ao aplicar filtro', 'error');
@@ -277,6 +279,29 @@ function setupMobileMenu() {
                 !mobileMenuToggle.contains(event.target)) {
                 sidebar.classList.remove('open');
             }
+        });
+    }
+}
+
+// Configurar botões de ação rápida
+function setupQuickActionButtons() {
+    // Botão Nova Transação
+    const addTransactionBtn = document.getElementById('addTransactionBtn');
+    if (addTransactionBtn) {
+        addTransactionBtn.addEventListener('click', function() {
+            const modal = document.getElementById('quickTransactionModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        });
+    }
+    
+    // Botão Ver Relatórios
+    const viewReportsBtn = document.getElementById('viewReportsBtn');
+    if (viewReportsBtn) {
+        viewReportsBtn.addEventListener('click', function() {
+            window.location.href = 'reports.html';
         });
     }
 }
@@ -309,6 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setupUserMenu();
             setupMonthFilter();
             setupMobileMenu();
+            setupQuickActionButtons();
             
             // Carregar imóveis inicialmente se estivermos no dashboard
             if (window.location.pathname.includes('dashboard')) {
