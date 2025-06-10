@@ -107,37 +107,7 @@ auth.onAuthStateChanged(user => {
       return;
     }
   }
-});
-    
-    // Atualizar UI com informações do usuário logado
-    const userNameElement = document.getElementById('userName');
-    if (userNameElement) {
-      userNameElement.textContent = user.email;
-    }
-    
-    // Carregar dados do usuário
-    loadUserData(user.uid);
-  } else {
-    // Usuário não logado
-    console.log('Nenhum usuário autenticado');
-    
-    // Se estiver em página protegida, redirecionar para login
-    if (!isLoginPage) {
-      console.log('Acesso a página protegida sem autenticação, redirecionando para login');
-      isRedirecting = true;
-      
-      // Determinar o caminho correto para o index.html
-      let loginPath = '../index.html';
-      if (currentPath.includes('property-details')) {
-        loginPath = '../index.html';
-      }
-      
-      console.log('Redirecionando para:', loginPath);
-      window.location.href = loginPath;
-      return;
-    }
-  }
-});
+  });
 
 // Função de login
 function login(email, password) {
