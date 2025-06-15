@@ -309,7 +309,7 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header Desktop -->
-        <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-8">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
             <div class="mb-4 md:mb-0">
                 <div class="hidden md:flex items-center text-sm text-gray-500 mb-2">
                     <span>FlowBnb</span>
@@ -319,63 +319,46 @@
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Bem-vindo de volta! 👋</h1>
                 <p class="text-gray-600">Aqui está um resumo dos seus imóveis hoje.</p>
             </div>
-            
-            <!-- Desktop User Avatar -->
-            <div class="hidden md:block user-dropdown">
-                <button id="userAvatarBtn" class="avatar-button">
-                    <i class="fas fa-user"></i>
-                </button>
-                <div id="userDropdownMenu" class="dropdown-menu">
-                    <div class="dropdown-header">
-                        <div id="dropdownUserName" class="dropdown-user-name">Nome do Usuário</div>
-                        <div id="dropdownUserEmail" class="dropdown-user-email">usuario@email.com</div>
-                    </div>
-                    <div class="dropdown-items">
-                        <a href="properties.html" class="dropdown-item">
-                            <i class="fas fa-home"></i>
-                            <span>Gerenciar Imóveis</span>
-                        </a>
-                        <a href="reports.html" class="dropdown-item">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Relatórios</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" id="logoutBtn" class="dropdown-item logout-item">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Sair</span>
-                        </a>
+            <div class="flex items-center space-x-3">
+                <div class="quick-actions-inline flex space-x-2">
+                    <button id="addTransactionBtn" class="quick-action-btn compact">
+                        <i class="fas fa-plus-circle mr-1"></i>
+                        <span>Nova Transação</span>
+                    </button>
+                    <button id="viewReportsBtn" class="quick-action-btn compact reports">
+                        <i class="fas fa-chart-line mr-1"></i>
+                        <span>Ver Relatórios</span>
+                    </button>
+                </div>
+
+                <!-- Desktop User Avatar -->
+                <div class="hidden md:block user-dropdown">
+                    <button id="userAvatarBtn" class="avatar-button">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <div id="userDropdownMenu" class="dropdown-menu">
+                        <div class="dropdown-header">
+                            <div id="dropdownUserName" class="dropdown-user-name">Nome do Usuário</div>
+                            <div id="dropdownUserEmail" class="dropdown-user-email">usuario@email.com</div>
+                        </div>
+                        <div class="dropdown-items">
+                            <a href="properties.html" class="dropdown-item">
+                                <i class="fas fa-home"></i>
+                                <span>Gerenciar Imóveis</span>
+                            </a>
+                            <a href="reports.html" class="dropdown-item">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Relatórios</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" id="logoutBtn" class="dropdown-item logout-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Sair</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Quick Actions -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <button id="addTransactionBtn" class="quick-action-btn">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-plus-circle text-2xl mr-3"></i>
-                            <h3 class="text-lg font-bold">Nova Transação</h3>
-                        </div>
-                        <p class="text-green-100 text-sm">Adicionar receita ou despesa rapidamente</p>
-                    </div>
-                    <i class="fas fa-arrow-right text-xl"></i>
-                </div>
-            </button>
-            
-            <button id="viewReportsBtn" class="quick-action-btn reports">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-chart-line text-2xl mr-3"></i>
-                            <h3 class="text-lg font-bold">Ver Relatórios</h3>
-                        </div>
-                        <p class="text-blue-100 text-sm">Analisar performance dos imóveis</p>
-                    </div>
-                    <i class="fas fa-arrow-right text-xl"></i>
-                </div>
-            </button>
         </div>
         
         <!-- Financial Summary -->
@@ -412,7 +395,7 @@
                         <p class="text-2xl font-bold text-gray-900" id="totalRevenue">R$ 0,00</p>
                     </div>
                 </div>
-                <div class="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                <div class="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded no-data">
                     <i class="fas fa-minus mr-1"></i>
                     Sem dados do mês anterior
                 </div>
@@ -428,7 +411,7 @@
                         <p class="text-2xl font-bold text-gray-900" id="totalExpenses">R$ 0,00</p>
                     </div>
                 </div>
-                <div class="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                <div class="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded no-data">
                     <i class="fas fa-minus mr-1"></i>
                     Sem dados do mês anterior
                 </div>
@@ -444,7 +427,7 @@
                         <p class="text-2xl font-bold text-gray-900" id="totalProfit">R$ 0,00</p>
                     </div>
                 </div>
-                <div class="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                <div class="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded no-data">
                     <i class="fas fa-minus mr-1"></i>
                     Sem dados do mês anterior
                 </div>
