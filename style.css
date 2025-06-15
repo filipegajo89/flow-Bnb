@@ -1343,8 +1343,13 @@
         display: flex !important;
     }
     
-    /* Header mobile sempre visível */
-    .mobile-header {
+    grid-template-columns: 1fr;
+@media (min-width: 768px) {
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
         display: flex !important;
     }
 }
