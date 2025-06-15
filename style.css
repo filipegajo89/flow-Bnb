@@ -1301,13 +1301,14 @@
     }
     
     .quick-action-btn .flex {
-        flex-direction: column;
-        text-align: center;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
     }
-    
+
     .quick-action-btn i {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
     }
     
     /* Ajustar tamanho de fontes */
@@ -1349,7 +1350,7 @@
     background: linear-gradient(135deg, #09b188, #08a078);
     color: white;
     border-radius: 1rem;
-    padding: 1.25rem;
+    padding: 1rem;
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
@@ -1384,7 +1385,7 @@
     }
 
     .quick-action-btn i {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
     }
 
     .quick-actions-grid {
