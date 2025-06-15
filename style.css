@@ -1201,7 +1201,7 @@
 @media (min-width: 768px) {
     .sidebar {
         width: 280px;
-        background: linear-gradient(to bottom, #0c2e69, #041c44);
+        background: #f0f4f8;
         position: fixed;
         height: 100vh;
         left: 0;
