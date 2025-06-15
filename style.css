@@ -1354,8 +1354,21 @@
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
-    width: 100%;
+    width: auto;
     text-align: left;
+}
+
+.quick-actions-grid .quick-action-btn {
+    width: 100%;
+}
+
+.quick-action-btn.compact {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.quick-action-btn.compact i {
+    font-size: 1rem;
 }
 
 .quick-action-btn.reports {
