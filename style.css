@@ -69,25 +69,40 @@
 
 /* Menu de Navegação */
 .sidebar-nav-item {
+  position: relative;
   display: flex;
   align-items: center;
   padding: 1rem 1.5rem;
   color: var(--primary-color);
   transition: var(--transition-standard);
-  border-left: 3px solid transparent;
   margin: 0.25rem 0;
 }
 
+.sidebar-nav-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: var(--secondary-color);
+  transition: width 0.3s ease;
+}
+
+.sidebar-nav-item:hover::before,
+.sidebar-nav-item.active::before {
+  width: 4px;
+=======
 .sidebar-nav-item:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: var(--primary-color);
   border-left: 3px solid var(--secondary-color);
 }
 
+.sidebar-nav-item:hover,
 .sidebar-nav-item.active {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(9, 177, 136, 0.1);
   color: var(--primary-color);
-  border-left: 3px solid var(--secondary-color);
 }
 
 .sidebar-nav-icon {
@@ -1339,7 +1354,7 @@
     background: linear-gradient(135deg, #09b188, #08a078);
     color: white;
     border-radius: 1rem;
-    padding: 1.5rem;
+    padding: 1.25rem;
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
@@ -1354,6 +1369,27 @@
 .quick-action-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+@media (max-width: 767px) {
+    .quick-action-btn {
+        padding: 0.75rem;
+    }
+
+    .quick-action-btn i {
+        font-size: 1.25rem;
+    }
+
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
 }
 
 /* Correções para dropdown do usuário */
@@ -1467,6 +1503,16 @@
 .stats-card:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-1px);
+}
+
+.stats-card .no-data {
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 767px) {
+    .stats-card .no-data {
+        display: none;
+    }
 }
 
 /* Garantir que notificações apareçam acima de tudo */
