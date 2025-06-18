@@ -11,6 +11,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
 </head>
+
 <body class="bg-gray-50">
     <!-- Mobile Header -->
     <div class="mobile-header">
@@ -49,6 +50,12 @@
 
     <!-- Conteúdo Principal -->
     <div class="main-content">
+        <!-- Header móvel (visível apenas em dispositivos móveis) -->
+        <div class="mobile-header md:hidden">
+            <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="mobile-logo">
+            <span class="font-semibold text-gray-800 mobile-title">FlowBnb</span>
+        </div>
+
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center">
                 <a href="dashboard.html" class="text-gray-500 mr-3">
