@@ -11,11 +11,17 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
 </head>
-<body>
-    <!-- Botão de menu mobile -->
-    <button class="mobile-menu-toggle hidden md:hidden">
-        <i class="fas fa-bars"></i>
-    </button>
+
+<body class="bg-gray-50">
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div class="mobile-header-title">
+            <img src="../assets/images/logo.png" alt="FlowBnb" class="mobile-header-logo">
+        </div>
+        <button id="mobileProfileBtn" class="mobile-profile-btn">
+            <i class="fas fa-user"></i>
+        </button>
+    </div>
 
     <!-- Barra lateral -->
     <div class="sidebar">
@@ -50,7 +56,6 @@
             <span class="font-semibold text-gray-800 mobile-title">FlowBnb</span>
         </div>
 
-        <!-- Cabeçalho da página -->
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center">
                 <a href="dashboard.html" class="text-gray-500 mr-3">
