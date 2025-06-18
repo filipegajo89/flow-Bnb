@@ -10,11 +10,16 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
 </head>
-<body>
-    <!-- Botão de menu mobile -->
-    <button class="mobile-menu-toggle hidden md:hidden">
-        <i class="fas fa-bars"></i>
-    </button>
+<body class="bg-gray-50">
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div class="mobile-header-title">
+            <img src="../assets/images/logo.png" alt="FlowBnb" class="mobile-header-logo">
+        </div>
+        <button id="mobileProfileBtn" class="mobile-profile-btn">
+            <i class="fas fa-user"></i>
+        </button>
+    </div>
     
     <!-- Barra lateral -->
     <div class="sidebar">
@@ -41,15 +46,9 @@
             </a>
         </div>
     </div>
+
     
     <!-- Conteúdo Principal -->
-    <div class="main-content">
-        <!-- Header móvel (visível apenas em dispositivos móveis) -->
-        <div class="mobile-header md:hidden">
-            <img src="../assets/images/logo.png" alt="FlowBnb Logo" class="mobile-logo">
-            <span class="font-semibold text-gray-800 mobile-title">FlowBnb</span>
-        </div>
-        
         <!-- Cabeçalho da página -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-gray-800">Imóveis</h1>
@@ -183,7 +182,68 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Mobile Bottom Menu -->
+    <div class="mobile-menu">
+        <a href="dashboard.html" class="mobile-menu-item" data-page="dashboard">
+            <i class="fas fa-home mobile-menu-icon"></i>
+            <span class="mobile-menu-label">Início</span>
+        </a>
+        <a href="properties.html" class="mobile-menu-item active" data-page="properties">
+            <i class="fas fa-building mobile-menu-icon"></i>
+            <span class="mobile-menu-label">Imóveis</span>
+        </a>
+        <a href="transactions.html" class="mobile-menu-item" data-page="transactions">
+            <i class="fas fa-exchange-alt mobile-menu-icon"></i>
+            <span class="mobile-menu-label">Transações</span>
+        </a>
+        <a href="reports.html" class="mobile-menu-item" data-page="reports">
+            <i class="fas fa-chart-bar mobile-menu-icon"></i>
+            <span class="mobile-menu-label">Relatórios</span>
+        </a>
+    </div>
+
+    <!-- Mobile FAB -->
+    <button class="mobile-fab" id="mobileFAB">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Mobile Quick Actions -->
+    <div class="mobile-quick-actions" id="mobileQuickActions">
+        <button class="mobile-quick-action property" title="Novo Imóvel">
+            <i class="fas fa-home"></i>
+        </button>
+        <button class="mobile-quick-action transaction" title="Nova Transação">
+            <i class="fas fa-dollar-sign"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Mobile Dropdown -->
+    <div class="mobile-dropdown" id="mobileDropdown">
+        <div class="dropdown-header">
+            <div class="dropdown-user-name">Nome do Usuário</div>
+            <div class="dropdown-user-email">usuario@email.com</div>
+        </div>
+        <div class="dropdown-items">
+            <a href="#" class="dropdown-item" onclick="showNotification('Perfil em desenvolvimento', 'info'); return false;">
+                <i class="fas fa-user-circle"></i>
+                <span>Meu Perfil</span>
+            </a>
+            <a href="#" class="dropdown-item" onclick="showNotification('Configurações em desenvolvimento', 'info'); return false;">
+                <i class="fas fa-cog"></i>
+                <span>Configurações</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item logout-item" id="mobileLogoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </a>
+        </div>
+    </div>
+
     <!-- Modal Adicionar Imóvel -->
     <div id="addPropertyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
@@ -327,5 +387,133 @@
     <script src="../js/properties.js"></script>
     <script src="../js/transactions.js"></script>
     <script src="../js/properties-page.js"></script>
+    <script>
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification-toast ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+                z-index: 9999;
+                padding: 1rem 1.5rem;
+                border-radius: 0.75rem;
+                color: white;
+                font-weight: 500;
+                max-width: 24rem;
+                box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                background-color: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+            `;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-3"></i>
+                    <span>${message}</span>
+                </div>`;
+            document.body.appendChild(notification);
+            setTimeout(() => { notification.style.transform = 'translateX(0)'; }, 100);
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileFAB = document.getElementById('mobileFAB');
+            const mobileQuickActions = document.getElementById('mobileQuickActions');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+
+            if (mobileFAB) {
+                mobileFAB.addEventListener('click', function() {
+                    const isOpen = mobileQuickActions.classList.contains('show');
+                    if (isOpen) {
+                        mobileQuickActions.classList.remove('show');
+                        mobileOverlay.classList.remove('show');
+                        mobileFAB.innerHTML = '<i class="fas fa-plus"></i>';
+                    } else {
+                        mobileQuickActions.classList.add('show');
+                        mobileOverlay.classList.add('show');
+                        mobileFAB.innerHTML = '<i class="fas fa-times"></i>';
+                    }
+                });
+            }
+
+            if (mobileOverlay) {
+                mobileOverlay.addEventListener('click', function() {
+                    mobileQuickActions.classList.remove('show');
+                    mobileOverlay.classList.remove('show');
+                    mobileFAB.innerHTML = '<i class="fas fa-plus"></i>';
+                });
+            }
+
+            const propertyBtn = document.querySelector('.mobile-quick-action.property');
+            const transactionBtn = document.querySelector('.mobile-quick-action.transaction');
+
+            if (propertyBtn) {
+                propertyBtn.addEventListener('click', function() {
+                    mobileQuickActions.classList.remove('show');
+                    mobileOverlay.classList.remove('show');
+                    mobileFAB.innerHTML = '<i class="fas fa-plus"></i>';
+                    const modal = document.getElementById('addPropertyModal');
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                    }
+                });
+            }
+
+            if (transactionBtn) {
+                transactionBtn.addEventListener('click', function() {
+                    mobileQuickActions.classList.remove('show');
+                    mobileOverlay.classList.remove('show');
+                    mobileFAB.innerHTML = '<i class="fas fa-plus"></i>';
+                    if (window.openQuickTransactionModal) {
+                        window.openQuickTransactionModal();
+                    } else {
+                        const modal = document.getElementById('addTransactionModal');
+                        if (modal) {
+                            modal.classList.remove('hidden');
+                            modal.classList.add('flex');
+                        }
+                    }
+                });
+            }
+
+            const mobileProfileBtn = document.getElementById('mobileProfileBtn');
+            const mobileDropdown = document.getElementById('mobileDropdown');
+
+            if (mobileProfileBtn) {
+                mobileProfileBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    mobileDropdown.classList.toggle('show');
+                    const user = auth.currentUser;
+                    if (user) {
+                        const userName = user.email.split('@')[0];
+                        document.querySelector('.mobile-dropdown .dropdown-user-name').textContent = userName.charAt(0).toUpperCase() + userName.slice(1);
+                        document.querySelector('.mobile-dropdown .dropdown-user-email').textContent = user.email;
+                    }
+                });
+            }
+
+            document.addEventListener('click', function(e) {
+                if (mobileDropdown && !mobileDropdown.contains(e.target) && e.target !== mobileProfileBtn) {
+                    mobileDropdown.classList.remove('show');
+                }
+            });
+
+            const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Tem certeza que deseja sair?')) {
+                        auth.signOut().then(() => {
+                            window.location.href = '../index.html';
+                        });
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
